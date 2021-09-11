@@ -41,6 +41,20 @@ class FeedViewModel extends BaseViewModel {
     }
   }
 
+  void pauseVideo(int index) async {
+    if (videoSource!.listVideos.length > index) {
+      videoSource!.listVideos[index].controller?.pause();
+      notifyListeners();
+    }
+  }
+
+  void playVideo(int index) async {
+    if (videoSource!.listVideos.length > index) {
+      videoSource!.listVideos[index].controller?.play();
+      notifyListeners();
+    }
+  }
+
   void setActualScreen(index) {
     actualScreen = index;
     if (index == 0) {

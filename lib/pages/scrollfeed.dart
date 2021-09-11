@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/feedviewmodel.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get_it/get_it.dart';
 import '../data/video.dart';
 
@@ -48,39 +49,99 @@ class _ScrollFeedState extends State<ScrollFeed> {
           scrollDirection: Axis.vertical,
           itemBuilder: (context, index) {
             index = index % (feedViewModel.videoSource!.listVideos.length);
-            return videoCard(feedViewModel.videoSource!.listVideos[index]);
+            return Stack(children: [
+              videoCard(feedViewModel.videoSource!.listVideos[index]),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: OutlinedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          (states) => Colors.black.withOpacity(0.5))),
+                  child: const Text(
+                    'View Product',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    feedViewModel.pauseVideo(index);
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.fromLTRB(8, 8, 8, 4),
+                                  child: Text(
+                                    'Products',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: AnimationLimiter(
+                                  child: ListView.builder(
+                                    physics: const BouncingScrollPhysics(),
+                                    //shrinkWrap: true,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder: (ctx, ind) {
+                                      return AnimationConfiguration
+                                          .staggeredList(
+                                        position: ind,
+                                        duration:
+                                            const Duration(milliseconds: 800),
+                                        child: SlideAnimation(
+                                          horizontalOffset:
+                                              MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2,
+                                          child: FadeInAnimation(
+                                            child: Column(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          9, 18, 9, 18),
+                                                  child: Container(
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .height,
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            maxHeight: 140,
+                                                            minWidth: 140),
+                                                    child: Text('$ind'),
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                                Text('Product name -$ind'),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text('Product price -$ind')
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    itemCount: 4,
+                                  ),
+                                ),
+                              ),
+                              ElevatedButton(
+                                  onPressed: () {},
+                                  child: const Text('Visit Store'))
+                            ],
+                          );
+                        }).whenComplete(() => feedViewModel.playVideo(index));
+                  },
+                ),
+              ),
+            ]);
           },
-        ),
-        SafeArea(
-          child: Container(
-            padding: const EdgeInsets.only(top: 20),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  const Text('Following',
-                      style: TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white70)),
-                  const SizedBox(
-                    width: 7,
-                  ),
-                  Container(
-                    color: Colors.white70,
-                    height: 10,
-                    width: 1.0,
-                  ),
-                  const SizedBox(
-                    width: 7,
-                  ),
-                  const Text('For You',
-                      style: TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white))
-                ]),
-          ),
         ),
       ],
     );
