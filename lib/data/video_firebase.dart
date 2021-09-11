@@ -1,9 +1,12 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:video_player/video_player.dart';
 import 'demodata.dart';
 import 'video.dart';
 
 class VideosAPI {
   List<Video> listVideos = <Video>[];
+  List<Map<int, VideoPlayerController>> controllers =
+      <Map<int, VideoPlayerController>>[];
 
   VideosAPI() {
     load();
@@ -11,6 +14,12 @@ class VideosAPI {
 
   void load() async {
     listVideos = await getVideoList();
+    controllers = await getControllersList();
+  }
+
+  Future<List<Map<int, VideoPlayerController>>> getControllersList() async {
+    var controllerlist = <Map<int, VideoPlayerController>>[];
+    return controllerlist;
   }
 
   Future<List<Video>> getVideoList() async {

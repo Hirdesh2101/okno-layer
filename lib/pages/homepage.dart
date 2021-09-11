@@ -24,9 +24,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget videoScreen() {
     return Scaffold(
-      backgroundColor: GetIt.instance<FeedViewModel>().actualScreen == 0
-          ? Colors.black
-          : Colors.white,
+      //backgroundColor: GetIt.instance<FeedViewModel>().actualScreen == 0
+      //   ? Colors.black
+      //  : Colors.white,
       body: SafeArea(
         child: Stack(
           // ignore: prefer_const_literals_to_create_immutables

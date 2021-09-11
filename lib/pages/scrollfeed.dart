@@ -17,9 +17,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
   final feedViewModel = GetIt.instance<FeedViewModel>();
   @override
   void initState() {
-    feedViewModel.loadVideo(0);
-    feedViewModel.loadVideo(1);
-
+    feedViewModel.initial();
     super.initState();
   }
 
@@ -41,14 +39,14 @@ class _ScrollFeedState extends State<ScrollFeed> {
             initialPage: 0,
             viewportFraction: 1,
           ),
-          itemCount: feedViewModel.videoSource?.listVideos.length,
+          itemCount: feedViewModel.length(),
           onPageChanged: (index) {
-            index = index % (feedViewModel.videoSource!.listVideos.length);
-            feedViewModel.changeVideo(index);
+            //index = index % (feedViewModel.videoSource!.listVideos.length);
+            feedViewModel.onpageChanged(index);
           },
           scrollDirection: Axis.vertical,
           itemBuilder: (context, index) {
-            index = index % (feedViewModel.videoSource!.listVideos.length);
+            //index = index % (feedViewModel.videoSource!.listVideos.length);
             return Stack(children: [
               videoCard(feedViewModel.videoSource!.listVideos[index]),
               Align(
@@ -148,49 +146,56 @@ class _ScrollFeedState extends State<ScrollFeed> {
   }
 
   Widget videoCard(Video video) {
-    return Stack(
-      children: [
-        video.controller != null
-            ? GestureDetector(
-                onTap: () {
-                  if (video.controller!.value.isPlaying) {
-                    video.controller?.pause();
-                  } else {
-                    video.controller?.play();
-                  }
-                },
-                child: SizedBox.expand(
-                    child: FittedBox(
-                  fit: BoxFit.cover,
-                  child: SizedBox(
-                    width: video.controller?.value.size.width ?? 0,
-                    height: video.controller?.value.size.height ?? 0,
-                    child: VideoPlayer(video.controller!),
+    return video.controller != null
+        ? Stack(
+            children: [
+              video.controller != null
+                  ? GestureDetector(
+                      onTap: () {
+                        if (video.controller!.value.isPlaying) {
+                          video.controller?.pause();
+                        } else {
+                          video.controller?.play();
+                        }
+                      },
+                      child: SizedBox.expand(
+                          child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: SizedBox(
+                          width: video.controller?.value.size.width ?? 0,
+                          height: video.controller?.value.size.height ?? 0,
+                          child: VideoPlayer(video.controller!),
+                        ),
+                      )),
+                    )
+                  : Container(
+                      color: Colors.black,
+                      child: const Center(
+                        child: Text(
+                          "Loading",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    //children: <Widget>[
+                    //VideoDescription(video.user,video.videoTitle,video.songName),
+                    //ActionsToolbar(video.likes, video.comments,
+                    //  "https://www.andersonsobelcosmetic.com/wp-content/uploads/2018/09/chin-implant-vs-fillers-best-for-improving-profile-bellevue-washington-chin-surgery.jpg"),
+                    //  ],
                   ),
-                )),
-              )
-            : Container(
-                color: Colors.black,
-                child: const Center(
-                  child: Text("Loading"),
-                ),
+                  const SizedBox(height: 20)
+                ],
               ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              //children: <Widget>[
-              //VideoDescription(video.user, video.videoTitle, video.songName),
-              //ActionsToolbar(video.likes, video.comments,
-              //  "https://www.andersonsobelcosmetic.com/wp-content/uploads/2018/09/chin-implant-vs-fillers-best-for-improving-profile-bellevue-washington-chin-surgery.jpg"),
-              //  ],
-            ),
-            const SizedBox(height: 20)
-          ],
-        ),
-      ],
-    );
+            ],
+          )
+        : const Center(
+            child: Text('Wait'),
+          );
   }
 }

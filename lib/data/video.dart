@@ -50,4 +50,8 @@ class Video {
     await controller?.initialize();
     controller?.setLooping(true);
   }
+
+  Future<void> dispose() async {
+    controller?.dispose();
+  }
 }
