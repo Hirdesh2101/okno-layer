@@ -8,6 +8,7 @@ var data = [
     "product1":
         "https://www.rd.com/wp-content/uploads/2017/09/01-shutterstock_476340928-Irina-Bg-1024x683.jpg",
     "product2": "",
+    "p1name": "rings",
   },
   {
     "id": "2",
@@ -18,6 +19,7 @@ var data = [
     "product1":
         "https://i.pinimg.com/originals/5e/eb/8d/5eeb8d615bea040425f9937699392751.jpg",
     "product2": "",
+    "p1name": "dress",
   },
   {
     "id": "3",
@@ -28,5 +30,6 @@ var data = [
     "product1":
         "https://www.rd.com/wp-content/uploads/2017/09/01-shutterstock_476340928-Irina-Bg-1024x683.jpg",
     "product2": "",
+    "p1name": "kurta"
   },
 ];

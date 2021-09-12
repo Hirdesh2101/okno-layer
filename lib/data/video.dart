@@ -7,6 +7,7 @@ class Video {
   String product2;
   String seller;
   String price;
+  String p1name;
 
   VideoPlayerController? controller;
 
@@ -16,11 +17,13 @@ class Video {
       required this.product1,
       required this.product2,
       required this.seller,
+      required this.p1name,
       required this.price});
 
   Video.fromJson(Map<dynamic, dynamic> json)
       : id = json['id'],
         url = json['url'],
+        p1name = json['p1name'],
         product1 = json['product1'],
         product2 = json['product2'],
         seller = json['seller'],
@@ -32,6 +35,7 @@ class Video {
     data['url'] = url;
     data['product1'] = product1;
     data['product2'] = product2;
+    data['p1name'] = p1name;
     data['selller'] = seller;
     data['price'] = price;
     return data;

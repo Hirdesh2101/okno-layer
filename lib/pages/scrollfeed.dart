@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/feedviewmodel.dart';
 import 'package:video_player/video_player.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
 import '../data/video.dart';
 
@@ -49,101 +49,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
             //index = index % (feedViewModel.videoSource!.listVideos.length);
             return Stack(children: [
               videoCard(feedViewModel.videoSource!.listVideos[index]),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: OutlinedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (states) => Colors.black.withOpacity(0.5))),
-                  child: const Text(
-                    'View Product',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onPressed: () {
-                    feedViewModel.pauseVideo(index);
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.fromLTRB(8, 8, 8, 4),
-                                  child: Text(
-                                    'Products',
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: AnimationLimiter(
-                                  child: ListView.builder(
-                                    physics: const BouncingScrollPhysics(),
-                                    shrinkWrap: true,
-                                    scrollDirection: Axis.horizontal,
-                                    itemBuilder: (ctx, ind) {
-                                      return AnimationConfiguration
-                                          .staggeredList(
-                                        position: ind,
-                                        duration:
-                                            const Duration(milliseconds: 800),
-                                        child: SlideAnimation(
-                                          horizontalOffset:
-                                              MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  2,
-                                          child: FadeInAnimation(
-                                            child: Column(
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          9, 18, 9, 18),
-                                                  child: Container(
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                            .size
-                                                            .height,
-                                                    constraints:
-                                                        const BoxConstraints(
-                                                            maxHeight: 140,
-                                                            minWidth: 140),
-                                                    child: Image.network(
-                                                        feedViewModel
-                                                            .videoSource!
-                                                            .listVideos[index]
-                                                            .product1),
-                                                    color: Colors.red,
-                                                  ),
-                                                ),
-                                                Text(
-                                                    'Product name -${feedViewModel.videoSource!.listVideos[index].seller}'),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                    'Product price -${feedViewModel.videoSource!.listVideos[index].price}')
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    itemCount: 1,
-                                  ),
-                                ),
-                              ),
-                              ElevatedButton(
-                                  onPressed: () {},
-                                  child: const Text('Visit Store'))
-                            ],
-                          );
-                        }).whenComplete(() => feedViewModel.playVideo(index));
-                  },
-                ),
-              ),
+              ActionToolBar(index),
             ]);
           },
         ),
@@ -183,21 +89,6 @@ class _ScrollFeedState extends State<ScrollFeed> {
                         ),
                       ),
                     ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    //children: <Widget>[
-                    //VideoDescription(video.user,video.videoTitle,video.songName),
-                    //ActionsToolbar(video.likes, video.comments,
-                    //  "https://www.andersonsobelcosmetic.com/wp-content/uploads/2018/09/chin-implant-vs-fillers-best-for-improving-profile-bellevue-washington-chin-surgery.jpg"),
-                    //  ],
-                  ),
-                  const SizedBox(height: 20)
-                ],
-              ),
             ],
           )
         : const Center(
