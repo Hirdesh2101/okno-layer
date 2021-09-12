@@ -2,46 +2,38 @@ import 'package:video_player/video_player.dart';
 
 class Video {
   String id;
-  String user;
-  String userPic;
-  String videoTitle;
-  String songName;
-  String likes;
-  String comments;
   String url;
+  String product1;
+  String product2;
+  String seller;
+  String price;
 
   VideoPlayerController? controller;
 
   Video(
       {required this.id,
-      required this.user,
-      required this.userPic,
-      required this.videoTitle,
-      required this.songName,
-      required this.likes,
-      required this.comments,
-      required this.url});
+      required this.url,
+      required this.product1,
+      required this.product2,
+      required this.seller,
+      required this.price});
 
   Video.fromJson(Map<dynamic, dynamic> json)
       : id = json['id'],
-        user = json['user'],
-        userPic = json['user_pic'],
-        videoTitle = json['video_title'],
-        songName = json['song_name'],
-        likes = json['likes'],
-        comments = json['comments'],
-        url = json['url'];
+        url = json['url'],
+        product1 = json['product1'],
+        product2 = json['product2'],
+        seller = json['seller'],
+        price = json['price'];
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
-    data['user'] = user;
-    data['user_pic'] = userPic;
-    data['video_title'] = videoTitle;
-    data['song_name'] = songName;
-    data['likes'] = likes;
-    data['comments'] = comments;
     data['url'] = url;
+    data['product1'] = product1;
+    data['product2'] = product2;
+    data['selller'] = seller;
+    data['price'] = price;
     return data;
   }
 

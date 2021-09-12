@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "389369389297",
+    "project_id": "okno-1ae24",
+    "storage_bucket": "okno-1ae24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:389369389297:android:967e5402c971ecc289c950",
+        "android_client_info": {
+          "package_name": "com.example.oknoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "389369389297-u6epq2jv1q7qe2q3ffhtsl1er364q865.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2nrHv-Y_-bZbr0Nm7DrHZxLP5-4v8E6k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "389369389297-u6epq2jv1q7qe2q3ffhtsl1er364q865.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

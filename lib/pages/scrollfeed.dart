@@ -80,7 +80,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                 child: AnimationLimiter(
                                   child: ListView.builder(
                                     physics: const BouncingScrollPhysics(),
-                                    //shrinkWrap: true,
+                                    shrinkWrap: true,
                                     scrollDirection: Axis.horizontal,
                                     itemBuilder: (ctx, ind) {
                                       return AnimationConfiguration
@@ -110,22 +110,28 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                                         const BoxConstraints(
                                                             maxHeight: 140,
                                                             minWidth: 140),
-                                                    child: Text('$ind'),
+                                                    child: Image.network(
+                                                        feedViewModel
+                                                            .videoSource!
+                                                            .listVideos[index]
+                                                            .product1),
                                                     color: Colors.red,
                                                   ),
                                                 ),
-                                                Text('Product name -$ind'),
+                                                Text(
+                                                    'Product name -${feedViewModel.videoSource!.listVideos[index].seller}'),
                                                 const SizedBox(
                                                   height: 10,
                                                 ),
-                                                Text('Product price -$ind')
+                                                Text(
+                                                    'Product price -${feedViewModel.videoSource!.listVideos[index].price}')
                                               ],
                                             ),
                                           ),
                                         ),
                                       );
                                     },
-                                    itemCount: 4,
+                                    itemCount: 1,
                                   ),
                                 ),
                               ),

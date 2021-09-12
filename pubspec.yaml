@@ -42,6 +42,8 @@ dev_dependencies:
   video_player: ^2.1.15
   get_it: ^7.2.0
   stacked: ^2.2.5
+  firebase_core: ^1.6.0
+  cloud_firestore: ^2.5.2
   flutter_staggered_animations: ^1.0.0
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
