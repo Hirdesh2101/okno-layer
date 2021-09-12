@@ -5,6 +5,8 @@ import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
 import '../data/video.dart';
 
+import 'package:stacked/stacked.dart';
+
 class ScrollFeed extends StatefulWidget {
   const ScrollFeed({Key? key}) : super(key: key);
 
@@ -41,12 +43,10 @@ class _ScrollFeedState extends State<ScrollFeed> {
           ),
           itemCount: feedViewModel.length(),
           onPageChanged: (index) {
-            //index = index % (feedViewModel.videoSource!.listVideos.length);
             feedViewModel.onpageChanged(index);
           },
           scrollDirection: Axis.vertical,
           itemBuilder: (context, index) {
-            //index = index % (feedViewModel.videoSource!.listVideos.length);
             return Stack(children: [
               videoCard(feedViewModel.videoSource!.listVideos[index]),
               ActionToolBar(index),
@@ -58,41 +58,31 @@ class _ScrollFeedState extends State<ScrollFeed> {
   }
 
   Widget videoCard(Video video) {
-    return video.controller != null
-        ? Stack(
-            children: [
-              video.controller != null
-                  ? GestureDetector(
-                      onTap: () {
-                        if (video.controller!.value.isPlaying) {
-                          video.controller?.pause();
-                        } else {
-                          video.controller?.play();
-                        }
-                      },
-                      child: SizedBox.expand(
-                          child: FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: video.controller?.value.size.width ?? 0,
-                          height: video.controller?.value.size.height ?? 0,
-                          child: VideoPlayer(video.controller!),
-                        ),
-                      )),
-                    )
-                  : Container(
-                      color: Colors.black,
-                      child: const Center(
-                        child: Text(
-                          "Loading",
-                          style: TextStyle(color: Colors.white),
-                        ),
+    return ViewModelBuilder<FeedViewModel>.reactive(
+        disposeViewModel: false,
+        viewModelBuilder: () => feedViewModel,
+        builder: (context, model, child) =>
+            video.controller != null && video.controller!.value.isInitialized
+                ? GestureDetector(
+                    onTap: () {
+                      if (video.controller!.value.isPlaying) {
+                        video.controller?.pause();
+                      } else {
+                        video.controller?.play();
+                      }
+                    },
+                    child: SizedBox.expand(
+                        child: FittedBox(
+                      fit: BoxFit.cover,
+                      child: SizedBox(
+                        width: video.controller?.value.size.width ?? 0,
+                        height: video.controller?.value.size.height ?? 0,
+                        child: VideoPlayer(video.controller!),
                       ),
-                    ),
-            ],
-          )
-        : const Center(
-            child: Text('Wait'),
-          );
+                    )),
+                  )
+                : const Center(
+                    child: Text('Wait'),
+                  ));
   }
 }

@@ -35,33 +35,6 @@ class FeedViewModel extends BaseViewModel {
     currentscreen = index;
   }
 
-  /*changeVideo(index) async {
-    if (videoSource!.listVideos[index].controller == null) {
-      await videoSource!.listVideos[index].loadController();
-    }
-    videoSource!.listVideos[index].controller!.play();
-    //videoSource.listVideos[prevVideo].controller.removeListener(() {});
-
-    if (videoSource!.listVideos[prevVideo].controller != null) {
-      videoSource!.listVideos[prevVideo].controller!.pause();
-    }
-
-    prevVideo = index;
-    notifyListeners();
-  }*/
-
-  /*void loadVideo(int index) async {
-    if (videoSource!.listVideos.length > index) {
-      await videoSource!.listVideos[index].loadController();
-      videoSource!.listVideos[index].controller?.play();
-      notifyListeners();
-      if (videoSource!.listVideos.length > index + 1) {
-        await videoSource!.listVideos[index + 1].loadController();
-        notifyListeners();
-      }
-    }
-  }*/
-
   void pauseVideo(int index) async {
     if (videoSource!.listVideos.length > index) {
       videoSource!.listVideos[index].controller?.pause();
@@ -75,16 +48,6 @@ class FeedViewModel extends BaseViewModel {
       notifyListeners();
     }
   }
-
-  /*void setActualScreen(index) {
-    actualScreen = index;
-    if (index == 0) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
-    } else {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    }
-    notifyListeners();
-  }*/
 
   void playNext(int index) {
     /// Stop [index - 1] controller

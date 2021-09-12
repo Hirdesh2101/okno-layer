@@ -13,21 +13,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final locator = GetIt.instance;
-  final feedViewModel = GetIt.instance<FeedViewModel>();
+  //final locator = GetIt.instance;
+  //final feedViewModel = GetIt.instance<FeedViewModel>();
   @override
   Widget build(BuildContext context) {
-    return ViewModelBuilder<FeedViewModel>.reactive(
-        disposeViewModel: false,
-        builder: (context, model, child) => videoScreen(),
-        viewModelBuilder: () => feedViewModel);
+    return videoScreen();
   }
 
   Widget videoScreen() {
     return Scaffold(
-      //backgroundColor: GetIt.instance<FeedViewModel>().actualScreen == 0
-      //   ? Colors.black
-      //  : Colors.white,
       body: FutureBuilder(
           future: FirebaseFirestore.instance.collection("VideosData").get(),
           builder: (ctx, snapshot) {
