@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/feedviewmodel.dart';
+import '../providers/feedviewprovider.dart';
 import 'package:video_player/video_player.dart';
 import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
@@ -63,26 +63,32 @@ class _ScrollFeedState extends State<ScrollFeed> {
         viewModelBuilder: () => feedViewModel,
         builder: (context, model, child) =>
             video.controller != null && video.controller!.value.isInitialized
-                ? GestureDetector(
-                    onTap: () {
-                      if (video.controller!.value.isPlaying) {
-                        video.controller?.pause();
-                      } else {
-                        video.controller?.play();
-                      }
-                    },
-                    child: SizedBox.expand(
-                        child: FittedBox(
-                      fit: BoxFit.cover,
-                      child: SizedBox(
-                        width: video.controller?.value.size.width ?? 0,
-                        height: video.controller?.value.size.height ?? 0,
-                        child: VideoPlayer(video.controller!),
-                      ),
-                    )),
-                  )
+                ? Stack(children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (video.controller!.value.isPlaying) {
+                          video.controller?.pause();
+                        } else {
+                          video.controller?.play();
+                        }
+                      },
+                      child: SizedBox.expand(
+                          child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: SizedBox(
+                          width: video.controller?.value.size.width ?? 0,
+                          height: video.controller?.value.size.height ?? 0,
+                          child: VideoPlayer(video.controller!),
+                        ),
+                      )),
+                    ),
+                    if (video.controller!.value.isBuffering)
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                  ])
                 : const Center(
-                    child: Text('Wait'),
+                    child: Text('Loading'),
                   ));
   }
 }

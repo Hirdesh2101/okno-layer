@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'scrollfeed.dart';
-import '../models/feedviewmodel.dart';
-import 'package:stacked/stacked.dart';
-import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,8 +10,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //final locator = GetIt.instance;
-  //final feedViewModel = GetIt.instance<FeedViewModel>();
   @override
   Widget build(BuildContext context) {
     return videoScreen();

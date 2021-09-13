@@ -4,6 +4,7 @@ import 'video.dart';
 
 class VideosAPI {
   List<Video> listVideos = <Video>[];
+  List<String> docId = <String>[];
 
   VideosAPI() {
     load();
@@ -15,7 +16,6 @@ class VideosAPI {
 
   Future<List<Video>> getVideoList() async {
     var data = await FirebaseFirestore.instance.collection("VideosData").get();
-
     var videoList = <Video>[];
     QuerySnapshot<Map<String, dynamic>> videos;
 
@@ -28,6 +28,7 @@ class VideosAPI {
     }
 
     for (var element in videos.docs) {
+      docId.add(element.reference.id);
       Video video = Video.fromJson(element.data());
       videoList.add(video);
     }
