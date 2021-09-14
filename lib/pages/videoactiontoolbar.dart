@@ -68,6 +68,15 @@ class _ActionToolBarState extends State<ActionToolBar> {
               child: SizedBox(
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   LikeButton(
+                    likeBuilder: (bool isLiked) {
+                      return Icon(
+                        isLiked ? Icons.favorite : Icons.favorite_border,
+                        color: isLiked
+                            ? Colors.red
+                            : Colors.black.withOpacity(0.5),
+                        size: MediaQuery.of(context).size.width * 0.08,
+                      );
+                    },
                     isLiked:
                         list.contains(firebaseServices.user) ? true : false,
                     onTap: likeFunc,

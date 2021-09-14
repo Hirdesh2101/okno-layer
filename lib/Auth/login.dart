@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 //import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
-import 'auth_form.dart';
+import 'auth_form_login.dart';
 
 class Loginscreen extends StatefulWidget {
   static const routeName = '/login_screen';
@@ -38,7 +38,6 @@ class _LoginscreenState extends State<Loginscreen> {
         );
 
         UserCredential result = await _auth.signInWithCredential(credential);
-        Navigator.of(context).pop();
       } on PlatformException catch (err) {
         var message = 'An error occurred, pelase check your credentials!';
 
@@ -122,14 +121,6 @@ class _LoginscreenState extends State<Loginscreen> {
         email: email,
         password: password,
       );
-      //await Firestore.instance
-      //  .collection('users')
-      //.document(authResult.user.uid)
-      //.setData({
-      //'username': username,
-      //'email': email,
-      //}
-      Navigator.of(context).pop();
     } on PlatformException catch (err) {
       var message = 'An error occurred, pelase check your credentials!';
 
@@ -155,6 +146,60 @@ class _LoginscreenState extends State<Loginscreen> {
     }
   }
 
+  void _forgotPassword(BuildContext ctx) {
+    String? _emailFor = '';
+    bool inProgress = false;
+    showDialog(
+        context: ctx,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Enter Email ID'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  enabled: !inProgress,
+                  key: const ValueKey('Forgotemail'),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Email',
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty || !value.contains('@')) {
+                      return 'Please enter a valid email address.';
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.emailAddress,
+                  onSaved: (value) {
+                    _emailFor = value;
+                    _emailFor!.trim();
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          setState(() {
+                            inProgress = !inProgress;
+                          });
+                          _auth.sendPasswordResetEmail(email: _emailFor!);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Submit'))
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,6 +209,7 @@ class _LoginscreenState extends State<Loginscreen> {
         _isLoading,
         _signInWithGoogle,
         _signInWithFacebook,
+        _forgotPassword,
       ),
     );
   }

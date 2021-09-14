@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:oknoapp/Auth/auth.dart';
+import 'package:oknoapp/Auth/login.dart';
+import 'package:oknoapp/Auth/register.dart';
 import 'pages/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'service_locator.dart';
@@ -23,24 +24,33 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'OkNoApp',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: StreamBuilder(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (ctx, userSnapshot) {
-            if (userSnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            if (userSnapshot.hasData) {
-              return const HomePage();
-            }
-            return const Loginscreen();
-          }), // defa,
-    );
+        title: 'OkNoApp',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        debugShowCheckedModeBanner: false,
+        home: StreamBuilder(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (ctx, userSnapshot) {
+              if (userSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (userSnapshot.hasData) {
+                return const HomePage();
+              }
+              return const Loginscreen();
+            }),
+        routes: {
+          HomePage.routeName: (ctx) => const HomePage(),
+          Loginscreen.routeName: (ctx) => const Loginscreen(),
+          Register.routeName: (ctx) => const Register(),
+        },
+        onUnknownRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (ctx) => const Loginscreen(),
+          );
+        });
   }
 }

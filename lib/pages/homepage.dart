@@ -3,6 +3,7 @@ import 'scrollfeed.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
+  static const routeName = '/home_page';
   const HomePage({Key? key}) : super(key: key);
 
   @override

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:oknoapp/Auth/register.dart';
+import 'auth_form_register.dart';
 
 class AuthFormLogin extends StatefulWidget {
   // ignore: use_key_in_widget_constructors
@@ -7,6 +9,7 @@ class AuthFormLogin extends StatefulWidget {
     this.isLoading,
     this.signInWithGoogle,
     this.signInWithFacebook,
+    this.forgotPass,
   );
 
   final bool isLoading;
@@ -22,6 +25,9 @@ class AuthFormLogin extends StatefulWidget {
   final void Function(
     BuildContext ctx,
   ) signInWithFacebook;
+  final void Function(
+    BuildContext ctx,
+  ) forgotPass;
 
   @override
   _AuthFormLoginState createState() => _AuthFormLoginState();
@@ -50,6 +56,10 @@ class _AuthFormLoginState extends State<AuthFormLogin> {
 
   void _tryFacebookSignIn() {
     widget.signInWithFacebook(context);
+  }
+
+  void _tryForgotPassword() {
+    widget.forgotPass(context);
   }
 
   @override
@@ -105,19 +115,27 @@ class _AuthFormLoginState extends State<AuthFormLogin> {
                         _userPassword = '$value';
                       },
                     ),
-                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: TextButton(
+                          onPressed: _tryForgotPassword,
+                          child: const Text('Forgot Password?')),
+                    ),
                     if (widget.isLoading) const CircularProgressIndicator(),
                     if (!widget.isLoading)
-                      ElevatedButton(
-                        //color: const Color.fromARGB(255, 0, 171, 227),
-                        style: ButtonStyle(),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(
-                            color: Colors.white,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: ElevatedButton(
+                          //color: const Color.fromARGB(255, 0, 171, 227),
+                          style: ButtonStyle(),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
                           ),
+                          onPressed: _trySubmit,
                         ),
-                        onPressed: _trySubmit,
                       ),
                     const SizedBox(height: 10),
                     const Center(child: Text("Or Login With")),
@@ -134,13 +152,17 @@ class _AuthFormLoginState extends State<AuthFormLogin> {
                           ),
                           IconButton(
                             iconSize: 12,
-                            icon: Image.asset('assets/facebook.png'),
+                            icon: Image.asset('assets/facebook.jpg'),
                             onPressed:
                                 widget.isLoading ? null : _tryFacebookSignIn,
                           )
                         ],
                       ),
-                    )
+                    ),
+                    TextButton(
+                        onPressed: () =>
+                            Navigator.of(context).pushNamed(Register.routeName),
+                        child: const Text('Register Now'))
                   ],
                 ),
               ),
