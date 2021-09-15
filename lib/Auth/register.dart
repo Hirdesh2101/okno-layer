@@ -61,7 +61,6 @@ class _RegisterState extends State<Register> {
         _isLoading = false;
       });
     } catch (err) {
-      print(err);
       setState(() {
         _isLoading = false;
       });

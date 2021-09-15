@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:oknoapp/Auth/register.dart';
-import 'auth_form_register.dart';
 
 class AuthFormLogin extends StatefulWidget {
   // ignore: use_key_in_widget_constructors

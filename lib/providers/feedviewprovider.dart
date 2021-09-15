@@ -35,6 +35,16 @@ class FeedViewModel extends BaseViewModel {
     currentscreen = index;
   }
 
+  void pauseDrawer() async {
+    videoSource!.listVideos[currentscreen].controller?.pause();
+    notifyListeners();
+  }
+
+  void playDrawer() async {
+    videoSource!.listVideos[currentscreen].controller?.play();
+    notifyListeners();
+  }
+
   void pauseVideo(int index) async {
     if (videoSource!.listVideos.length > index) {
       videoSource!.listVideos[index].controller?.pause();
@@ -112,5 +122,16 @@ class FeedViewModel extends BaseViewModel {
       notifyListeners();
       //log('🚀🚀🚀 DISPOSED $index');
     }
+  }
+
+  void disposingall() {
+    videoSource!.listVideos[currentscreen].controller?.dispose();
+    if (currentscreen + 1 < videoSource!.listVideos.length) {
+      videoSource!.listVideos[currentscreen + 1].controller?.dispose();
+    }
+    if (currentscreen - 1 >= 0) {
+      videoSource!.listVideos[currentscreen - 1].controller?.dispose();
+    }
+    notifyListeners();
   }
 }

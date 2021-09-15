@@ -71,9 +71,7 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     likeBuilder: (bool isLiked) {
                       return Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
-                        color: isLiked
-                            ? Colors.red
-                            : Colors.black.withOpacity(0.5),
+                        color: isLiked ? Colors.red : Colors.white,
                         size: MediaQuery.of(context).size.width * 0.08,
                       );
                     },

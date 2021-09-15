@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oknoapp/Auth/login.dart';
 import 'package:oknoapp/Auth/register.dart';
+import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'pages/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'service_locator.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
           HomePage.routeName: (ctx) => const HomePage(),
           Loginscreen.routeName: (ctx) => const Loginscreen(),
           Register.routeName: (ctx) => const Register(),
+          MyLikedVideos.routeName: (ctx) => const MyLikedVideos(),
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute(

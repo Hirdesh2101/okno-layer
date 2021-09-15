@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class AuthForm extends StatefulWidget {
+  // ignore: use_key_in_widget_constructors
   const AuthForm(
     this.submitFn,
     this.isLoading,
@@ -34,7 +35,7 @@ class _AuthFormState extends State<AuthForm> {
     FocusScope.of(context).unfocus();
     if (_showing == 0) {
       Fluttertoast.showToast(
-          msg: "Please Select Branch",
+          msg: "Please Select Age",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
@@ -105,7 +106,6 @@ class _AuthFormState extends State<AuthForm> {
       backgroundColor: Colors.blue,
       appBar: AppBar(
         elevation: 0,
-        //backgroundColor: Colors.blue,
       ),
       body: Center(
         child: Card(
@@ -267,9 +267,9 @@ class _AuthFormState extends State<AuthForm> {
                               Color.fromARGB(200, 32, 29, 48)
                             ])),
                         child: ElevatedButton(
-                          //color: Colors.transparent,
                           //shape: RoundedRectangleBorder(
                           // borderRadius: BorderRadius.circular(20)),
+                          style: ButtonStyle(),
                           child: const Text(
                             'SIGNUP',
                             style: TextStyle(
