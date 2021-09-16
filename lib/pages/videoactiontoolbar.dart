@@ -17,7 +17,7 @@ class ActionToolBar extends StatefulWidget {
 }
 
 class _ActionToolBarState extends State<ActionToolBar> {
-  final locator = GetIt.instance;
+  //final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final SideBarFirebase firebaseServices = SideBarFirebase();
 

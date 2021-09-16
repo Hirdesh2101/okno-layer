@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetails {
-  final locator = GetIt.instance;
+  //final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
   void sheet(context, int index) {
     showModalBottomSheet(
@@ -90,7 +91,17 @@ class ProductDetails {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
-                        onPressed: () {}, child: const Text('Visit Store')),
+                        onPressed: () async {
+                          final url = feedViewModel
+                              .videoSource!.listVideos[index].store;
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          } else {
+                            // ignore: avoid_print
+                            print("error");
+                          }
+                        },
+                        child: const Text('Visit Store')),
                   )),
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),

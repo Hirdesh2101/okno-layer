@@ -2,7 +2,6 @@ import '../data/video_firebase.dart';
 import 'package:stacked/stacked.dart';
 
 class FeedViewModel extends BaseViewModel {
-  //VideoPlayerController? controller;
   VideosAPI? videoSource;
 
   int prevVideo = 0;
