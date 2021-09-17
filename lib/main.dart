@@ -11,7 +11,7 @@ import 'package:flutter/services.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  setup();
+  //setup();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
@@ -38,6 +38,8 @@ class MyApp extends StatelessWidget {
                 );
               }
               if (userSnapshot.hasData) {
+                WidgetsFlutterBinding.ensureInitialized();
+                setup();
                 return const HomePage();
               }
               return const Loginscreen();

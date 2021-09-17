@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:oknoapp/data/liked_firebase.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
+import 'package:oknoapp/providers/likedvideoprovider.dart';
 import 'scrollfeed.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -57,13 +59,15 @@ class _HomePageState extends State<HomePage> {
                   // if (user.providerData[1].providerId == 'google.com') {
                   //   await _googleSignIn.signOut();
                   // }
-
                   await _firebase.signOut();
-                  feedViewModel.disposingall();
+                  Navigator.pop(context);
                   locator<FeedViewModel>().removeListener(() {
                     setState(() {});
                   });
-                  Navigator.pop(context);
+                  locator<LikeProvider>().removeListener(() {
+                    setState(() {});
+                  });
+                  feedViewModel.disposingall();
                 },
               )
             ],
