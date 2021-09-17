@@ -77,8 +77,7 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                   );
                 },
                 future: VideoThumbnail.thumbnailFile(
-                  video:
-                      'https://firebasestorage.googleapis.com/v0/b/okno-1ae24.appspot.com/o/Videos%2F1.mp4?alt=media&token=f6772532-7fc0-48c1-a876-5e174d1eea4a',
+                  video: feedViewModel.likedVideosAPI!.listData[index].url,
                   thumbnailPath: _tempDir,
                   imageFormat: ImageFormat
                       .PNG, // specify the height of the thumbnail, let the width auto-scaled to keep the source aspect ratio

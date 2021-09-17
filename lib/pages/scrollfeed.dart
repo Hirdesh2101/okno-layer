@@ -3,7 +3,7 @@ import '../providers/feedviewprovider.dart';
 import 'package:video_player/video_player.dart';
 import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
-import '../data/video.dart';
+import '../models/video.dart';
 
 import 'package:stacked/stacked.dart';
 
