@@ -1,4 +1,7 @@
 import 'package:video_player/video_player.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:pedantic/pedantic.dart';
+import '../services/cache_service.dart';
 
 class Video {
   String id;
@@ -11,6 +14,7 @@ class Video {
   String store;
 
   VideoPlayerController? controller;
+  BaseCacheManager? _cacheManager;
 
   Video(
       {required this.id,
@@ -46,9 +50,22 @@ class Video {
   }
 
   Future<void> loadController() async {
-    controller = VideoPlayerController.network(url);
-    await controller?.initialize();
-    controller?.setLooping(true);
+    _cacheManager ??= CustomCacheManager.instance;
+    final fileInfo = await _cacheManager?.getFileFromCache(url);
+    if (fileInfo == null || fileInfo.file == null) {
+      // print('[VideoControllerService]: No video in cache');
+
+      // print('[VideoControllerService]: Saving video to cache');
+      unawaited(_cacheManager!.downloadFile(url));
+      controller = VideoPlayerController.network(url);
+      await controller?.initialize();
+      controller?.setLooping(true);
+    } else {
+      // print('[VideoControllerService]: Loading video from cache');
+      controller = VideoPlayerController.file(fileInfo.file);
+      await controller?.initialize();
+      controller?.setLooping(true);
+    }
   }
 
   Future<void> dispose() async {

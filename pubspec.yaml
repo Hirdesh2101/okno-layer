@@ -52,6 +52,9 @@ dev_dependencies:
   like_button: ^2.0.3
   url_launcher: ^6.0.10
   path_provider: ^2.0.3
+  cached_network_image: ^3.1.0
+  flutter_cache_manager: ^3.1.2
+  pedantic: ^1.11.1
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

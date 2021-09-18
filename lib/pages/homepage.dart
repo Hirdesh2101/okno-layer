@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:oknoapp/data/liked_firebase.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/providers/likedvideoprovider.dart';
 import 'scrollfeed.dart';
@@ -75,7 +74,10 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: FutureBuilder(
-          future: FirebaseFirestore.instance.collection("VideosData").get(),
+          future: FirebaseFirestore.instance
+              .collection("VideosData")
+              .limit(10)
+              .get(),
           builder: (ctx, snapshot) {
             return snapshot.hasData
                 ? SafeArea(

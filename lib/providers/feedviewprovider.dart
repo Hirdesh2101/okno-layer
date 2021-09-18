@@ -26,6 +26,11 @@ class FeedViewModel extends BaseViewModel {
   }
 
   onpageChanged(int index) {
+    print(videoSource!.listVideos.length);
+    if ((index - 7) % 10 == 0) {
+      videoSource!.addVideos();
+      notifyListeners();
+    }
     if (index > currentscreen) {
       playNext(index);
     } else {

@@ -23,11 +23,12 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
   LikedVideosAPI? likedVideosAPI;
 
   void _init() async {
-    await getTemporaryDirectory()
-        .then((d) => _tempDir = d.path)
-        .whenComplete(() {
-      setState(() {});
-    });
+    final _appdir = await getTemporaryDirectory();
+    _tempDir = _appdir.path;
+    setState(() {});
+    if (_appdir.existsSync()) {
+      _appdir.deleteSync(recursive: true);
+    }
   }
 
   @override
@@ -43,49 +44,54 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
       appBar: AppBar(
         elevation: 0,
       ),
-      body: GridView.builder(
-        physics: const BouncingScrollPhysics(),
-        itemCount: feedViewModel.likedVideosAPI!.listVideos.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 1.5,
-          mainAxisSpacing: 1.5,
-          childAspectRatio: 9 / 15,
-        ),
-        itemBuilder: (
-          context,
-          index,
-        ) {
-          return GestureDetector(
-              onTap: () {
-                //Navigator.of(context).pushNamed(RouteName.GridViewCustom);
+      body: feedViewModel.likedVideosAPI!.listVideos.isEmpty
+          ? const Center(
+              child: Text('No Liked Videos'),
+            )
+          : GridView.builder(
+              physics: const BouncingScrollPhysics(),
+              itemCount: feedViewModel.likedVideosAPI!.listVideos.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 1.5,
+                mainAxisSpacing: 1.5,
+                childAspectRatio: 9 / 15,
+              ),
+              itemBuilder: (
+                context,
+                index,
+              ) {
+                return GestureDetector(
+                    onTap: () {
+                      //Navigator.of(context).pushNamed(RouteName.GridViewCustom);
+                    },
+                    child: FutureBuilder(
+                      builder: (ctx, snapshot) {
+                        if (snapshot.hasData) {
+                          final file = File(snapshot.data.toString());
+                          filePath = file.path;
+                          return FittedBox(
+                              fit: BoxFit.fill,
+                              child:
+                                  Card(elevation: 3, child: Image.file(file)));
+                        }
+                        return Card(
+                          elevation: 3,
+                          child: Container(
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                      future: VideoThumbnail.thumbnailFile(
+                        video:
+                            feedViewModel.likedVideosAPI!.listData[index].url,
+                        thumbnailPath: _tempDir,
+                        imageFormat: ImageFormat.PNG,
+                        quality: 25,
+                      ),
+                    ));
               },
-              child: FutureBuilder(
-                builder: (ctx, snapshot) {
-                  if (snapshot.hasData) {
-                    final file = File(snapshot.data.toString());
-                    filePath = file.path;
-                    return FittedBox(
-                        fit: BoxFit.fill,
-                        child: Card(elevation: 3, child: Image.file(file)));
-                  }
-                  return Card(
-                    elevation: 3,
-                    child: Container(
-                      color: Colors.grey,
-                    ),
-                  );
-                },
-                future: VideoThumbnail.thumbnailFile(
-                  video: feedViewModel.likedVideosAPI!.listData[index].url,
-                  thumbnailPath: _tempDir,
-                  imageFormat: ImageFormat
-                      .PNG, // specify the height of the thumbnail, let the width auto-scaled to keep the source aspect ratio
-                  quality: 25,
-                ),
-              ));
-        },
-      ),
+            ),
     );
   }
 }

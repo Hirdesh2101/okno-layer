@@ -36,59 +36,58 @@ class _ScrollFeedState extends State<ScrollFeed> {
   Widget feedVideos() {
     return Stack(
       children: [
-        PageView.builder(
-          controller: PageController(
-            initialPage: 0,
-            viewportFraction: 1,
-          ),
-          itemCount: feedViewModel.length(),
-          onPageChanged: (index) {
-            feedViewModel.onpageChanged(index);
-          },
-          scrollDirection: Axis.vertical,
-          itemBuilder: (context, index) {
-            return Stack(children: [
-              videoCard(feedViewModel.videoSource!.listVideos[index]),
-              ActionToolBar(index),
-            ]);
-          },
+        ViewModelBuilder<FeedViewModel>.reactive(
+          disposeViewModel: false,
+          viewModelBuilder: () => feedViewModel,
+          builder: (context, model, child) => PageView.builder(
+              controller: PageController(
+                initialPage: 0,
+                viewportFraction: 1,
+              ),
+              itemCount: feedViewModel.length(),
+              onPageChanged: (index) {
+                feedViewModel.onpageChanged(index);
+              },
+              scrollDirection: Axis.vertical,
+              itemBuilder: (context, index) {
+                return Stack(children: [
+                  videoCard(feedViewModel.videoSource!.listVideos[index]),
+                  ActionToolBar(index),
+                ]);
+              }),
         ),
       ],
     );
   }
 
   Widget videoCard(Video video) {
-    return ViewModelBuilder<FeedViewModel>.reactive(
-        disposeViewModel: false,
-        viewModelBuilder: () => feedViewModel,
-        builder: (context, model, child) =>
-            video.controller != null && video.controller!.value.isInitialized
-                ? Stack(children: [
-                    GestureDetector(
-                      onTap: () {
-                        if (video.controller!.value.isPlaying) {
-                          video.controller?.pause();
-                        } else {
-                          video.controller?.play();
-                        }
-                      },
-                      child: SizedBox.expand(
-                          child: FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: video.controller?.value.size.width ?? 0,
-                          height: video.controller?.value.size.height ?? 0,
-                          child: VideoPlayer(video.controller!),
-                        ),
-                      )),
-                    ),
-                    if (video.controller!.value.isBuffering)
-                      const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                  ])
-                : const Center(
-                    child: Text('Loading'),
-                  ));
+    return video.controller != null && video.controller!.value.isInitialized
+        ? Stack(children: [
+            GestureDetector(
+              onTap: () {
+                if (video.controller!.value.isPlaying) {
+                  video.controller?.pause();
+                } else {
+                  video.controller?.play();
+                }
+              },
+              child: SizedBox.expand(
+                  child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: video.controller?.value.size.width ?? 0,
+                  height: video.controller?.value.size.height ?? 0,
+                  child: VideoPlayer(video.controller!),
+                ),
+              )),
+            ),
+            if (video.controller!.value.isBuffering)
+              const Center(
+                child: CircularProgressIndicator(),
+              )
+          ])
+        : const Center(
+            child: Text('Loading'),
+          );
   }
 }

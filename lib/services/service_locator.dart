@@ -1,5 +1,5 @@
-import 'providers/feedviewprovider.dart';
-import 'providers/likedvideoprovider.dart';
+import '../providers/feedviewprovider.dart';
+import '../providers/likedvideoprovider.dart';
 import 'package:get_it/get_it.dart';
 
 final locator = GetIt.instance;

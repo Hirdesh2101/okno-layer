@@ -3,6 +3,8 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../services/cache_service.dart';
 
 class ProductDetails {
   //final locator = GetIt.instance;
@@ -10,6 +12,7 @@ class ProductDetails {
   void sheet(context, int index) {
     showModalBottomSheet(
         context: context,
+        barrierColor: Colors.black.withOpacity(0.3),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
         ),
@@ -26,7 +29,7 @@ class ProductDetails {
                     height: MediaQuery.of(context).size.height * 0.01,
                     width: MediaQuery.of(context).size.width * 0.10,
                     decoration: const BoxDecoration(
-                        color: Colors.black54,
+                        color: Colors.grey,
                         borderRadius: BorderRadius.all(Radius.circular(20))),
                   ),
                 ),
@@ -59,9 +62,10 @@ class ProductDetails {
                                 Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(9, 18, 9, 18),
-                                  child: Image.network(
-                                    feedViewModel.videoSource!.listVideos[index]
-                                        .product1,
+                                  child: CachedNetworkImage(
+                                    cacheManager: CustomCacheManager.instance2,
+                                    imageUrl: feedViewModel.videoSource!
+                                        .listVideos[index].product1,
                                     height: MediaQuery.of(context).size.height *
                                         0.2,
                                     width: MediaQuery.of(context).size.height *

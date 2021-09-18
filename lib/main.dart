@@ -4,7 +4,7 @@ import 'package:oknoapp/Auth/register.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'pages/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'service_locator.dart';
+import 'services/service_locator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'OkNoApp',
         themeMode: ThemeMode.dark,
-        theme: ThemeData.light(),
+        theme: ThemeData.dark(),
         debugShowCheckedModeBanner: false,
         home: StreamBuilder(
             stream: FirebaseAuth.instance.authStateChanges(),
