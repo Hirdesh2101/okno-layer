@@ -63,6 +63,9 @@ class ProductDetails {
                                   padding:
                                       const EdgeInsets.fromLTRB(9, 18, 9, 18),
                                   child: CachedNetworkImage(
+                                    placeholder: (context, url) => Container(
+                                      color: Colors.grey,
+                                    ),
                                     cacheManager: CustomCacheManager.instance2,
                                     imageUrl: feedViewModel.videoSource!
                                         .listVideos[index].product1,

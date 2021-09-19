@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/likedvideoprovider.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../services/cache_service.dart';
 import '../data/liked_firebase.dart';
 
 class MyLikedVideos extends StatefulWidget {
@@ -18,22 +17,10 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
   //final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<LikeProvider>();
 
-  late String _tempDir;
-  late String filePath;
   LikedVideosAPI? likedVideosAPI;
-
-  void _init() async {
-    final _appdir = await getTemporaryDirectory();
-    _tempDir = _appdir.path;
-    setState(() {});
-    if (_appdir.existsSync()) {
-      _appdir.deleteSync(recursive: true);
-    }
-  }
 
   @override
   void initState() {
-    _init();
     likedVideosAPI = LikedVideosAPI();
     super.initState();
   }
@@ -65,29 +52,16 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                     onTap: () {
                       //Navigator.of(context).pushNamed(RouteName.GridViewCustom);
                     },
-                    child: FutureBuilder(
-                      builder: (ctx, snapshot) {
-                        if (snapshot.hasData) {
-                          final file = File(snapshot.data.toString());
-                          filePath = file.path;
-                          return FittedBox(
-                              fit: BoxFit.fill,
-                              child:
-                                  Card(elevation: 3, child: Image.file(file)));
-                        }
-                        return Card(
-                          elevation: 3,
-                          child: Container(
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                      future: VideoThumbnail.thumbnailFile(
-                        video:
-                            feedViewModel.likedVideosAPI!.listData[index].url,
-                        thumbnailPath: _tempDir,
-                        imageFormat: ImageFormat.PNG,
-                        quality: 25,
+                    child: Card(
+                      elevation: 3,
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey,
+                        ),
+                        fit: BoxFit.contain,
+                        cacheManager: CustomCacheManager.instance2,
+                        imageUrl: feedViewModel
+                            .likedVideosAPI!.listData[index].product1,
                       ),
                     ));
               },

@@ -74,10 +74,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: FutureBuilder(
-          future: FirebaseFirestore.instance
-              .collection("VideosData")
-              .limit(10)
-              .get(),
+          future: feedViewModel.videoSource!.getVideoList(),
           builder: (ctx, snapshot) {
             return snapshot.hasData
                 ? SafeArea(

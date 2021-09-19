@@ -7,26 +7,44 @@ class FeedViewModel extends BaseViewModel {
   int prevVideo = 0;
 
   int currentscreen = 0;
+  // bool loading = true;
 
   FeedViewModel() {
+    setBusy(true);
     videoSource = VideosAPI();
+    setBusy(false);
   }
   dynamic length() {
     return videoSource?.listVideos.length;
   }
 
+  // Stream<bool> state() async* {
+  //   yield videoSource!.loading;
+  // }
+
+  // void isLoading() {
+  //   state().listen((event) {
+  //     loading = event;
+  //     notifyListeners();
+  //   });
+  // }
+
   initial() async {
+    setBusy(true);
     await _initializeControllerAtIndex(0);
+    //print('aya');
 
     /// Play 1st video
     _playControllerAtIndex(0);
+    //notifyListeners();
+    //print('aya1');
+    setBusy(false);
 
     /// Initialize 2nd vide
     await _initializeControllerAtIndex(1);
   }
 
   onpageChanged(int index) {
-    print(videoSource!.listVideos.length);
     if ((index - 7) % 10 == 0) {
       videoSource!.addVideos();
       notifyListeners();

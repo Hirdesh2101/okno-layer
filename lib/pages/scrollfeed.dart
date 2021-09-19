@@ -4,7 +4,6 @@ import 'package:video_player/video_player.dart';
 import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
 import '../models/video.dart';
-
 import 'package:stacked/stacked.dart';
 
 class ScrollFeed extends StatefulWidget {
@@ -37,25 +36,31 @@ class _ScrollFeedState extends State<ScrollFeed> {
     return Stack(
       children: [
         ViewModelBuilder<FeedViewModel>.reactive(
-          disposeViewModel: false,
-          viewModelBuilder: () => feedViewModel,
-          builder: (context, model, child) => PageView.builder(
-              controller: PageController(
-                initialPage: 0,
-                viewportFraction: 1,
-              ),
-              itemCount: feedViewModel.length(),
-              onPageChanged: (index) {
-                feedViewModel.onpageChanged(index);
-              },
-              scrollDirection: Axis.vertical,
-              itemBuilder: (context, index) {
-                return Stack(children: [
-                  videoCard(feedViewModel.videoSource!.listVideos[index]),
-                  ActionToolBar(index),
-                ]);
-              }),
-        ),
+            disposeViewModel: false,
+            viewModelBuilder: () => feedViewModel,
+            builder: (context, model, child) {
+              return !feedViewModel.isBusy
+                  ? PageView.builder(
+                      controller: PageController(
+                        initialPage: 0,
+                        viewportFraction: 1,
+                      ),
+                      itemCount: feedViewModel.length(),
+                      onPageChanged: (index) {
+                        feedViewModel.onpageChanged(index);
+                      },
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (context, index) {
+                        return Stack(children: [
+                          videoCard(
+                              feedViewModel.videoSource!.listVideos[index]),
+                          ActionToolBar(index),
+                        ]);
+                      })
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    );
+            }),
       ],
     );
   }
@@ -81,10 +86,6 @@ class _ScrollFeedState extends State<ScrollFeed> {
                 ),
               )),
             ),
-            if (video.controller!.value.isBuffering)
-              const Center(
-                child: CircularProgressIndicator(),
-              )
           ])
         : const Center(
             child: Text('Loading'),
