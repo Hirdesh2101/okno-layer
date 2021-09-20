@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:oknoapp/pages/liked_scroll.dart';
 import '../providers/likedvideoprovider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cache_service.dart';
-import '../data/liked_firebase.dart';
 
 class MyLikedVideos extends StatefulWidget {
   static const routeName = '/my_likevideos';
@@ -17,27 +17,20 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
   //final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<LikeProvider>();
 
-  LikedVideosAPI? likedVideosAPI;
-
-  @override
-  void initState() {
-    likedVideosAPI = LikedVideosAPI();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
       ),
-      body: feedViewModel.likedVideosAPI!.listVideos.isEmpty
+      body: feedViewModel.videoSource!.listVideos.isEmpty
           ? const Center(
               child: Text('No Liked Videos'),
             )
           : GridView.builder(
+              shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
-              itemCount: feedViewModel.likedVideosAPI!.listVideos.length,
+              itemCount: feedViewModel.videoSource!.listVideos.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 crossAxisSpacing: 1.5,
@@ -50,7 +43,8 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
               ) {
                 return GestureDetector(
                     onTap: () {
-                      //Navigator.of(context).pushNamed(RouteName.GridViewCustom);
+                      Navigator.of(context).pushNamed(LikeScroll.routeName,
+                          arguments: ScreenArguments(index));
                     },
                     child: Card(
                       elevation: 3,
@@ -60,12 +54,17 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                         ),
                         fit: BoxFit.contain,
                         cacheManager: CustomCacheManager.instance2,
-                        imageUrl: feedViewModel
-                            .likedVideosAPI!.listData[index].product1,
+                        imageUrl:
+                            feedViewModel.videoSource!.listData[index].product1,
                       ),
                     ));
               },
             ),
     );
   }
+}
+
+class ScreenArguments {
+  final int indexofgrid;
+  ScreenArguments(this.indexofgrid);
 }

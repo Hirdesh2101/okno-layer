@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/providers/likedvideoprovider.dart';
 import 'scrollfeed.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get_it/get_it.dart';
@@ -59,6 +58,8 @@ class _HomePageState extends State<HomePage> {
                   //   await _googleSignIn.signOut();
                   // }
                   await _firebase.signOut();
+                  await feedViewModel.pauseDrawer();
+                  await feedViewModel.disposingall();
                   Navigator.pop(context);
                   locator<FeedViewModel>().removeListener(() {
                     setState(() {});
@@ -79,9 +80,8 @@ class _HomePageState extends State<HomePage> {
             return snapshot.hasData
                 ? SafeArea(
                     child: Stack(
-                      // ignore: prefer_const_literals_to_create_immutables
                       children: [
-                        const ScrollFeed(),
+                        const ScrollFeed(0, false),
                         Positioned(
                           left: 10,
                           top: 20,

@@ -6,11 +6,12 @@ import 'package:like_button/like_button.dart';
 import './bottomsheet.dart';
 import '../firebase functions/sidebar_fun.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../providers/likedvideoprovider.dart';
 
 class ActionToolBar extends StatefulWidget {
   final int index;
-  // ignore: use_key_in_widget_constructors
-  const ActionToolBar(this.index);
+  final bool likedPage;
+  const ActionToolBar(this.index, this.likedPage, {Key? key}) : super(key: key);
 
   @override
   _ActionToolBarState createState() => _ActionToolBarState();
@@ -19,6 +20,7 @@ class ActionToolBar extends StatefulWidget {
 class _ActionToolBarState extends State<ActionToolBar> {
   //final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
+  final feedViewMode2 = GetIt.instance<LikeProvider>();
   final SideBarFirebase firebaseServices = SideBarFirebase();
 
   @override
@@ -35,8 +37,12 @@ class _ActionToolBarState extends State<ActionToolBar> {
             style: TextStyle(color: Colors.white),
           ),
           onPressed: () {
-            feedViewModel.pauseVideo(widget.index);
-            ProductDetails().sheet(context, widget.index);
+            if (!widget.likedPage) {
+              feedViewModel.pauseVideo(widget.index);
+            } else {
+              feedViewMode2.pauseVideo(widget.index);
+            }
+            ProductDetails().sheet(context, widget.index, widget.likedPage);
           },
         ),
       ),
@@ -58,7 +64,9 @@ class _ActionToolBarState extends State<ActionToolBar> {
             List<dynamic> list = documents[widget.index]['Likes'];
             Future<bool> likeFunc(bool init) async {
               firebaseServices.add(
-                  feedViewModel.videoSource!.docId[widget.index],
+                  widget.likedPage
+                      ? feedViewMode2.videoSource!.listVideos[widget.index]
+                      : feedViewModel.videoSource!.docId[widget.index],
                   list.contains(firebaseServices.user) ? true : false);
               return !init;
             }

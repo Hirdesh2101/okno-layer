@@ -57,19 +57,19 @@ class FeedViewModel extends BaseViewModel {
     currentscreen = index;
   }
 
-  void pauseDrawer() async {
-    videoSource!.listVideos[currentscreen].controller?.pause();
+  Future<void> pauseDrawer() async {
+    await videoSource!.listVideos[currentscreen].controller?.pause();
     notifyListeners();
   }
 
-  void playDrawer() async {
+  Future<void> playDrawer() async {
     videoSource!.listVideos[currentscreen].controller?.play();
     notifyListeners();
   }
 
   void pauseVideo(int index) async {
     if (videoSource!.listVideos.length > index) {
-      videoSource!.listVideos[index].controller?.pause();
+      await videoSource!.listVideos[index].controller?.pause();
       notifyListeners();
     }
   }
@@ -146,13 +146,13 @@ class FeedViewModel extends BaseViewModel {
     }
   }
 
-  void disposingall() {
-    videoSource!.listVideos[currentscreen].controller?.dispose();
+  Future<void> disposingall() async {
+    await videoSource!.listVideos[currentscreen].controller?.dispose();
     if (currentscreen + 1 < videoSource!.listVideos.length) {
-      videoSource!.listVideos[currentscreen + 1].controller?.dispose();
+      await videoSource!.listVideos[currentscreen + 1].controller?.dispose();
     }
     if (currentscreen - 1 >= 0) {
-      videoSource!.listVideos[currentscreen - 1].controller?.dispose();
+      await videoSource!.listVideos[currentscreen - 1].controller?.dispose();
     }
     notifyListeners();
   }

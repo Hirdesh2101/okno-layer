@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oknoapp/Auth/login.dart';
 import 'package:oknoapp/Auth/register.dart';
+import 'package:oknoapp/pages/liked_scroll.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'pages/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
           Loginscreen.routeName: (ctx) => const Loginscreen(),
           Register.routeName: (ctx) => const Register(),
           MyLikedVideos.routeName: (ctx) => const MyLikedVideos(),
+          LikeScroll.routeName: (ctx) => const LikeScroll(),
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute(

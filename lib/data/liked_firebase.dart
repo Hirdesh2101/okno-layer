@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/video.dart';
+import '../models/like_videos.dart';
 
 class LikedVideosAPI {
   List<String> listVideos = <String>[];
-  List<Video> listData = <Video>[];
+  List<LikeVideo> listData = <LikeVideo>[];
 
   LikedVideosAPI() {
     load();
@@ -25,16 +25,16 @@ class LikedVideosAPI {
     });
   }
 
-  Future<List<Video>> getData() async {
-    var videoList = <Video>[];
-    Video video;
+  Future<List<LikeVideo>> getData() async {
+    var videoList = <LikeVideo>[];
+    LikeVideo video;
     for (var element in listVideos) {
       await _firestore
           .collection("VideosData")
           .doc(element)
           .get()
           .then((snapshot) {
-        video = Video.fromJson(snapshot.data()!);
+        video = LikeVideo.fromJson(snapshot.data()!);
         videoList.add(video);
       });
     }

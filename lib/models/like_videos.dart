@@ -3,7 +3,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:pedantic/pedantic.dart';
 import '../services/cache_service.dart';
 
-class Video {
+class LikeVideo {
   String id;
   String url;
   String product1;
@@ -16,7 +16,7 @@ class Video {
   VideoPlayerController? controller;
   BaseCacheManager? _cacheManager;
 
-  Video(
+  LikeVideo(
       {required this.id,
       required this.url,
       required this.product1,
@@ -26,7 +26,7 @@ class Video {
       required this.store,
       required this.price});
 
-  Video.fromJson(Map<dynamic, dynamic> json)
+  LikeVideo.fromJson(Map<dynamic, dynamic> json)
       : id = json['id'],
         url = json['url'],
         p1name = json['p1name'],
