@@ -52,6 +52,10 @@ class LikeProvider extends BaseViewModel {
     notifyListeners();
   }
 
+  void refresh() {
+    notifyListeners();
+  }
+
   void playDrawer() async {
     videoSource!.listData[currentscreen].controller?.play();
     notifyListeners();

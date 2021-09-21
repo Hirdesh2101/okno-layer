@@ -3,6 +3,7 @@ import 'package:oknoapp/Auth/login.dart';
 import 'package:oknoapp/Auth/register.dart';
 import 'package:oknoapp/pages/liked_scroll.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
+import 'package:oknoapp/pages/profile_page.dart';
 import 'pages/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/service_locator.dart';
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
           Register.routeName: (ctx) => const Register(),
           MyLikedVideos.routeName: (ctx) => const MyLikedVideos(),
           LikeScroll.routeName: (ctx) => const LikeScroll(),
+          ProfileScreen.routeName: (ctx) => const ProfileScreen(),
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute(

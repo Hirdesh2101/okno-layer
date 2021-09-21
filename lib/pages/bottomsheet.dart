@@ -6,11 +6,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cache_service.dart';
 import '../providers/likedvideoprovider.dart';
+import '../firebase functions/sidebar_fun.dart';
 
 class ProductDetails {
   //final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final feedViewModel2 = GetIt.instance<LikeProvider>();
+  SideBarFirebase firebasefun = SideBarFirebase();
   void sheet(context, int index, bool likedVideo) {
     showModalBottomSheet(
             context: context,
@@ -119,6 +121,10 @@ class ProductDetails {
                                       .videoSource!.listVideos[index].store;
                               if (await canLaunch(url)) {
                                 await launch(url);
+                                await firebasefun.viewedProduct(likedVideo
+                                    ? feedViewModel2
+                                        .videoSource!.listVideos[index]
+                                    : feedViewModel.videoSource!.docId[index]);
                               } else {
                                 // ignore: avoid_print
                                 print("error");

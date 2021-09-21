@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
+import 'package:oknoapp/pages/profile_page.dart';
 import 'package:oknoapp/providers/likedvideoprovider.dart';
 import 'scrollfeed.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -48,6 +49,14 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('My Profile'),
+                onTap: () {
+                  Navigator.of(context).pushNamed(ProfileScreen.routeName);
+                  feedViewModel.pauseDrawer();
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.exit_to_app),
                 title: const Text("Logout"),
                 onTap: () async {
@@ -67,7 +76,6 @@ class _HomePageState extends State<HomePage> {
                   locator<LikeProvider>().removeListener(() {
                     setState(() {});
                   });
-                  feedViewModel.disposingall();
                 },
               )
             ],

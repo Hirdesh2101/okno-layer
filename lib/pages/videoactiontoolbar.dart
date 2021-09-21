@@ -36,21 +36,25 @@ class _ActionToolBarState extends State<ActionToolBar> {
             'View Product',
             style: TextStyle(color: Colors.white),
           ),
-          onPressed: () {
+          onPressed: () async {
             if (!widget.likedPage) {
               feedViewModel.pauseVideo(widget.index);
             } else {
               feedViewMode2.pauseVideo(widget.index);
             }
             ProductDetails().sheet(context, widget.index, widget.likedPage);
+            await firebaseServices.viewedProduct(widget.likedPage
+                ? feedViewMode2.videoSource!.listVideos[widget.index]
+                : feedViewModel.videoSource!.docId[widget.index]);
           },
         ),
       ),
-      Positioned(
-        right: 0,
-        bottom: 0,
-        child: sideButtons(),
-      )
+      if (!widget.likedPage)
+        Positioned(
+          right: 0,
+          bottom: 0,
+          child: sideButtons(),
+        )
     ]);
   }
 
@@ -80,7 +84,7 @@ class _ActionToolBarState extends State<ActionToolBar> {
                       return Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
                         color: isLiked ? Colors.red : Colors.white,
-                        size: MediaQuery.of(context).size.width * 0.08,
+                        size: MediaQuery.of(context).size.width * 0.10,
                       );
                     },
                     isLiked:
