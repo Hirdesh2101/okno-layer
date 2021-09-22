@@ -3,6 +3,7 @@ import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/pages/profile_page.dart';
 import 'package:oknoapp/providers/likedvideoprovider.dart';
 import 'scrollfeed.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get_it/get_it.dart';
@@ -85,7 +86,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: FutureBuilder(
-          future: feedViewModel.videoSource!.getVideoList(),
+          future: FirebaseFirestore.instance
+              .collection("VideosData")
+              .where('Approved', isEqualTo: true)
+              .limit(10)
+              .get(),
           builder: (ctx, snapshot) {
             return snapshot.hasData
                 ? SafeArea(

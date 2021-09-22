@@ -149,12 +149,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
-                      // Container(
-                      //   height: 45,
-                      //   decoration:
-                      //       BoxDecoration(border: Border.all(color: Colors.white12)),
-                      //   child: ,
-                      // ),
+                      if (data['Creator'] == true)
+                        Container(
+                          height: 45,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white12)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  const Icon(Icons.menu),
+                                  const SizedBox(
+                                    height: 7,
+                                  ),
+                                  const SizedBox(
+                                    height: 7,
+                                  ),
+                                  Container(
+                                    color: Colors.white,
+                                    height: 2,
+                                    width: 55,
+                                  )
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  const Icon(
+                                    Icons.favorite_border,
+                                    color: Colors.white24,
+                                  ),
+                                  const SizedBox(
+                                    height: 7,
+                                  ),
+                                  Container(
+                                    color: Colors.transparent,
+                                    height: 2,
+                                    width: 55,
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   );
                 }),

@@ -11,7 +11,7 @@ class VideosAPI {
     load();
   }
   void load() async {
-    listVideos = await getVideoList();
+    listVideos = await _getVideoList();
   }
 
   void addVideos() async {
@@ -19,7 +19,7 @@ class VideosAPI {
     listVideos.addAll(list);
   }
 
-  Future<List<Video>> getVideoList() async {
+  Future<List<Video>> _getVideoList() async {
     var data =
         await _firebase.where('Approved', isEqualTo: true).limit(10).get();
     var videoList = <Video>[];
@@ -34,7 +34,7 @@ class VideosAPI {
     }
     lastData = data.docs.last;
     for (var element in videos.docs) {
-      docId.add(element.reference.id);
+      docId.add(element.id);
       Video video = Video.fromJson(element.data());
       videoList.add(video);
     }
@@ -59,7 +59,7 @@ class VideosAPI {
     videos = data;
     lastData = data.docs.last;
     for (var element in videos.docs) {
-      docId.add(element.reference.id);
+      docId.add(element.id);
       Video video = Video.fromJson(element.data());
       videoList.add(video);
     }
