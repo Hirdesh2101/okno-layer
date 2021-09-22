@@ -38,7 +38,9 @@ class SideBarFirebase {
         .get()
         .then((snapshot) {
       if (snapshot.exists) {
-        length = (snapshot.data()!['ViewedProduct'].length);
+        if (snapshot.data()!['ViewedProduct'] != null) {
+          length = (snapshot.data()!['ViewedProduct'].length);
+        }
       }
     });
     if (length > 0) {
@@ -52,6 +54,32 @@ class SideBarFirebase {
           .doc(docu)
           .set({'ViewedProduct': FieldValue.arrayUnion(obj)});
     }
-    //.set({'ViewedProduct': FieldValue.arrayUnion(obj)});
+  }
+
+  Future<void> viewedUrl(dynamic docu) async {
+    var obj = [user];
+    int length = 0;
+    await FirebaseFirestore.instance
+        .collection('VideosDataAdmin')
+        .doc(docu)
+        .get()
+        .then((snapshot) {
+      if (snapshot.exists) {
+        if (snapshot.data()!['ViewedUrl'] != null) {
+          length = (snapshot.data()!['ViewedUrl'].length);
+        }
+      }
+    });
+    if (length > 0) {
+      await FirebaseFirestore.instance
+          .collection('VideosDataAdmin')
+          .doc(docu)
+          .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
+    } else {
+      await FirebaseFirestore.instance
+          .collection('VideosDataAdmin')
+          .doc(docu)
+          .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
+    }
   }
 }

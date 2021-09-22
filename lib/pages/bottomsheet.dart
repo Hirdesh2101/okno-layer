@@ -121,7 +121,7 @@ class ProductDetails {
                                       .videoSource!.listVideos[index].store;
                               if (await canLaunch(url)) {
                                 await launch(url);
-                                await firebasefun.viewedProduct(likedVideo
+                                await firebasefun.viewedUrl(likedVideo
                                     ? feedViewModel2
                                         .videoSource!.listVideos[index]
                                     : feedViewModel.videoSource!.docId[index]);

@@ -13,7 +13,9 @@ class LikedVideosAPI {
   void load() {
     getLiked().listen((listofstring) async {
       listVideos = listofstring;
+      listVideos.reversed;
       listData = await getData();
+      listData.reversed;
     });
   }
 

@@ -66,6 +66,8 @@ class _HomePageState extends State<HomePage> {
                   // if (user.providerData[1].providerId == 'google.com') {
                   //   await _googleSignIn.signOut();
                   // }
+                  //await InternetAddress.lookup('google.com');
+                  // if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
                   await _firebase.signOut();
                   await feedViewModel.pauseDrawer();
                   await feedViewModel.disposingall();

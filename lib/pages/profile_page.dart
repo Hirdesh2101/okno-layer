@@ -2,11 +2,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:oknoapp/pages/edit_profile.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   static const routeName = '/profile_page';
   const ProfileScreen({Key? key}) : super(key: key);
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!.uid;
@@ -77,7 +83,10 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           OutlinedButton(
                             style: ButtonStyle(),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushNamed(EditProfile.routeName);
+                            },
                             child: const Center(
                               child: Text(
                                 "Edit profile",
@@ -108,7 +117,37 @@ class ProfileScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(
-                        height: 25,
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          OutlinedButton(
+                            style: ButtonStyle(),
+                            onPressed: () {
+                              data['Creator'] == false
+                                  ? _firebase.update(
+                                      {'Creator': true}).whenComplete(() {
+                                      setState(() {});
+                                    })
+                                  : _firebase.update(
+                                      {'Creator': false}).whenComplete(() {
+                                      setState(() {});
+                                    });
+                            },
+                            child: Center(
+                              child: Text(
+                                data['Creator'] == false
+                                    ? "Become a Creator"
+                                    : "Unregistor as a creator",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       // Container(
                       //   height: 45,

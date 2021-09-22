@@ -42,6 +42,7 @@ class _RegisterState extends State<Register> {
         'Gender': gender,
         'Email': email,
         'Age': age,
+        'Creator': false,
       });
       Navigator.of(context).pushReplacementNamed(HomePage.routeName);
     } on PlatformException catch (err) {

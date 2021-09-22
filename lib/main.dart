@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oknoapp/Auth/login.dart';
 import 'package:oknoapp/Auth/register.dart';
+import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/liked_scroll.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/pages/profile_page.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
           MyLikedVideos.routeName: (ctx) => const MyLikedVideos(),
           LikeScroll.routeName: (ctx) => const LikeScroll(),
           ProfileScreen.routeName: (ctx) => const ProfileScreen(),
+          EditProfile.routeName: (ctx) => const EditProfile(),
         },
         onUnknownRoute: (settings) {
           return MaterialPageRoute(
