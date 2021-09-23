@@ -101,27 +101,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(
                             width: 5,
                           ),
-                          IconButton(
-                            icon: Container(
-                                width: MediaQuery.of(context).size.width * 0.1,
-                                height: MediaQuery.of(context).size.width * 0.1,
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white12)),
-                                child: const Center(
-                                    child: Icon(
-                                  Icons.bookmark,
-                                  size: 20,
-                                  color: Colors.white,
-                                ))),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const VideoRecorder()),
-                              );
-                            },
-                          )
+                          if (data['Creator'] == true)
+                            IconButton(
+                              icon: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  decoration: BoxDecoration(
+                                      border:
+                                          Border.all(color: Colors.white12)),
+                                  child: const Center(
+                                      child: Icon(
+                                    Icons.add_a_photo_outlined,
+                                    size: 20,
+                                    color: Colors.white,
+                                  ))),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const VideoRecorder()),
+                                );
+                              },
+                            )
                         ],
                       ),
                       const SizedBox(

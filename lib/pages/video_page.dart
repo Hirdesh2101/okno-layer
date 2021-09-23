@@ -52,6 +52,9 @@ class _VideoRecorderState extends State<VideoRecorder> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final deviceRatio = size.width / size.height;
+
     return Scaffold(
         key: _scaffoldKey,
         body: SafeArea(
@@ -59,25 +62,95 @@ class _VideoRecorderState extends State<VideoRecorder> {
             onWillPop: () async {
               return true;
             },
-            child: Stack(children: <Widget>[
-              SizedBox.expand(
-                child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        padding: MediaQuery.of(context).padding,
-                        child: _cameraPreviewWidget())),
+            child: Stack(children: [
+              Align(
+                alignment: Alignment.center,
+                child: Transform.scale(
+                    scale: controller!.value.aspectRatio / deviceRatio,
+                    //fit: BoxFit.contain,
+                    child: _cameraPreviewWidget()),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                child: Container(
+                  width: double.infinity,
+                  height: 120.0,
+                  padding: const EdgeInsets.all(20.0),
+                  color: Colors.black45,
+                  child: Stack(
                     children: <Widget>[
-                      _cameraTogglesRowWidget(),
-                      _captureControlRowWidget(),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              _captureControlRowWidget(),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(50.0)),
+                            onTap: () {
+                              _selectImage();
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(4.0),
+                              child: Icon(
+                                Ionicons.file_tray_full,
+                                color: Colors.grey[200],
+                                size: 42,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Align(
+                      //   alignment: Alignment.center,
+                      //   child: Material(
+                      //     color: Colors.transparent,
+                      //     child: GestureDetector(
+                      //       child: InkWell(
+                      //         child: Container(
+                      //           padding: EdgeInsets.all(4.0),
+                      //           child: const Icon(
+                      //             Ionicons.add_circle,
+                      //             size: 72,
+                      //           ),
+                      //         ),
+                      //         onTap: () {},
+                      //         splashColor: Colors.red,
+                      //         borderRadius:
+                      //             const BorderRadius.all(Radius.circular(50.0)),
+                      //       ),
+                      //       onLongPress: () {
+                      //         controller != null &&
+                      //                 controller!.value.isInitialized &&
+                      //                 !controller!.value.isRecordingVideo
+                      //             ? _onRecordButtonPressed
+                      //             : null;
+                      //       },
+                      //       onLongPressUp: () {
+                      //         controller != null &&
+                      //                 controller!.value.isInitialized &&
+                      //                 controller!.value.isRecordingVideo
+                      //             ? _onStopButtonPressed
+                      //             : null;
+                      //       },
+                      //     ),
+                      //   ),
+                      // ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: _cameraTogglesRowWidget(),
+                      ),
                     ],
                   ),
                 ),
@@ -92,7 +165,7 @@ class _VideoRecorderState extends State<VideoRecorder> {
                         }),
                   ],
                 ),
-              )
+              ),
             ]),
           ),
         ));
@@ -123,22 +196,34 @@ class _VideoRecorderState extends State<VideoRecorder> {
       );
     }
     return AspectRatio(
-      aspectRatio: 9 / 16,
+      aspectRatio: controller!.value.aspectRatio,
       child: CameraPreview(controller!),
     );
   }
 
   Widget _cameraTogglesRowWidget() {
     if (cameras! == null) {
-      return Row();
+      return Container();
     }
 
     CameraDescription selectedCamera = cameras![selectedCameraIdx!];
     CameraLensDirection lensDirection = selectedCamera.lensDirection;
-
-    return IconButton(
-      onPressed: _onSwitchCamera,
-      icon: Icon(_getCameraLensIcon(lensDirection)),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.all(Radius.circular(50.0)),
+        onTap: _onSwitchCamera,
+        child: Container(
+          padding: EdgeInsets.all(4.0),
+          child: Icon(
+            _getCameraLensIcon(
+              lensDirection,
+            ),
+            color: Colors.grey[200],
+            size: 42,
+          ),
+        ),
+      ),
     );
   }
 
@@ -166,10 +251,6 @@ class _VideoRecorderState extends State<VideoRecorder> {
                 ? _onStopButtonPressed
                 : null,
           ),
-          IconButton(
-              icon: const Icon(Ionicons.file_tray),
-              color: Colors.white,
-              onPressed: () => {_selectImage()}),
         ],
       ),
     );
@@ -182,7 +263,7 @@ class _VideoRecorderState extends State<VideoRecorder> {
       await controller!.dispose();
     }
 
-    controller = CameraController(cameraDescription, ResolutionPreset.high);
+    controller = CameraController(cameraDescription, ResolutionPreset.medium);
 
     controller!.addListener(() {
       if (mounted) {
