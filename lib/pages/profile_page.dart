@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
+import 'video_page.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = '/profile_page';
@@ -112,7 +113,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   size: 20,
                                   color: Colors.white,
                                 ))),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const VideoRecorder()),
+                              );
+                            },
                           )
                         ],
                       ),
