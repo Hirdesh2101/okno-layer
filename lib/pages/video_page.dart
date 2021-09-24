@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ionicons/ionicons.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:oknoapp/pages/upload_videopage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,15 +21,14 @@ class _VideoRecorderState extends State<VideoRecorder> {
   File? file;
   CameraController? controller;
   String? videoPath;
+  File? videoFile;
   ImagePicker imagePicker = ImagePicker();
   List<CameraDescription>? cameras;
   int? selectedCameraIdx;
+  bool _isrecording = false;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  void initState() {
-    super.initState();
+  void initialize() {
     availableCameras().then((availableCameras) {
       cameras = availableCameras;
 
@@ -42,6 +42,12 @@ class _VideoRecorderState extends State<VideoRecorder> {
     }).catchError((err) {
       print('Error: $err.code\nError Message: $err.message');
     });
+  }
+
+  @override
+  void initState() {
+    initialize();
+    super.initState();
   }
 
   @override
@@ -97,12 +103,12 @@ class _VideoRecorderState extends State<VideoRecorder> {
                           color: Colors.transparent,
                           child: InkWell(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(50.0)),
+                                const BorderRadius.all(Radius.circular(50.0)),
                             onTap: () {
                               _selectImage();
                             },
                             child: Container(
-                              padding: EdgeInsets.all(4.0),
+                              padding: const EdgeInsets.all(4.0),
                               child: Icon(
                                 Ionicons.file_tray_full,
                                 color: Colors.grey[200],
@@ -117,32 +123,33 @@ class _VideoRecorderState extends State<VideoRecorder> {
                       //   child: Material(
                       //     color: Colors.transparent,
                       //     child: GestureDetector(
-                      //       child: InkWell(
-                      //         child: Container(
-                      //           padding: EdgeInsets.all(4.0),
-                      //           child: const Icon(
-                      //             Ionicons.add_circle,
-                      //             size: 72,
-                      //           ),
+                      //       child: Container(
+                      //         padding: EdgeInsets.all(4.0),
+                      //         child: Icon(
+                      //           Ionicons.add_circle,
+                      //           size: 72,
+                      //           color: _isrecording ? Colors.red : Colors.white,
                       //         ),
-                      //         onTap: () {},
-                      //         splashColor: Colors.red,
-                      //         borderRadius:
-                      //             const BorderRadius.all(Radius.circular(50.0)),
                       //       ),
-                      //       onLongPress: () {
-                      //         controller != null &&
-                      //                 controller!.value.isInitialized &&
-                      //                 !controller!.value.isRecordingVideo
-                      //             ? _onRecordButtonPressed
-                      //             : null;
-                      //       },
-                      //       onLongPressUp: () {
-                      //         controller != null &&
-                      //                 controller!.value.isInitialized &&
-                      //                 controller!.value.isRecordingVideo
-                      //             ? _onStopButtonPressed
-                      //             : null;
+                      //       onTap: () {
+                      //         setState(() {
+                      //           _isrecording = !_isrecording;
+                      //         });
+                      //         if (_isrecording) {
+                      //           print('aya1');
+                      //           controller != null &&
+                      //                   controller!.value.isInitialized &&
+                      //                   !controller!.value.isRecordingVideo
+                      //               ? _onRecordButtonPressed
+                      //               : {print('aya1')};
+                      //         } else {
+                      //           print('aya2');
+                      //           controller != null &&
+                      //                   controller!.value.isInitialized &&
+                      //                   controller!.value.isRecordingVideo
+                      //               ? _onStopButtonPressed
+                      //               : {print('aya2')};
+                      //         }
                       //       },
                       //     ),
                       //   ),
@@ -211,10 +218,10 @@ class _VideoRecorderState extends State<VideoRecorder> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.all(Radius.circular(50.0)),
+        borderRadius: const BorderRadius.all(Radius.circular(50.0)),
         onTap: _onSwitchCamera,
         child: Container(
-          padding: EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(4.0),
           child: Icon(
             _getCameraLensIcon(
               lensDirection,
@@ -283,6 +290,8 @@ class _VideoRecorderState extends State<VideoRecorder> {
 
     try {
       await controller!.initialize();
+      controller!.value =
+          controller!.value.copyWith(previewSize: const Size(1080, 1920));
     } on CameraException catch (e) {
       _showCameraException(e);
     }
@@ -314,6 +323,7 @@ class _VideoRecorderState extends State<VideoRecorder> {
   }
 
   void _onRecordButtonPressed() {
+    print('aya');
     _startVideoRecording().then((String? filePath) {
       if (filePath != null) {
         Fluttertoast.showToast(
@@ -328,7 +338,7 @@ class _VideoRecorderState extends State<VideoRecorder> {
   }
 
   void _onStopButtonPressed() {
-    _stopVideoRecording().then((_) {
+    _stopVideoRecording().then((_) async {
       if (mounted) setState(() {});
       Fluttertoast.showToast(
           msg: 'Video recorded to $videoPath',
@@ -337,10 +347,24 @@ class _VideoRecorderState extends State<VideoRecorder> {
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.grey,
           textColor: Colors.white);
+      File temp = File(videoPath!);
+      if (controller!.value.isStreamingImages) {
+        await controller!.stopImageStream();
+      }
+      //controller!.dispose();
+      await controller!.dispose();
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => UploadPage(videoFile!)))
+          .then((value) {
+        initialize();
+      });
+
+      await controller!.dispose();
     });
   }
 
   Future<String?> _startVideoRecording() async {
+    print('aya');
     if (!controller!.value.isInitialized) {
       Fluttertoast.showToast(
           msg: 'Please wait',
@@ -357,8 +381,8 @@ class _VideoRecorderState extends State<VideoRecorder> {
       return null;
     }
 
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String videoDirectory = '${appDirectory.path}/Videos';
+    final Directory? appDirectory = await getExternalStorageDirectory();
+    final String videoDirectory = '${appDirectory!.path}/Videos';
     await Directory(videoDirectory).create(recursive: true);
     final String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
     final String filePath = '$videoDirectory/$currentTime.mp4';
@@ -380,7 +404,9 @@ class _VideoRecorderState extends State<VideoRecorder> {
     }
 
     try {
-      await controller!.stopVideoRecording();
+      await controller!.stopVideoRecording().then((value) {
+        videoFile = File(value.path);
+      });
     } on CameraException catch (e) {
       _showCameraException(e);
       return;
