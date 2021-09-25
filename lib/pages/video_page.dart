@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ionicons/ionicons.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/upload_videopage.dart';
@@ -17,7 +16,8 @@ class VideoRecorder extends StatefulWidget {
   }
 }
 
-class _VideoRecorderState extends State<VideoRecorder> {
+class _VideoRecorderState extends State<VideoRecorder>
+    with WidgetsBindingObserver {
   File? file;
   CameraController? controller;
   String? videoPath;
@@ -57,9 +57,25 @@ class _VideoRecorderState extends State<VideoRecorder> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final CameraController? cameraController = controller;
+    if (cameraController == null || !cameraController.value.isInitialized) {
+      return;
+    }
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      cameraController.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      initialize();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final deviceRatio = size.width / size.height;
+    final height = size.height - MediaQuery.of(context).padding.top;
+    final deviceRatio = size.width / height;
 
     return Scaffold(
         key: _scaffoldKey,
@@ -73,7 +89,6 @@ class _VideoRecorderState extends State<VideoRecorder> {
                 alignment: Alignment.center,
                 child: Transform.scale(
                     scale: controller!.value.aspectRatio / deviceRatio,
-                    //fit: BoxFit.contain,
                     child: _cameraPreviewWidget()),
               ),
               Align(
@@ -86,18 +101,6 @@ class _VideoRecorderState extends State<VideoRecorder> {
                   child: Stack(
                     children: <Widget>[
                       Align(
-                        alignment: Alignment.center,
-                        child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              _captureControlRowWidget(),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Align(
                         alignment: Alignment.centerRight,
                         child: Material(
                           color: Colors.transparent,
@@ -105,55 +108,71 @@ class _VideoRecorderState extends State<VideoRecorder> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(50.0)),
                             onTap: () {
-                              _selectImage();
+                              _isrecording ? null : _selectImage();
                             },
                             child: Container(
                               padding: const EdgeInsets.all(4.0),
-                              child: Icon(
-                                Ionicons.file_tray_full,
+                              child: Image.asset(
+                                'assets/gallery_button.png',
                                 color: Colors.grey[200],
-                                size: 42,
+                                width: 42.0,
+                                height: 42.0,
                               ),
                             ),
                           ),
                         ),
                       ),
-                      // Align(
-                      //   alignment: Alignment.center,
-                      //   child: Material(
-                      //     color: Colors.transparent,
-                      //     child: GestureDetector(
-                      //       child: Container(
-                      //         padding: EdgeInsets.all(4.0),
-                      //         child: Icon(
-                      //           Ionicons.add_circle,
-                      //           size: 72,
-                      //           color: _isrecording ? Colors.red : Colors.white,
-                      //         ),
-                      //       ),
-                      //       onTap: () {
-                      //         setState(() {
-                      //           _isrecording = !_isrecording;
-                      //         });
-                      //         if (_isrecording) {
-                      //           print('aya1');
-                      //           controller != null &&
-                      //                   controller!.value.isInitialized &&
-                      //                   !controller!.value.isRecordingVideo
-                      //               ? _onRecordButtonPressed
-                      //               : {print('aya1')};
-                      //         } else {
-                      //           print('aya2');
-                      //           controller != null &&
-                      //                   controller!.value.isInitialized &&
-                      //                   controller!.value.isRecordingVideo
-                      //               ? _onStopButtonPressed
-                      //               : {print('aya2')};
-                      //         }
-                      //       },
-                      //     ),
-                      //   ),
-                      // ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: GestureDetector(
+                            child: Container(
+                                padding: const EdgeInsets.all(4.0),
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 800),
+                                  transitionBuilder: (widget, animation) =>
+                                      ScaleTransition(
+                                    scale: animation,
+                                    child: widget,
+                                  ),
+                                  switchInCurve: Curves.easeInExpo,
+                                  switchOutCurve: Curves.easeOutExpo,
+                                  child: _isrecording
+                                      ? Image.asset(
+                                          'assets/shutter2.png',
+                                          key: UniqueKey(),
+                                          width: 72.0,
+                                          height: 72.0,
+                                        )
+                                      : Image.asset(
+                                          'assets/shutter.png',
+                                          key: UniqueKey(),
+                                          width: 72.0,
+                                          height: 72.0,
+                                        ),
+                                )),
+                            onTap: () {
+                              setState(() {
+                                _isrecording = !_isrecording;
+                              });
+                              if (_isrecording) {
+                                controller != null &&
+                                        controller!.value.isInitialized &&
+                                        !controller!.value.isRecordingVideo
+                                    ? _onRecordButtonPressed()
+                                    : null;
+                              } else {
+                                controller != null &&
+                                        controller!.value.isInitialized &&
+                                        controller!.value.isRecordingVideo
+                                    ? _onStopButtonPressed()
+                                    : null;
+                              }
+                            },
+                          ),
+                        ),
+                      ),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: _cameraTogglesRowWidget(),
@@ -178,19 +197,6 @@ class _VideoRecorderState extends State<VideoRecorder> {
         ));
   }
 
-  IconData _getCameraLensIcon(CameraLensDirection direction) {
-    switch (direction) {
-      case CameraLensDirection.back:
-        return Icons.camera_rear;
-      case CameraLensDirection.front:
-        return Icons.camera_front;
-      case CameraLensDirection.external:
-        return Icons.camera;
-      default:
-        return Icons.device_unknown;
-    }
-  }
-
   Widget _cameraPreviewWidget() {
     if (!controller!.value.isInitialized) {
       return const Text(
@@ -209,56 +215,20 @@ class _VideoRecorderState extends State<VideoRecorder> {
   }
 
   Widget _cameraTogglesRowWidget() {
-    if (cameras! == null) {
-      return Container();
-    }
-
-    CameraDescription selectedCamera = cameras![selectedCameraIdx!];
-    CameraLensDirection lensDirection = selectedCamera.lensDirection;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: const BorderRadius.all(Radius.circular(50.0)),
-        onTap: _onSwitchCamera,
+        onTap: _isrecording ? null : _onSwitchCamera,
         child: Container(
           padding: const EdgeInsets.all(4.0),
-          child: Icon(
-            _getCameraLensIcon(
-              lensDirection,
-            ),
+          child: Image.asset(
+            'assets/switch_camera.png',
             color: Colors.grey[200],
-            size: 42,
+            width: 42.0,
+            height: 42.0,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _captureControlRowWidget() {
-    return Expanded(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.videocam),
-            color: Colors.blue,
-            onPressed: controller != null &&
-                    controller!.value.isInitialized &&
-                    !controller!.value.isRecordingVideo
-                ? _onRecordButtonPressed
-                : null,
-          ),
-          IconButton(
-            icon: const Icon(Icons.stop),
-            color: Colors.red,
-            onPressed: controller != null &&
-                    controller!.value.isInitialized &&
-                    controller!.value.isRecordingVideo
-                ? _onStopButtonPressed
-                : null,
-          ),
-        ],
       ),
     );
   }
@@ -270,7 +240,7 @@ class _VideoRecorderState extends State<VideoRecorder> {
       await controller!.dispose();
     }
 
-    controller = CameraController(cameraDescription, ResolutionPreset.medium);
+    controller = CameraController(cameraDescription, ResolutionPreset.veryHigh);
 
     controller!.addListener(() {
       if (mounted) {
@@ -302,12 +272,20 @@ class _VideoRecorderState extends State<VideoRecorder> {
   }
 
   void _selectImage() async {
+    await controller!.dispose();
     XFile? imageFile = await imagePicker.pickVideo(
       source: ImageSource.gallery,
     );
-    setState(() {
-      file = File(imageFile!.path);
-    });
+    if (imageFile != null) {
+      file = File(imageFile.path);
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => UploadPage(file!)))
+          .then((value) {
+        initialize();
+      });
+    } else {
+      initialize();
+    }
   }
 
   void _onSwitchCamera() {
@@ -323,7 +301,6 @@ class _VideoRecorderState extends State<VideoRecorder> {
   }
 
   void _onRecordButtonPressed() {
-    print('aya');
     _startVideoRecording().then((String? filePath) {
       if (filePath != null) {
         Fluttertoast.showToast(
@@ -347,24 +324,19 @@ class _VideoRecorderState extends State<VideoRecorder> {
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.grey,
           textColor: Colors.white);
-      File temp = File(videoPath!);
       if (controller!.value.isStreamingImages) {
         await controller!.stopImageStream();
       }
-      //controller!.dispose();
       await controller!.dispose();
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => UploadPage(videoFile!)))
           .then((value) {
         initialize();
       });
-
-      await controller!.dispose();
     });
   }
 
   Future<String?> _startVideoRecording() async {
-    print('aya');
     if (!controller!.value.isInitialized) {
       Fluttertoast.showToast(
           msg: 'Please wait',
@@ -406,6 +378,7 @@ class _VideoRecorderState extends State<VideoRecorder> {
     try {
       await controller!.stopVideoRecording().then((value) {
         videoFile = File(value.path);
+        videoFile!.rename(videoPath!);
       });
     } on CameraException catch (e) {
       _showCameraException(e);

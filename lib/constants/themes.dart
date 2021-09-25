@@ -54,7 +54,8 @@ final lightTheme = ThemeData(
   ),
   cardColor: Colors.grey[300],
   colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.black),
-  textSelectionTheme: TextSelectionThemeData(selectionColor: Colors.black38),
+  textSelectionTheme:
+      const TextSelectionThemeData(selectionColor: Colors.black38),
 );
 
 const kFontWeightBoldTextStyle = TextStyle(fontWeight: FontWeight.bold);

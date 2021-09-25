@@ -49,20 +49,24 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                     index,
                   ) {
                     return GestureDetector(
+                        key: Key(feedViewModel
+                            .videoSource!.listData[index].product1),
                         onTap: () {
                           Navigator.of(context).pushNamed(LikeScroll.routeName,
                               arguments: ScreenArguments(index));
                         },
                         child: Card(
+                          key: Key(feedViewModel
+                              .videoSource!.listData[index].product1),
                           elevation: 3,
                           child: Stack(
                             children: [
                               SizedBox.expand(
-                                //fit: FlexFit.tight,
-                                // fit: BoxFit.fill,
                                 child: FittedBox(
                                   fit: BoxFit.fill,
                                   child: CachedNetworkImage(
+                                    key: Key(feedViewModel
+                                        .videoSource!.listData[index].product1),
                                     placeholder: (context, url) => Container(
                                       color: Colors.grey,
                                     ),
@@ -74,6 +78,8 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                                 ),
                               ),
                               Positioned(
+                                key: Key(feedViewModel
+                                    .videoSource!.listData[index].product1),
                                 right: 0,
                                 child: PopupMenuButton(
                                   itemBuilder: (BuildContext context) {

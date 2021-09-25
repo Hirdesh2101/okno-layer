@@ -19,7 +19,6 @@ class ScrollFeed extends StatefulWidget {
 }
 
 class _ScrollFeedState extends State<ScrollFeed> {
-  //final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final feedViewModel2 = GetIt.instance<LikeProvider>();
   @override
