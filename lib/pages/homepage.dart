@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oknoapp/pages/creator_section.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/pages/profile_page.dart';
 import 'package:oknoapp/providers/likedvideoprovider.dart';
@@ -58,6 +59,14 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Creator Page'),
+                onTap: () {
+                  Navigator.of(context).pushNamed(CreatorPage.routeName);
+                  feedViewModel.pauseDrawer();
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.exit_to_app),
                 title: const Text("Logout"),
                 onTap: () async {
@@ -96,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                 ? SafeArea(
                     child: Stack(
                       children: [
-                        const ScrollFeed(0, false),
+                        const ScrollFeed(0, false, false),
                         Positioned(
                           left: 10,
                           top: 20,

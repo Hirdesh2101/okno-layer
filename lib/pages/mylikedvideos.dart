@@ -52,8 +52,10 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                         key: Key(feedViewModel
                             .videoSource!.listData[index].product1),
                         onTap: () {
-                          Navigator.of(context).pushNamed(LikeScroll.routeName,
-                              arguments: ScreenArguments(index));
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return LikeScroll(index, false);
+                          }));
                         },
                         child: Card(
                           key: Key(feedViewModel
@@ -111,9 +113,4 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
               }),
     );
   }
-}
-
-class ScreenArguments {
-  final int indexofgrid;
-  ScreenArguments(this.indexofgrid);
 }

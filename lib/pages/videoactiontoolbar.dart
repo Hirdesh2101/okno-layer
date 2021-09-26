@@ -7,11 +7,14 @@ import './bottomsheet.dart';
 import '../firebase functions/sidebar_fun.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/likedvideoprovider.dart';
+import '../providers/myvideosprovider.dart';
 
 class ActionToolBar extends StatefulWidget {
   final int index;
   final bool likedPage;
-  const ActionToolBar(this.index, this.likedPage, {Key? key}) : super(key: key);
+  final bool mypage;
+  const ActionToolBar(this.index, this.likedPage, this.mypage, {Key? key})
+      : super(key: key);
 
   @override
   _ActionToolBarState createState() => _ActionToolBarState();
@@ -21,6 +24,7 @@ class _ActionToolBarState extends State<ActionToolBar> {
   //final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final feedViewMode2 = GetIt.instance<LikeProvider>();
+  final feedViewMode3 = GetIt.instance<MyVideosProvider>();
   final SideBarFirebase firebaseServices = SideBarFirebase();
 
   @override
@@ -37,19 +41,20 @@ class _ActionToolBarState extends State<ActionToolBar> {
             style: TextStyle(color: Colors.white),
           ),
           onPressed: () async {
-            if (!widget.likedPage) {
-              feedViewModel.pauseVideo(widget.index);
-            } else {
-              feedViewMode2.pauseVideo(widget.index);
-            }
-            ProductDetails().sheet(context, widget.index, widget.likedPage);
+            widget.likedPage || widget.mypage
+                ? widget.likedPage
+                    ? feedViewMode2.pauseDrawer()
+                    : feedViewMode3.pauseDrawer()
+                : feedViewModel.pauseDrawer();
+            ProductDetails()
+                .sheet(context, widget.index, widget.likedPage, widget.mypage);
             await firebaseServices.viewedProduct(widget.likedPage
                 ? feedViewMode2.videoSource!.listVideos[widget.index]
                 : feedViewModel.videoSource!.docId[widget.index]);
           },
         ),
       ),
-      if (!widget.likedPage)
+      if (!widget.likedPage && !widget.mypage)
         Positioned(
           right: 0,
           bottom: 0,

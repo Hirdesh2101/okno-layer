@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:oknoapp/pages/mylikedvideos.dart';
+import 'package:oknoapp/providers/myvideosprovider.dart';
 import './scrollfeed.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/likedvideoprovider.dart';
 
 class LikeScroll extends StatefulWidget {
+  final bool isMyVideo;
+  final int indexofgrid;
   static const routeName = '/like_scroll';
-  const LikeScroll({Key? key}) : super(key: key);
+  const LikeScroll(this.indexofgrid, this.isMyVideo, {Key? key})
+      : super(key: key);
 
   @override
   _LikeScrollState createState() => _LikeScrollState();
@@ -14,34 +17,46 @@ class LikeScroll extends StatefulWidget {
 
 class _LikeScrollState extends State<LikeScroll> {
   final feedViewModel = GetIt.instance<LikeProvider>();
+  final feedViewModel2 = GetIt.instance<MyVideosProvider>();
   @override
   Widget build(BuildContext context) {
-    final arguments =
-        ModalRoute.of(context)!.settings.arguments as ScreenArguments;
     return Scaffold(
       body: SafeArea(
         child: WillPopScope(
           onWillPop: () async {
-            await feedViewModel.pauseDrawer();
-            await feedViewModel.disposingall();
+            if (widget.isMyVideo) {
+              await feedViewModel2.pauseDrawer();
+              await feedViewModel2.disposingall();
+            } else {
+              await feedViewModel.pauseDrawer();
+              await feedViewModel.disposingall();
+            }
             return true;
           },
           child: Stack(
             children: [
-              ScrollFeed(arguments.indexofgrid, true),
+              if (widget.isMyVideo) ScrollFeed(widget.indexofgrid, false, true),
+              if (!widget.isMyVideo)
+                ScrollFeed(widget.indexofgrid, true, false),
               Positioned(
                 child: Row(
                   children: [
                     IconButton(
                         icon: const Icon(Icons.arrow_back),
                         onPressed: () {
-                          feedViewModel.disposingall();
+                          if (widget.isMyVideo) {
+                            feedViewModel2.disposingall();
+                          } else {
+                            feedViewModel.disposingall();
+                          }
                           Navigator.of(context).pop();
                         }),
                     const SizedBox(
                       width: 10,
                     ),
-                    const Text('Liked Videos')
+                    (widget.isMyVideo)
+                        ? const Text('My Creation')
+                        : const Text('Liked Videos')
                   ],
                 ),
               ),

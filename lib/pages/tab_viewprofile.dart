@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:stacked/stacked.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:oknoapp/providers/myvideosprovider.dart';
+import 'package:get_it/get_it.dart';
+import './liked_scroll.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../services/cache_service.dart';
 
 class TabBarControllerWidget extends StatefulWidget {
   const TabBarControllerWidget({Key? key}) : super(key: key);
@@ -25,7 +30,7 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
 
   @override
   Widget build(BuildContext context) {
-    var user = FirebaseAuth.instance.currentUser!.uid;
+    final feedViewModel = GetIt.instance<MyVideosProvider>();
     return ListView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -45,7 +50,6 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
               ),
             ),
           ],
-          isScrollable: true,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white24,
           indicatorColor: Colors.white,
@@ -61,44 +65,74 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
         IndexedStack(
           children: <Widget>[
             Visibility(
-              child: FutureBuilder(
-                future: FirebaseFirestore.instance
-                    .collection('UsersData')
-                    .doc(user)
-                    .get(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  }
-                  dynamic data = snapshot.data;
-                  List temp = data['MyVideos'];
-                  return GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: data['MyVideos'].length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 1.5,
-                        mainAxisSpacing: 1.5,
-                        childAspectRatio: 9 / 15,
+              child: feedViewModel.videoSource!.listVideos.isEmpty
+                  ? Center(
+                      child: Column(
+                        children: const [
+                          SizedBox(
+                            height: 50,
+                          ),
+                          Text('No Videos Created'),
+                        ],
                       ),
-                      itemBuilder: (
-                        context,
-                        index,
-                      ) {
-                        return Card();
-                      });
-                },
-              ),
+                    )
+                  : ViewModelBuilder.reactive(
+                      disposeViewModel: false,
+                      viewModelBuilder: () => feedViewModel,
+                      builder: (context, model, child) {
+                        return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount:
+                                feedViewModel.videoSource!.listVideos.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 1.5,
+                              mainAxisSpacing: 1.5,
+                              childAspectRatio: 9 / 15,
+                            ),
+                            itemBuilder: (
+                              context,
+                              index,
+                            ) {
+                              return GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) {
+                                      return LikeScroll(index, true);
+                                    }));
+                                  },
+                                  child: Card(
+                                    elevation: 3,
+                                    child: SizedBox.expand(
+                                      child: FittedBox(
+                                        fit: BoxFit.fill,
+                                        child: CachedNetworkImage(
+                                          key: Key(feedViewModel.videoSource!
+                                              .listData[index].thumbnail),
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            color: Colors.grey,
+                                          ),
+                                          fit: BoxFit.fill,
+                                          cacheManager:
+                                              CustomCacheManager.instance2,
+                                          imageUrl: feedViewModel.videoSource!
+                                              .listData[index].thumbnail,
+                                        ),
+                                      ),
+                                    ),
+                                  ));
+                            });
+                      },
+                    ),
               maintainState: true,
               visible: selectedIndex == 0,
             ),
             Visibility(
-              child: Container(
-                child: const Center(
-                  child: Text('Content'),
-                ),
+              child: const Center(
+                child: Text('Coming SOOn'),
               ),
               maintainState: true,
               visible: selectedIndex == 1,

@@ -12,7 +12,8 @@ import 'package:video_thumbnail/video_thumbnail.dart';
 
 class UploadPage extends StatefulWidget {
   final File file;
-  const UploadPage(this.file, {Key? key}) : super(key: key);
+  final String path;
+  const UploadPage(this.file, this.path, {Key? key}) : super(key: key);
 
   @override
   _UploadPageState createState() => _UploadPageState();
@@ -21,6 +22,7 @@ class UploadPage extends StatefulWidget {
 class _UploadPageState extends State<UploadPage> {
   bool uploading = false;
   File? finalFile;
+  String? finalPath;
   File? thumbnailFile;
   VideoPlayerController? _controller;
   TextEditingController urlController = TextEditingController();
@@ -34,7 +36,10 @@ class _UploadPageState extends State<UploadPage> {
           mediaUrl: data,
           url: urlController.text,
           thumbnail: data2,
-        );
+        ).then((value) {
+          finalFile!.delete();
+          thumbnailFile!.delete();
+        });
       });
     }).then((_) {
       setState(() {
@@ -52,7 +57,10 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   Future<void> init() async {
-    finalFile = await CameraFuctions(widget.file).compressFunction();
+    finalPath =
+        await CameraFuctions(widget.file).reduceSizeAndType(widget.path);
+    //finalFile = await CameraFuctions(widget.file).compressFunction();
+    finalFile = File(finalPath!);
     _controller = VideoPlayerController.file(finalFile!);
     await _controller!.initialize();
     await _controller!.setLooping(true).then((value) {
@@ -183,7 +191,8 @@ Future<String> uploadImage(var thumnailfile) async {
   return downloadUrl;
 }
 
-void postToFireStore({String? mediaUrl, String? url, String? thumbnail}) async {
+Future<void> postToFireStore(
+    {String? mediaUrl, String? url, String? thumbnail}) async {
   var user = FirebaseAuth.instance.currentUser!.uid;
   var reference = FirebaseFirestore.instance.collection('VideosData');
   var reference2 = FirebaseFirestore.instance.collection('UsersData').doc(user);

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:video_compress/video_compress.dart';
+import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 
 class CameraFuctions {
   File file;
@@ -17,5 +18,15 @@ class CameraFuctions {
       file = File(info!.path!);
     }
     return file;
+  }
+
+  Future<String> reduceSizeAndType(outDirPath) async {
+    final FlutterFFmpeg _encoder = FlutterFFmpeg();
+    assert(File(file.path).existsSync());
+    await _encoder
+        .execute("-i ${file.path} -c:v mpeg4 $outDirPath")
+        .then((value) => print('the value of rc is $value'));
+
+    return outDirPath;
   }
 }

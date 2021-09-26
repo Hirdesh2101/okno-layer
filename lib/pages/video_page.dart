@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/upload_videopage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -46,12 +47,14 @@ class _VideoRecorderState extends State<VideoRecorder>
 
   @override
   void initState() {
+    WidgetsBinding.instance!.addObserver(this);
     initialize();
     super.initState();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
     controller!.dispose();
     super.dispose();
   }
@@ -279,7 +282,8 @@ class _VideoRecorderState extends State<VideoRecorder>
     if (imageFile != null) {
       file = File(imageFile.path);
       Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => UploadPage(file!)))
+          .push(MaterialPageRoute(
+              builder: (context) => UploadPage(file!, file!.path)))
           .then((value) {
         initialize();
       });
@@ -329,7 +333,8 @@ class _VideoRecorderState extends State<VideoRecorder>
       }
       await controller!.dispose();
       Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => UploadPage(videoFile!)))
+          .push(MaterialPageRoute(
+              builder: (context) => UploadPage(videoFile!, videoPath!)))
           .then((value) {
         initialize();
       });
@@ -378,7 +383,7 @@ class _VideoRecorderState extends State<VideoRecorder>
     try {
       await controller!.stopVideoRecording().then((value) {
         videoFile = File(value.path);
-        videoFile!.rename(videoPath!);
+        //videoFile!.rename(videoPath!);
       });
     } on CameraException catch (e) {
       _showCameraException(e);

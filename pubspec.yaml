@@ -61,6 +61,7 @@ dev_dependencies:
   video_compress: ^3.1.0
   image_cropper: ^1.4.1
   firebase_storage: ^10.0.3
+  flutter_ffmpeg: ^0.4.2
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
