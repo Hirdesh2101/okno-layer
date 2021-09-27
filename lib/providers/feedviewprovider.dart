@@ -18,26 +18,12 @@ class FeedViewModel extends BaseViewModel {
     return videoSource?.listVideos.length;
   }
 
-  // Stream<bool> state() async* {
-  //   yield videoSource!.loading;
-  // }
-
-  // void isLoading() {
-  //   state().listen((event) {
-  //     loading = event;
-  //     notifyListeners();
-  //   });
-  // }
-
   initial() async {
     setBusy(true);
     await _initializeControllerAtIndex(0);
-    //print('aya');
 
     /// Play 1st video
     _playControllerAtIndex(0);
-    //notifyListeners();
-    //print('aya1');
     setBusy(false);
 
     /// Initialize 2nd vide

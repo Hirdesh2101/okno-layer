@@ -3,6 +3,7 @@ import 'package:oknoapp/pages/creator_section.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/pages/profile_page.dart';
 import 'package:oknoapp/providers/likedvideoprovider.dart';
+import '../providers/myvideosprovider.dart';
 import 'scrollfeed.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -73,9 +74,9 @@ class _HomePageState extends State<HomePage> {
                   final FirebaseAuth _firebase = FirebaseAuth.instance;
                   final GoogleSignIn _googleSignIn = GoogleSignIn();
                   User user = _firebase.currentUser!;
-                  // if (user.providerData[1].providerId == 'google.com') {
-                  //   await _googleSignIn.signOut();
-                  // }
+                  if (user.providerData[0].providerId == 'google.com') {
+                    await _googleSignIn.signOut();
+                  }
                   //await InternetAddress.lookup('google.com');
                   // if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
                   await _firebase.signOut();
@@ -86,6 +87,9 @@ class _HomePageState extends State<HomePage> {
                     setState(() {});
                   });
                   locator<LikeProvider>().removeListener(() {
+                    setState(() {});
+                  });
+                  locator<MyVideosProvider>().removeListener(() {
                     setState(() {});
                   });
                 },

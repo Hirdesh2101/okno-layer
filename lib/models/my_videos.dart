@@ -13,6 +13,7 @@ class MyVideos {
   String p1name;
   String store;
   String thumbnail;
+  bool approved;
 
   VideoPlayerController? controller;
   BaseCacheManager? _cacheManager;
@@ -20,6 +21,7 @@ class MyVideos {
   MyVideos(
       {required this.id,
       required this.url,
+      required this.approved,
       required this.product1,
       required this.product2,
       required this.seller,
@@ -33,6 +35,7 @@ class MyVideos {
         url = json['url'],
         p1name = json['p1name'],
         product1 = json['product1'],
+        approved = json['Approved'],
         product2 = json['product2'],
         seller = json['seller'],
         store = json['store'],
@@ -47,6 +50,7 @@ class MyVideos {
     data['product2'] = product2;
     data['p1name'] = p1name;
     data['Thumbnail'] = thumbnail;
+    data['Approved'] = approved;
     data['selller'] = seller;
     data['store'] = store;
     data['price'] = price;

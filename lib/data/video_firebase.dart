@@ -1,21 +1,37 @@
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'demodata.dart';
 import '../models/video.dart';
 
 class VideosAPI {
   List<Video> listVideos = <Video>[];
-  List<String> docId = <String>[];
   late DocumentSnapshot lastData;
   final _firebase = FirebaseFirestore.instance.collection("VideosData");
   VideosAPI() {
     load();
   }
+  List<Video> shuffle1(List<Video> items) {
+    var random = Random();
+
+    for (var i = items.length - 1; i > 0; i--) {
+      var n = random.nextInt(i + 1);
+
+      var temp = items[i];
+      items[i] = items[n];
+      items[n] = temp;
+    }
+
+    return items;
+  }
+
   void load() async {
     listVideos = await _getVideoList();
+    listVideos = shuffle1(listVideos);
   }
 
   void addVideos() async {
     var list = await getMoreVideos();
+    list = shuffle1(list);
     listVideos.addAll(list);
   }
 
@@ -34,7 +50,7 @@ class VideosAPI {
     }
     lastData = data.docs.last;
     for (var element in videos.docs) {
-      docId.add(element.id);
+      //docId.add(element.id);
       Video video = Video.fromJson(element.data());
       videoList.add(video);
     }
@@ -59,7 +75,7 @@ class VideosAPI {
     videos = data;
     lastData = data.docs.last;
     for (var element in videos.docs) {
-      docId.add(element.id);
+      // docId.add(element.id);
       Video video = Video.fromJson(element.data());
       videoList.add(video);
     }

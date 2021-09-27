@@ -19,7 +19,7 @@ class SideBarFirebase {
     } else {
       await FirebaseFirestore.instance
           .collection('VideosData')
-          .doc(docu)
+          .doc(docu.toString().trim())
           .update({'Likes': FieldValue.arrayUnion(obj)});
 
       await FirebaseFirestore.instance
@@ -27,6 +27,14 @@ class SideBarFirebase {
           .doc(user)
           .update({'Likes': FieldValue.arrayUnion(obj2)});
     }
+  }
+
+  Future<void> watchedVideo(dynamic docu) async {
+    var obj = [docu];
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .update({'WatchedVideo': FieldValue.arrayUnion(obj)});
   }
 
   Future<void> viewedProduct(dynamic docu) async {

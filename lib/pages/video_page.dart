@@ -383,7 +383,7 @@ class _VideoRecorderState extends State<VideoRecorder>
     try {
       await controller!.stopVideoRecording().then((value) {
         videoFile = File(value.path);
-        //videoFile!.rename(videoPath!);
+        videoFile!.rename(videoPath!);
       });
     } on CameraException catch (e) {
       _showCameraException(e);

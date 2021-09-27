@@ -50,7 +50,8 @@ class _ActionToolBarState extends State<ActionToolBar> {
                 .sheet(context, widget.index, widget.likedPage, widget.mypage);
             await firebaseServices.viewedProduct(widget.likedPage
                 ? feedViewMode2.videoSource!.listVideos[widget.index]
-                : feedViewModel.videoSource!.docId[widget.index]);
+                : feedViewModel.videoSource!.listVideos[widget.index].id
+                    .trim());
           },
         ),
       ),
@@ -69,13 +70,18 @@ class _ActionToolBarState extends State<ActionToolBar> {
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
           } else {
-            final documents = snapshot.data!.docs;
-            List<dynamic> list = documents[widget.index]['Likes'];
+            final documents = snapshot.data!.docs.where((element) {
+              return element.id ==
+                  feedViewModel.videoSource!.listVideos[widget.index].id.trim();
+            });
+            List<dynamic> list = documents.first['Likes'] ?? [];
+
             Future<bool> likeFunc(bool init) async {
               firebaseServices.add(
                   widget.likedPage
                       ? feedViewMode2.videoSource!.listVideos[widget.index]
-                      : feedViewModel.videoSource!.docId[widget.index],
+                      : feedViewModel.videoSource!.listVideos[widget.index].id
+                          .trim(),
                   list.contains(firebaseServices.user) ? true : false);
               return !init;
             }

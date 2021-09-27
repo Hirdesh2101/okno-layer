@@ -9,7 +9,9 @@ import 'pages/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'services/service_locator.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_analytics/observer.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +28,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FirebaseAnalytics analytics = FirebaseAnalytics();
     return MaterialApp(
         title: 'OkNoApp',
         themeMode: ThemeMode.dark,
@@ -55,6 +58,9 @@ class MyApp extends StatelessWidget {
           EditProfile.routeName: (ctx) => const EditProfile(),
           CreatorPage.routeName: (ctx) => const CreatorPage(),
         },
+        navigatorObservers: [
+          FirebaseAnalyticsObserver(analytics: analytics),
+        ],
         onUnknownRoute: (settings) {
           return MaterialPageRoute(
             builder: (ctx) => const Loginscreen(),

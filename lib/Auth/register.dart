@@ -43,6 +43,8 @@ class _RegisterState extends State<Register> {
         'Email': email,
         'Age': age,
         'Creator': false,
+        'Likes': [],
+        'MyVideos': [],
       });
       Navigator.of(context).pushReplacementNamed(HomePage.routeName);
     } on PlatformException catch (err) {

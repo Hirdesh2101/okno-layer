@@ -129,7 +129,9 @@ class ProductDetails {
                             await launch(url);
                             await firebasefun.viewedUrl(likedVideo
                                 ? feedViewModel2.videoSource!.listVideos[index]
-                                : feedViewModel.videoSource!.docId[index]);
+                                : feedViewModel
+                                    .videoSource!.listVideos[index].id
+                                    .trim());
                           } else {
                             // ignore: avoid_print
                             print("error");

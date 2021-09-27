@@ -149,12 +149,12 @@ class _AuthFormLoginState extends State<AuthFormLogin> {
                             onPressed:
                                 widget.isLoading ? null : _tryGoogleSignIn,
                           ),
-                          IconButton(
-                            iconSize: 12,
-                            icon: Image.asset('assets/facebook.jpg'),
-                            onPressed:
-                                widget.isLoading ? null : _tryFacebookSignIn,
-                          )
+                          // IconButton(
+                          //   iconSize: 12,
+                          //   icon: Image.asset('assets/facebook.jpg'),
+                          //   onPressed:
+                          //       widget.isLoading ? null : _tryFacebookSignIn,
+                          // )
                         ],
                       ),
                     ),

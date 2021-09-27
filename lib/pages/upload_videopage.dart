@@ -22,7 +22,7 @@ class UploadPage extends StatefulWidget {
 class _UploadPageState extends State<UploadPage> {
   bool uploading = false;
   File? finalFile;
-  String? finalPath;
+  //String? finalPath;
   File? thumbnailFile;
   VideoPlayerController? _controller;
   TextEditingController urlController = TextEditingController();
@@ -57,10 +57,10 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   Future<void> init() async {
-    finalPath =
-        await CameraFuctions(widget.file).reduceSizeAndType(widget.path);
+    // await CameraFuctions(widget.file).reduceSizeAndType(widget.path);
     //finalFile = await CameraFuctions(widget.file).compressFunction();
-    finalFile = File(finalPath!);
+    //finalFile = File(finalPath!);
+    finalFile = widget.file;
     _controller = VideoPlayerController.file(finalFile!);
     await _controller!.initialize();
     await _controller!.setLooping(true).then((value) {
@@ -197,7 +197,7 @@ Future<void> postToFireStore(
   var reference = FirebaseFirestore.instance.collection('VideosData');
   var reference2 = FirebaseFirestore.instance.collection('UsersData').doc(user);
   await reference.add({
-    "Approved": true,
+    "Approved": false,
     "Likes": [],
     "Thumbnail": thumbnail,
     "url": mediaUrl,

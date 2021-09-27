@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oknoapp/firebase%20functions/sidebar_fun.dart';
 import 'package:oknoapp/models/like_videos.dart';
 import 'package:oknoapp/models/my_videos.dart';
 import 'package:oknoapp/providers/myvideosprovider.dart';
@@ -93,9 +94,30 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                   : videoCard3(feedViewModel3
                                       .videoSource!.listData[index])
                               : videoCard(
-                                  feedViewModel.videoSource!.listVideos[index]),
-                          ActionToolBar(
-                              index, widget.likedPage, widget.myVideopage),
+                                  feedViewModel.videoSource!.listVideos[index],
+                                  feedViewModel
+                                      .videoSource!.listVideos[index].id),
+                          !widget.myVideopage
+                              ? ActionToolBar(
+                                  index, widget.likedPage, widget.myVideopage)
+                              : (widget.myVideopage &&
+                                      !feedViewModel3.videoSource!
+                                          .listData[index].approved)
+                                  ? Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: const [
+                                          Text('Approval Pending'),
+                                          SizedBox(
+                                            height: 8,
+                                          )
+                                        ],
+                                      ))
+                                  : ActionToolBar(index, widget.likedPage,
+                                      widget.myVideopage),
                         ]);
                       })
                   : const Center(
@@ -106,7 +128,15 @@ class _ScrollFeedState extends State<ScrollFeed> {
     );
   }
 
-  Widget videoCard(Video video) {
+  Widget videoCard(Video video, var id) {
+    video.controller!.addListener(() {
+      if (video.controller!.value.position ==
+          const Duration(seconds: 0, minutes: 0, hours: 0)) {}
+      if (video.controller!.value.position.inSeconds ==
+          video.controller!.value.duration.inSeconds) {
+        SideBarFirebase().watchedVideo(id);
+      }
+    });
     return video.controller != null && video.controller!.value.isInitialized
         ? Stack(children: [
             GestureDetector(

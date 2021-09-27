@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 import 'auth_form_login.dart';
@@ -40,6 +41,47 @@ class _LoginscreenState extends State<Loginscreen> {
         );
 
         UserCredential result = await _auth.signInWithCredential(credential);
+        try {
+          final user = FirebaseAuth.instance.currentUser;
+          if (FirebaseFirestore.instance
+                  .collection('UsersData')
+                  .doc(user!.uid)
+                  .id ==
+              "") {
+            FirebaseFirestore.instance
+                .collection('UsersData')
+                .doc(user.uid)
+                .set({
+              'Name': googleUser.displayName,
+              'Gender': "",
+              'Email': googleUser.email,
+              'Age': "",
+              'Creator': false,
+              'Likes': [],
+              'MyVideos': [],
+            });
+          }
+        } on PlatformException catch (err) {
+          var message = 'An error occurred, pelase check your credentials!';
+
+          if (err.message != null) {
+            message = err.message!;
+          }
+
+          ScaffoldMessenger.of(ctx).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: Theme.of(ctx).errorColor,
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+        } catch (err) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       } on PlatformException catch (err) {
         var message = 'An error occurred, pelase check your credentials!';
 

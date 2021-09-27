@@ -20,7 +20,7 @@ class CameraFuctions {
     return file;
   }
 
-  Future<String> reduceSizeAndType(outDirPath) async {
+  Future<String> _reduceSizeAndType(outDirPath) async {
     final FlutterFFmpeg _encoder = FlutterFFmpeg();
     assert(File(file.path).existsSync());
     await _encoder
