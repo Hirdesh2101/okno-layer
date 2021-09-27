@@ -60,7 +60,10 @@ class VideosAPI {
 
   Future<void> addDemoData() async {
     for (var video in data) {
-      await _firebase.add(video);
+      await _firebase.add(video).then((DocumentReference doc) {
+        String docId = doc.id;
+        _firebase.doc(docId).update({"id": docId});
+      });
     }
   }
 
