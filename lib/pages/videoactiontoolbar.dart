@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
+import 'package:oknoapp/pages/comments.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:like_button/like_button.dart';
 import './bottomsheet.dart';
 import '../firebase functions/sidebar_fun.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/likedvideoprovider.dart';
+import 'package:ionicons/ionicons.dart';
 import '../providers/myvideosprovider.dart';
 
 class ActionToolBar extends StatefulWidget {
@@ -91,6 +93,7 @@ class _ActionToolBarState extends State<ActionToolBar> {
               child: SizedBox(
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   LikeButton(
+                    size: MediaQuery.of(context).size.width * 0.10,
                     likeBuilder: (bool isLiked) {
                       return Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
@@ -103,8 +106,40 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     onTap: likeFunc,
                   ),
                   const SizedBox(
-                    height: 150,
+                    height: 10,
                   ),
+                  IconButton(
+                      onPressed: () {
+                        feedViewModel.pauseDrawer();
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(
+                                builder: (context) => Comments(feedViewModel
+                                    .videoSource!.listVideos[widget.index].id
+                                    .trim())))
+                            .then((value) => feedViewModel.playDrawer());
+                      },
+                      icon: Icon(
+                        Ionicons.chatbubble_outline,
+                        size: MediaQuery.of(context).size.width * 0.085,
+                      )),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Ionicons.paper_plane_outline,
+                        size: MediaQuery.of(context).size.width * 0.085,
+                      )),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Ionicons.ellipsis_vertical_outline,
+                        size: MediaQuery.of(context).size.width * 0.085,
+                      )),
                 ]),
               ),
             );

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
@@ -18,6 +17,7 @@ class Loginscreen extends StatefulWidget {
 
 class _LoginscreenState extends State<Loginscreen> {
   final _auth = FirebaseAuth.instance;
+  GlobalKey<ScaffoldState> scafoldkey = GlobalKey<ScaffoldState>();
   var _isLoading = false;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final _formKey = GlobalKey<FormState>();
@@ -40,7 +40,7 @@ class _LoginscreenState extends State<Loginscreen> {
           idToken: googleAuth.idToken,
         );
 
-        UserCredential result = await _auth.signInWithCredential(credential);
+        await _auth.signInWithCredential(credential);
         try {
           final user = FirebaseAuth.instance.currentUser;
           if (FirebaseFirestore.instance
@@ -61,13 +61,8 @@ class _LoginscreenState extends State<Loginscreen> {
               'MyVideos': [],
             });
           }
-        } on PlatformException catch (err) {
-          var message = 'An error occurred, pelase check your credentials!';
-
-          if (err.message != null) {
-            message = err.message!;
-          }
-
+        } catch (err) {
+          var message = 'Try Again Later';
           ScaffoldMessenger.of(ctx).showSnackBar(
             SnackBar(
               content: Text(message),
@@ -77,30 +72,15 @@ class _LoginscreenState extends State<Loginscreen> {
           setState(() {
             _isLoading = false;
           });
-        } catch (err) {
-          setState(() {
-            _isLoading = false;
-          });
         }
-      } on PlatformException catch (err) {
+      } catch (err) {
         var message = 'An error occurred, pelase check your credentials!';
-
-        if (err.message != null) {
-          message = '${err.message}';
-        }
-
         ScaffoldMessenger.of(ctx).showSnackBar(
           SnackBar(
             content: Text(message),
             backgroundColor: Theme.of(ctx).errorColor,
           ),
         );
-        setState(() {
-          _isLoading = false;
-        });
-      } catch (err) {
-        // ignore: avoid_print
-        print(err);
         setState(() {
           _isLoading = false;
         });
@@ -154,43 +134,29 @@ class _LoginscreenState extends State<Loginscreen> {
     String username,
     BuildContext ctx,
   ) async {
-    UserCredential authResult;
+    //UserCredential authResult;
 
     try {
       setState(() {
         _isLoading = true;
       });
 
-      authResult = await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-    } on PlatformException catch (err) {
-      var message = 'An error occurred, pelase check your credentials!';
+    } on FirebaseAuthException catch (err) {
+      var message = '${err.message}';
 
-      if (err.message != null) {
-        message = '${err.message}';
-      }
-      Fluttertoast.showToast(
-          msg: message,
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          // textColor: Colors.white,
-          fontSize: 16.0);
       ScaffoldMessenger.of(ctx).showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
           backgroundColor: Theme.of(ctx).errorColor,
         ),
       );
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (err) {
-      // ignore: avoid_print
-      print(err);
       setState(() {
         _isLoading = false;
       });
@@ -201,7 +167,20 @@ class _LoginscreenState extends State<Loginscreen> {
     String? _emailFor = '';
     bool inProgress = false;
     Future<void> resetPassword(String email) async {
-      await _auth.sendPasswordResetEmail(email: email);
+      try {
+        await _auth.sendPasswordResetEmail(email: email);
+      } on FirebaseException catch (e) {
+        String message = "${e.message}";
+        ScaffoldMessenger.of(ctx).showSnackBar(
+          SnackBar(
+            content: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Theme.of(ctx).errorColor,
+          ),
+        );
+      }
     }
 
     showDialog(
@@ -262,6 +241,7 @@ class _LoginscreenState extends State<Loginscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scafoldkey,
       backgroundColor: Theme.of(context).primaryColor,
       body: AuthFormLogin(
         _submitAuthForm,

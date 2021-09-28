@@ -97,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         OutlinedButton(
-                          style: ButtonStyle(),
+                          style: OutlinedButton.styleFrom(),
                           onPressed: () {
                             Navigator.of(context)
                                 .pushNamed(EditProfile.routeName);
@@ -147,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           OutlinedButton(
-                            style: ButtonStyle(),
+                            style: OutlinedButton.styleFrom(),
                             onPressed: () {
                               _firebase
                                   .update({'Creator': true}).whenComplete(() {

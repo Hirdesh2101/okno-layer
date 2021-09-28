@@ -116,7 +116,7 @@ class _CreatorPageState extends State<CreatorPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           OutlinedButton(
-                            style: ButtonStyle(),
+                            style: OutlinedButton.styleFrom(),
                             onPressed: () {
                               _firebase
                                   .update({'Creator': true}).whenComplete(() {

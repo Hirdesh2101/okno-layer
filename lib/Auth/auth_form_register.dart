@@ -269,7 +269,7 @@ class _AuthFormState extends State<AuthForm> {
                         child: ElevatedButton(
                           //shape: RoundedRectangleBorder(
                           // borderRadius: BorderRadius.circular(20)),
-                          style: ButtonStyle(),
+                          style: ElevatedButton.styleFrom(),
                           child: const Text(
                             'SIGNUP',
                             style: TextStyle(

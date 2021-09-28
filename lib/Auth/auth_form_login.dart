@@ -126,7 +126,7 @@ class _AuthFormLoginState extends State<AuthFormLogin> {
                         width: MediaQuery.of(context).size.width * 0.5,
                         child: ElevatedButton(
                           //color: const Color.fromARGB(255, 0, 171, 227),
-                          style: ButtonStyle(),
+                          style: ElevatedButton.styleFrom(),
                           child: const Text(
                             'Login',
                             style: TextStyle(

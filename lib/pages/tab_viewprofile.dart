@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:oknoapp/providers/myvideosprovider.dart';
 import 'package:get_it/get_it.dart';
 import './liked_scroll.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cache_service.dart';
+import 'package:ionicons/ionicons.dart';
 
 class TabBarControllerWidget extends StatefulWidget {
   const TabBarControllerWidget({Key? key}) : super(key: key);
@@ -40,7 +40,7 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
             Padding(
               padding: EdgeInsets.all(8.0),
               child: Icon(
-                Icons.menu,
+                Ionicons.apps_outline,
               ),
             ),
             Padding(

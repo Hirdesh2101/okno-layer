@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 import './auth_form_register.dart';
 import '../pages/homepage.dart';
 
@@ -47,23 +46,17 @@ class _RegisterState extends State<Register> {
         'MyVideos': [],
       });
       Navigator.of(context).pushReplacementNamed(HomePage.routeName);
-    } on PlatformException catch (err) {
-      var message = 'An error occurred, pelase check your credentials!';
-
-      if (err.message != null) {
-        message = err.message!;
-      }
-
+    } on FirebaseAuthException catch (err) {
+      var message = '${err.message}';
       ScaffoldMessenger.of(ctx).showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
           backgroundColor: Theme.of(ctx).errorColor,
         ),
       );
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (err) {
       setState(() {
         _isLoading = false;
       });

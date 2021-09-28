@@ -41,7 +41,7 @@ class _VideoRecorderState extends State<VideoRecorder>
         _onCameraSwitched(cameras![selectedCameraIdx!]).then((void v) {});
       }
     }).catchError((err) {
-      print('Error: $err.code\nError Message: $err.message');
+      //print('Error: $err.code\nError Message: $err.message');
     });
   }
 
@@ -392,8 +392,8 @@ class _VideoRecorderState extends State<VideoRecorder>
   }
 
   void _showCameraException(CameraException e) {
-    String errorText = 'Error: ${e.code}\nError Message: ${e.description}';
-    print(errorText);
+    //String errorText = 'Error: ${e.code}\nError Message: ${e.description}';
+    //print(errorText);
 
     Fluttertoast.showToast(
         msg: 'Error: ${e.code}\n${e.description}',
