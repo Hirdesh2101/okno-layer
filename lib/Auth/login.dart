@@ -59,6 +59,9 @@ class _LoginscreenState extends State<Loginscreen> {
               'Creator': false,
               'Likes': [],
               'MyVideos': [],
+              'Total Income': 0.0,
+              'Balance': 0.0,
+              'Encashed': 0.0,
             });
           }
         } catch (err) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:oknoapp/pages/encashed_page.dart';
 import 'video_page.dart';
 import 'package:oknoapp/pages/tab_viewprofile.dart';
 
@@ -35,10 +36,11 @@ class _CreatorPageState extends State<CreatorPage> {
                 Column(
                   children: [
                     const SizedBox(
-                      height: 15,
+                      height: 5,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -57,23 +59,35 @@ class _CreatorPageState extends State<CreatorPage> {
                           ),
                         ),
                         const SizedBox(
-                          width: 50,
+                          width: 25,
                         ),
                         Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text("My VIEWS"),
-                            SizedBox(
+                          children: [
+                            const SizedBox(
+                              height: 30,
+                            ),
+                            Text("Encashed ${data['Encashed'] ?? '0.0'}"),
+                            const SizedBox(
                               height: 5,
                             ),
-                            Text("My income"),
-                            SizedBox(
+                            Text("Balance ${data['Balance'] ?? '0.0'}"),
+                            const SizedBox(
                               height: 5,
                             ),
-                            Text("My followers"),
-                            SizedBox(
+                            Text(
+                                "Total Income ${data['Total Income'] ?? '0.0'}"),
+                            const SizedBox(
                               height: 5,
-                            )
+                            ),
+                            OutlinedButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pushNamed(EncashedPage.routeName);
+                                },
+                                child: const Text('Encash'))
                           ],
                         )
                       ],
@@ -118,10 +132,68 @@ class _CreatorPageState extends State<CreatorPage> {
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(),
                             onPressed: () {
-                              _firebase
-                                  .update({'Creator': true}).whenComplete(() {
-                                setState(() {});
-                              });
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('Terms and Conditions'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.white24)),
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.25,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: ListView.builder(
+                                                  itemBuilder: (ctx, index) {
+                                                    return Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Text(
+                                                            'Terms And Conditions $index'),
+                                                        const SizedBox(
+                                                          height: 5,
+                                                        )
+                                                      ],
+                                                    );
+                                                  },
+                                                  itemCount: 10,
+                                                ),
+                                              )),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                                child: const Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                  child: const Text('Accept'),
+                                                  onPressed: () {
+                                                    _firebase.update({
+                                                      'Creator': true
+                                                    }).whenComplete(() {
+                                                      setState(() {});
+                                                    });
+
+                                                    Navigator.of(context).pop();
+                                                  }),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
                             },
                             child: const Center(
                               child: Text(

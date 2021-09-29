@@ -109,37 +109,43 @@ class _EditProfileState extends State<EditProfile> {
                           textCapitalization: TextCapitalization.sentences,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextField(
-                          enabled: _isUploading ? false : true,
-                          decoration: const InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)))),
-                          controller: _textEditingController2
-                            ..text = data['Email'],
-                          maxLines: null,
-                          minLines: null,
-                          autocorrect: false,
-                          textCapitalization: TextCapitalization.sentences,
+                      if (firebaseAuth
+                              .currentUser!.providerData[0].providerId !=
+                          'google.com')
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            enabled: _isUploading ? false : true,
+                            decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)))),
+                            controller: _textEditingController2
+                              ..text = data['Email'],
+                            maxLines: null,
+                            minLines: null,
+                            autocorrect: false,
+                            textCapitalization: TextCapitalization.sentences,
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextField(
-                          enabled: _isUploading ? false : true,
-                          decoration: const InputDecoration(
-                              hintText: 'Enter Password',
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)))),
-                          controller: _textEditingController3,
-                          autocorrect: false,
-                          obscureText: true,
-                          textCapitalization: TextCapitalization.sentences,
+                      if (firebaseAuth
+                              .currentUser!.providerData[0].providerId !=
+                          'google.com')
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            enabled: _isUploading ? false : true,
+                            decoration: const InputDecoration(
+                                hintText: 'Enter Password',
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)))),
+                            controller: _textEditingController3,
+                            autocorrect: false,
+                            obscureText: true,
+                            textCapitalization: TextCapitalization.sentences,
+                          ),
                         ),
-                      ),
                       ElevatedButton(
                         child: const Text('Update Profile'),
                         onPressed: _isUploading

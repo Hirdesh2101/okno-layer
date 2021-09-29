@@ -23,6 +23,37 @@ class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
+//   final snackBar = SnackBar(
+//   backgroundColor: Colors.transparent,
+//   elevation: 0,
+//   content: Container(
+//       padding: const EdgeInsets.all(8),
+//       decoration: BoxDecoration(
+//         color: Colors.greenAccent,
+//         border: Border.all(color: Colors.green, width: 3),
+//         boxShadow: const [
+//           BoxShadow(
+//             color: Color(0x19000000),
+//             spreadRadius: 2.0,
+//             blurRadius: 8.0,
+//             offset: Offset(2, 4),
+//           )
+//         ],
+//         borderRadius: BorderRadius.circular(4),
+//       ),
+//       child: Row(
+//         children: const [
+//           Icon(Icons.error_outline, color: Colors.red ),
+//           Padding(
+//             padding: EdgeInsets.only(left: 8.0),
+//             child: Text('Yay! A SnackBar!\nYou did great!', style: TextStyle(color: Colors.green)),
+//           ),
+//           Spacer(),
+//           // TextButton(onPressed: () => , child: const Text("Close"))
+//         ],
+//       )
+//   ),
+// );
   @override
   Widget build(BuildContext context) {
     return videoScreen();
@@ -74,13 +105,13 @@ class _HomePageState extends State<HomePage> {
                   final FirebaseAuth _firebase = FirebaseAuth.instance;
                   final GoogleSignIn _googleSignIn = GoogleSignIn();
                   User user = _firebase.currentUser!;
+                  await feedViewModel.pauseDrawer();
                   if (user.providerData[0].providerId == 'google.com') {
                     await _googleSignIn.signOut();
                   }
                   //await InternetAddress.lookup('google.com');
                   // if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
                   await _firebase.signOut();
-                  await feedViewModel.pauseDrawer();
                   await feedViewModel.disposingall();
                   Navigator.pop(context);
                   locator<FeedViewModel>().removeListener(() {

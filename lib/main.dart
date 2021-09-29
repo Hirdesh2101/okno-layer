@@ -3,6 +3,7 @@ import 'package:oknoapp/Auth/login.dart';
 import 'package:oknoapp/Auth/register.dart';
 import 'package:oknoapp/pages/creator_section.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
+import 'package:oknoapp/pages/encashed_page.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/pages/profile_page.dart';
 import 'pages/homepage.dart';
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
           ProfileScreen.routeName: (ctx) => const ProfileScreen(),
           EditProfile.routeName: (ctx) => const EditProfile(),
           CreatorPage.routeName: (ctx) => const CreatorPage(),
+          EncashedPage.routeName: (ctx) => const EncashedPage(),
         },
         navigatorObservers: [
           FirebaseAnalyticsObserver(analytics: analytics),

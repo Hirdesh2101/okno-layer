@@ -149,10 +149,68 @@ class _ProfileScreenState extends State<ProfileScreen>
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(),
                             onPressed: () {
-                              _firebase
-                                  .update({'Creator': true}).whenComplete(() {
-                                setState(() {});
-                              });
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('Terms and Conditions'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.white24)),
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.25,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: ListView.builder(
+                                                  itemBuilder: (ctx, index) {
+                                                    return Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Text(
+                                                            'Terms And Conditions $index'),
+                                                        const SizedBox(
+                                                          height: 5,
+                                                        )
+                                                      ],
+                                                    );
+                                                  },
+                                                  itemCount: 10,
+                                                ),
+                                              )),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                                child: const Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                  child: const Text('Accept'),
+                                                  onPressed: () {
+                                                    _firebase.update({
+                                                      'Creator': true
+                                                    }).whenComplete(() {
+                                                      setState(() {});
+                                                    });
+
+                                                    Navigator.of(context).pop();
+                                                  }),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
                             },
                             child: const Center(
                               child: Text(

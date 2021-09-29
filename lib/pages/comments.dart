@@ -73,8 +73,6 @@ class _CommentsState extends State<Comments> {
                     .where('id', isEqualTo: widget.id.trim())
                     .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  print(widget.id.trim());
-                  print('ayaaaaa');
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
@@ -85,10 +83,8 @@ class _CommentsState extends State<Comments> {
                       child: Text('ERROR'),
                     );
                   }
-                  print(snapshot.data!.size);
-                  print('ayaaaa');
-                  dynamic list = snapshot.data!.docs.first['Comments'];
-                  print(list);
+                  List<dynamic> temp = snapshot.data!.docs.first['Comments'];
+                  List<dynamic> list = temp.reversed.toList();
                   if (list.isEmpty) {
                     return const Center(child: Text("No Comments Yet...."));
                   }
