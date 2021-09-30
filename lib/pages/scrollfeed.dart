@@ -27,8 +27,8 @@ class _ScrollFeedState extends State<ScrollFeed> {
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final feedViewModel2 = GetIt.instance<LikeProvider>();
   final feedViewModel3 = GetIt.instance<MyVideosProvider>();
-  @override
-  void initState() {
+  final SideBarFirebase firebaseServices = SideBarFirebase();
+  void init() {
     if (!widget.likedPage && !widget.myVideopage) {
       feedViewModel.initial();
     }
@@ -38,6 +38,11 @@ class _ScrollFeedState extends State<ScrollFeed> {
     if (widget.myVideopage) {
       feedViewModel3.initial(widget.startIndex);
     }
+  }
+
+  @override
+  void initState() {
+    init();
     super.initState();
   }
 
@@ -65,61 +70,92 @@ class _ScrollFeedState extends State<ScrollFeed> {
               return !feedViewModel.isBusy &&
                       !feedViewModel2.isBusy &&
                       !feedViewModel3.isBusy
-                  ? PageView.builder(
-                      controller: PageController(
-                        initialPage: widget.likedPage || widget.myVideopage
-                            ? widget.startIndex
-                            : 0,
-                        viewportFraction: 1,
-                      ),
-                      itemCount: widget.likedPage || widget.myVideopage
-                          ? widget.likedPage
-                              ? feedViewModel2.length()
-                              : feedViewModel3.length()
-                          : feedViewModel.length(),
-                      onPageChanged: (index) {
-                        widget.likedPage || widget.myVideopage
-                            ? widget.likedPage
-                                ? feedViewModel2.onpageChanged(index)
-                                : feedViewModel3.onpageChanged(index)
-                            : feedViewModel.onpageChanged(index);
-                      },
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) {
-                        return Stack(children: [
-                          widget.likedPage || widget.myVideopage
+                  ? !widget.likedPage &&
+                          !widget.myVideopage &&
+                          feedViewModel.videoSource!.listVideos.isEmpty
+                      ? RefreshIndicator(
+                          onRefresh: () {
+                            return feedViewModel.videoSource!
+                                .load()
+                                .then((val) {
+                              init();
+                              setState(() {});
+                            });
+                          },
+                          child: SingleChildScrollView(
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Text('You Are All Caught Up'),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text('Pull To Refresh')
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : PageView.builder(
+                          controller: PageController(
+                            initialPage: widget.likedPage || widget.myVideopage
+                                ? widget.startIndex
+                                : 0,
+                            viewportFraction: 1,
+                          ),
+                          itemCount: widget.likedPage || widget.myVideopage
                               ? widget.likedPage
-                                  ? videoCard2(feedViewModel2
-                                      .videoSource!.listData[index])
-                                  : videoCard3(feedViewModel3
-                                      .videoSource!.listData[index])
-                              : videoCard(
-                                  feedViewModel.videoSource!.listVideos[index],
-                                  feedViewModel
-                                      .videoSource!.listVideos[index].id),
-                          !widget.myVideopage
-                              ? ActionToolBar(
-                                  index, widget.likedPage, widget.myVideopage)
-                              : (widget.myVideopage &&
-                                      !feedViewModel3.videoSource!
-                                          .listData[index].approved)
-                                  ? Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: const [
-                                          Text('Approval Pending'),
-                                          SizedBox(
-                                            height: 8,
-                                          )
-                                        ],
-                                      ))
-                                  : ActionToolBar(index, widget.likedPage,
-                                      widget.myVideopage),
-                        ]);
-                      })
+                                  ? feedViewModel2.length()
+                                  : feedViewModel3.length()
+                              : feedViewModel.length(),
+                          onPageChanged: (index) {
+                            widget.likedPage || widget.myVideopage
+                                ? widget.likedPage
+                                    ? feedViewModel2.onpageChanged(index)
+                                    : feedViewModel3.onpageChanged(index)
+                                : feedViewModel.onpageChanged(index);
+                          },
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, index) {
+                            return Stack(children: [
+                              widget.likedPage || widget.myVideopage
+                                  ? widget.likedPage
+                                      ? videoCard2(feedViewModel2
+                                          .videoSource!.listData[index])
+                                      : videoCard3(feedViewModel3
+                                          .videoSource!.listData[index])
+                                  : videoCard(
+                                      feedViewModel
+                                          .videoSource!.listVideos[index],
+                                      feedViewModel
+                                          .videoSource!.listVideos[index].id),
+                              !widget.myVideopage
+                                  ? ActionToolBar(index, widget.likedPage,
+                                      widget.myVideopage)
+                                  : (widget.myVideopage &&
+                                          !feedViewModel3.videoSource!
+                                              .listData[index].approved)
+                                      ? Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: const [
+                                              Text('Approval Pending'),
+                                              SizedBox(
+                                                height: 8,
+                                              )
+                                            ],
+                                          ))
+                                      : ActionToolBar(index, widget.likedPage,
+                                          widget.myVideopage),
+                            ]);
+                          })
                   : const Center(
                       child: CircularProgressIndicator(),
                     );
@@ -133,8 +169,8 @@ class _ScrollFeedState extends State<ScrollFeed> {
       if (video.controller!.value.position ==
           const Duration(seconds: 0, minutes: 0, hours: 0)) {}
       if (video.controller!.value.position.inSeconds ==
-          video.controller!.value.duration.inSeconds) {
-        SideBarFirebase().watchedVideo(id);
+          video.controller!.value.duration.inSeconds - 1) {
+        firebaseServices.watchedVideo(id);
       }
     });
     return video.controller != null && video.controller!.value.isInitialized

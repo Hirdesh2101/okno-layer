@@ -30,11 +30,14 @@ class SideBarFirebase {
   }
 
   Future<void> watchedVideo(dynamic docu) async {
+    // print('aya');
     var obj = [docu];
     await FirebaseFirestore.instance
         .collection('UsersData')
         .doc(user)
-        .update({'WatchedVideo': FieldValue.arrayUnion(obj)});
+        .update({'WatchedVideo': FieldValue.arrayUnion(obj)}).whenComplete(() {
+      //  print('done');
+    });
   }
 
   Future<void> viewedProduct(dynamic docu) async {

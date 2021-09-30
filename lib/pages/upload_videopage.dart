@@ -193,12 +193,15 @@ Future<String> uploadImage(var thumnailfile) async {
 Future<void> postToFireStore(
     {String? mediaUrl, String? url, String? thumbnail}) async {
   var user = FirebaseAuth.instance.currentUser!.uid;
-  var reference = FirebaseFirestore.instance.collection('VideosData');
+  var timestamp = DateTime.now().toString();
+  var reference =
+      FirebaseFirestore.instance.collection('VideosData').doc(timestamp);
   var reference2 = FirebaseFirestore.instance.collection('UsersData').doc(user);
-  await reference.add({
+  await reference.set({
     "Approved": false,
     "Likes": [],
     "Thumbnail": thumbnail,
+    "id": timestamp,
     "url": mediaUrl,
     "price": "56",
     "timestamp": DateTime.now(),
@@ -209,10 +212,8 @@ Future<void> postToFireStore(
     "seller": "Myself",
     "store": url,
     "Comments": [],
-  }).then((DocumentReference doc) {
-    String docId = doc.id;
-    var obj2 = [docId];
-    reference.doc(docId).update({"id": docId});
+  }).then((val) {
+    var obj2 = [timestamp];
     reference2.update({'MyVideos': FieldValue.arrayUnion(obj2)});
   });
 }

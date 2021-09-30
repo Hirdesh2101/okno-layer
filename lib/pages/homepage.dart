@@ -5,11 +5,12 @@ import 'package:oknoapp/pages/profile_page.dart';
 import 'package:oknoapp/providers/likedvideoprovider.dart';
 import '../providers/myvideosprovider.dart';
 import 'scrollfeed.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
@@ -23,6 +24,51 @@ class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
+
+  Future<void> initDynamicLinks() async {
+    FirebaseDynamicLinks.instance.onLink(
+        onSuccess: (PendingDynamicLinkData? dynamicLink) async {
+      final Uri? deepLink = dynamicLink?.link;
+
+      if (deepLink != null) {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.SUCCES,
+          animType: AnimType.BOTTOMSLIDE,
+          title: 'Thanks For Downloading',
+          desc: 'Description',
+          btnOkOnPress: () {},
+        ).show();
+        // ignore: unawaited_futures
+        //Navigator.pushNamed(context, deepLink.path);
+      }
+    }, onError: (OnLinkErrorException e) async {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.ERROR,
+        animType: AnimType.BOTTOMSLIDE,
+        title: e.message,
+        desc: e.details,
+        btnOkOnPress: () {},
+      ).show();
+    });
+
+    final PendingDynamicLinkData? data =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    final Uri? deepLink = data?.link;
+
+    if (deepLink != null) {
+      // ignore: unawaited_futures
+      // Navigator.pushNamed(context, deepLink.path)
+    }
+  }
+
+  @override
+  void initState() {
+    initDynamicLinks();
+    super.initState();
+  }
+
 //   final snackBar = SnackBar(
 //   backgroundColor: Colors.transparent,
 //   elevation: 0,
@@ -130,11 +176,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: FutureBuilder(
-          future: FirebaseFirestore.instance
-              .collection("VideosData")
-              .where('Approved', isEqualTo: true)
-              .limit(10)
-              .get(),
+          future: Future.wait(feedViewModel.videoSource!.loading()),
           builder: (ctx, snapshot) {
             return snapshot.hasData
                 ? SafeArea(

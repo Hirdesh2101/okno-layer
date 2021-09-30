@@ -47,6 +47,7 @@ class _RegisterState extends State<Register> {
         'Total Income': 0.0,
         'Balance': 0.0,
         'Encashed': 0.0,
+        'WatchedVideo': [],
       });
       Navigator.of(context).pushReplacementNamed(HomePage.routeName);
     } on FirebaseAuthException catch (err) {

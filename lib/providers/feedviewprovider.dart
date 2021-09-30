@@ -31,7 +31,7 @@ class FeedViewModel extends BaseViewModel {
   }
 
   onpageChanged(int index) {
-    if ((index - 7) % 10 == 0) {
+    if ((index + 3) == videoSource?.listVideos.length) {
       videoSource!.addVideos();
       notifyListeners();
     }
@@ -44,13 +44,17 @@ class FeedViewModel extends BaseViewModel {
   }
 
   Future<void> pauseDrawer() async {
-    await videoSource!.listVideos[currentscreen].controller?.pause();
-    notifyListeners();
+    if (videoSource!.listVideos.isNotEmpty) {
+      await videoSource!.listVideos[currentscreen].controller?.pause();
+      notifyListeners();
+    }
   }
 
   Future<void> playDrawer() async {
-    videoSource!.listVideos[currentscreen].controller?.play();
-    notifyListeners();
+    if (videoSource!.listVideos.isNotEmpty) {
+      videoSource!.listVideos[currentscreen].controller?.play();
+      notifyListeners();
+    }
   }
 
   void pauseVideo(int index) async {

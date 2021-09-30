@@ -2,10 +2,13 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'demodata.dart';
 import '../models/video.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class VideosAPI {
   List<Video> listVideos = <Video>[];
   late DocumentSnapshot lastData;
+  final user = FirebaseAuth.instance.currentUser!.uid;
+  List? userlist;
   final _firebase = FirebaseFirestore.instance.collection("VideosData");
   VideosAPI() {
     load();
@@ -24,15 +27,38 @@ class VideosAPI {
     return items;
   }
 
-  void load() async {
+  List<Future> loading() {
+    var futureslist = <Future>[];
+    futureslist.add(load());
+    return futureslist;
+  }
+
+  Future<void> load() async {
+    await _viewedProduct();
     listVideos = await _getVideoList();
+    listVideos.removeWhere((element) => userlist!.contains(element.id));
     listVideos = shuffle1(listVideos);
   }
 
   void addVideos() async {
     var list = await getMoreVideos();
+    list.removeWhere((element) => userlist!.contains(element));
     list = shuffle1(list);
     listVideos.addAll(list);
+  }
+
+  Future<void> _viewedProduct() async {
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .get()
+        .then((snapshot) {
+      if (snapshot.exists) {
+        if (snapshot.data()!['WatchedVideo'] != null) {
+          userlist = (snapshot.data()!['WatchedVideo']);
+        }
+      }
+    });
   }
 
   Future<List<Video>> _getVideoList() async {
@@ -54,7 +80,6 @@ class VideosAPI {
       Video video = Video.fromJson(element.data());
       videoList.add(video);
     }
-
     return videoList;
   }
 
@@ -71,6 +96,7 @@ class VideosAPI {
     var data = await _firebase
         .startAfterDocument(lastData)
         .where('Approved', isEqualTo: true)
+        //.where('id', whereNotIn: list)
         .limit(10)
         .get();
     var videoList = <Video>[];

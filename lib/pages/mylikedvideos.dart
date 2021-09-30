@@ -99,8 +99,10 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                                               feedViewModel.videoSource!
                                                   .listVideos[index],
                                               true)
-                                          .whenComplete(
-                                              () => feedViewModel.refresh());
+                                          .whenComplete(() {
+                                        feedViewModel.refresh();
+                                        setState(() {});
+                                      });
                                     }
                                   },
                                 ),

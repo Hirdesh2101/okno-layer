@@ -82,12 +82,13 @@ class _CreatorPageState extends State<CreatorPage> {
                             const SizedBox(
                               height: 5,
                             ),
-                            OutlinedButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pushNamed(EncashedPage.routeName);
-                                },
-                                child: const Text('Encash'))
+                            if (data['Creator'] == true)
+                              OutlinedButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pushNamed(EncashedPage.routeName);
+                                  },
+                                  child: const Text('Encash'))
                           ],
                         )
                       ],

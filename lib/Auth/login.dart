@@ -32,6 +32,9 @@ class _LoginscreenState extends State<Loginscreen> {
         _isLoading = true;
       });
       try {
+        setState(() {
+          _isLoading = true;
+        });
         final GoogleSignInAuthentication googleAuth =
             await googleUser.authentication;
 
@@ -39,16 +42,20 @@ class _LoginscreenState extends State<Loginscreen> {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-
-        await _auth.signInWithCredential(credential);
         try {
           final user = FirebaseAuth.instance.currentUser;
-          if (FirebaseFirestore.instance
-                  .collection('UsersData')
-                  .doc(user!.uid)
-                  .id ==
-              "") {
-            FirebaseFirestore.instance
+          var check = false;
+          await FirebaseFirestore.instance
+              .collection('UsersData')
+              .doc(user!.uid)
+              .get()
+              .then((value) {
+            if (value.exists) {
+              check = true;
+            }
+          });
+          if (!check) {
+            await FirebaseFirestore.instance
                 .collection('UsersData')
                 .doc(user.uid)
                 .set({
@@ -62,8 +69,11 @@ class _LoginscreenState extends State<Loginscreen> {
               'Total Income': 0.0,
               'Balance': 0.0,
               'Encashed': 0.0,
+              'WatchedVideo': [],
             });
           }
+
+          await _auth.signInWithCredential(credential);
         } catch (err) {
           var message = 'Try Again Later';
           ScaffoldMessenger.of(ctx).showSnackBar(
@@ -77,7 +87,7 @@ class _LoginscreenState extends State<Loginscreen> {
           });
         }
       } catch (err) {
-        var message = 'An error occurred, pelase check your credentials!';
+        var message = 'An error occurred, please check your credentials!';
         ScaffoldMessenger.of(ctx).showSnackBar(
           SnackBar(
             content: Text(message),

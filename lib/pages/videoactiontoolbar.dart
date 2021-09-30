@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/likedvideoprovider.dart';
 import 'package:ionicons/ionicons.dart';
 import '../providers/myvideosprovider.dart';
+import 'package:share/share.dart';
 
 class ActionToolBar extends StatefulWidget {
   final int index;
@@ -126,7 +127,12 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     height: 10,
                   ),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        feedViewModel.pauseDrawer();
+                        Share.share(
+                            'Check out my Application https://oknoapp.page.link/share-video',
+                            subject: 'Look at this video!');
+                      },
                       icon: Icon(
                         Ionicons.paper_plane_outline,
                         size: MediaQuery.of(context).size.width * 0.085,
