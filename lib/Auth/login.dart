@@ -32,9 +32,6 @@ class _LoginscreenState extends State<Loginscreen> {
         _isLoading = true;
       });
       try {
-        setState(() {
-          _isLoading = true;
-        });
         final GoogleSignInAuthentication googleAuth =
             await googleUser.authentication;
 

@@ -76,7 +76,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
                       ? RefreshIndicator(
                           onRefresh: () {
                             return feedViewModel.videoSource!
-                                .load()
+                                .load(0)
                                 .then((val) {
                               init();
                               setState(() {});
@@ -101,6 +101,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
                           ),
                         )
                       : PageView.builder(
+                          physics: const BouncingScrollPhysics(),
                           controller: PageController(
                             initialPage: widget.likedPage || widget.myVideopage
                                 ? widget.startIndex

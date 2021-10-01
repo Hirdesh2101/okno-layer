@@ -61,7 +61,7 @@ dev_dependencies:
   firebase_storage: ^10.0.3
   firebase_analytics: ^8.3.2
   firebase_dynamic_links: ^2.0.9
-  share: ^2.0.4
+  share_plus: ^2.1.4
   visibility_detector: ^0.2.0
   awesome_dialog: ^2.1.1
   readmore: ^2.1.0

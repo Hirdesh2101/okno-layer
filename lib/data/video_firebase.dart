@@ -3,15 +3,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'demodata.dart';
 import '../models/video.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../services/heap_sort.dart';
+import '../services/binar_search.dart';
 
 class VideosAPI {
   List<Video> listVideos = <Video>[];
   late DocumentSnapshot lastData;
   final user = FirebaseAuth.instance.currentUser!.uid;
   List? userlist;
+  final _sorting = HeapSort();
+  final _search = BinarySearch();
   final _firebase = FirebaseFirestore.instance.collection("VideosData");
   VideosAPI() {
-    load();
+    load(0);
   }
   List<Video> shuffle1(List<Video> items) {
     var random = Random();
@@ -29,25 +33,66 @@ class VideosAPI {
 
   List<Future> loading() {
     var futureslist = <Future>[];
-    futureslist.add(load());
+    futureslist.add(load(1));
     return futureslist;
   }
 
-  Future<void> load() async {
-    await _viewedProduct();
-    listVideos = await _getVideoList();
-    listVideos.removeWhere((element) => userlist!.contains(element.id));
-    listVideos = shuffle1(listVideos);
+  Future<void> load(int flag) async {
+    if (flag == 0) {
+      userlist = await _viewedProduct();
+      listVideos = await _getVideoList();
+      _sorting.heapSort(userlist!);
+      if (listVideos.length > userlist!.length) {
+        for (int i = 0; i < userlist!.length; i++) {
+          int temp = _search.count(listVideos, listVideos.length, userlist![0]);
+          if (temp != -1) {
+            listVideos.removeAt(temp);
+          }
+        }
+      } else {
+        for (int i = 0; i < listVideos.length; i++) {
+          int temp =
+              _search.count2(userlist!, userlist!.length, listVideos[i].id);
+          if (temp != -1) {
+            listVideos.removeAt(temp);
+          }
+        }
+      }
+      if (listVideos.length == 1) {
+        addVideos();
+      }
+      listVideos = shuffle1(listVideos);
+    } else {
+      var temp = await _viewedProduct();
+      var tem2 = await _getVideoList();
+      tem2.clear();
+      temp.clear();
+    }
   }
 
   void addVideos() async {
     var list = await getMoreVideos();
-    list.removeWhere((element) => userlist!.contains(element));
+    if (list.length > userlist!.length) {
+      for (int i = 0; i < userlist!.length; i++) {
+        int temp = _search.count(list, list.length, userlist![0]);
+        if (temp != -1) {
+          list.removeAt(temp);
+        }
+      }
+    } else {
+      for (int i = 0; i < list.length; i++) {
+        int temp = _search.count2(userlist!, userlist!.length, list[i].id);
+        if (temp != -1) {
+          list.removeAt(temp);
+        }
+      }
+    }
     list = shuffle1(list);
     listVideos.addAll(list);
   }
 
-  Future<void> _viewedProduct() async {
+  Future<List> _viewedProduct() async {
+    List? userlist2;
     await FirebaseFirestore.instance
         .collection('UsersData')
         .doc(user)
@@ -55,10 +100,11 @@ class VideosAPI {
         .then((snapshot) {
       if (snapshot.exists) {
         if (snapshot.data()!['WatchedVideo'] != null) {
-          userlist = (snapshot.data()!['WatchedVideo']);
+          userlist2 = (snapshot.data()!['WatchedVideo']);
         }
       }
     });
+    return userlist2!;
   }
 
   Future<List<Video>> _getVideoList() async {
@@ -76,7 +122,6 @@ class VideosAPI {
     }
     lastData = data.docs.last;
     for (var element in videos.docs) {
-      //docId.add(element.id);
       Video video = Video.fromJson(element.data());
       videoList.add(video);
     }
@@ -104,7 +149,6 @@ class VideosAPI {
     videos = data;
     lastData = data.docs.last;
     for (var element in videos.docs) {
-      // docId.add(element.id);
       Video video = Video.fromJson(element.data());
       videoList.add(video);
     }

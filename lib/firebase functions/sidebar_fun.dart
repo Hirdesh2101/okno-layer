@@ -32,12 +32,36 @@ class SideBarFirebase {
   Future<void> watchedVideo(dynamic docu) async {
     // print('aya');
     var obj = [docu];
+    var obj2 = [user];
+    int length = 0;
     await FirebaseFirestore.instance
         .collection('UsersData')
         .doc(user)
         .update({'WatchedVideo': FieldValue.arrayUnion(obj)}).whenComplete(() {
       //  print('done');
     });
+    FirebaseFirestore.instance
+        .collection('VideosDataAdmin')
+        .doc(docu)
+        .get()
+        .then((snapshot) {
+      if (snapshot.exists) {
+        if (snapshot.data()!['WatchedVideo'] != null) {
+          length = (snapshot.data()!['WatchedVideo'].length);
+        }
+      }
+    });
+    if (length > 0) {
+      FirebaseFirestore.instance
+          .collection('VideosDataAdmin')
+          .doc(docu)
+          .update({'WatchedVideo': FieldValue.arrayUnion(obj2)});
+    } else {
+      FirebaseFirestore.instance
+          .collection('VideosDataAdmin')
+          .doc(docu)
+          .set({'WatchedVideo': FieldValue.arrayUnion(obj2)});
+    }
   }
 
   Future<void> viewedProduct(dynamic docu) async {

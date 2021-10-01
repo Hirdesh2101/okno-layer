@@ -31,7 +31,7 @@ class FeedViewModel extends BaseViewModel {
   }
 
   onpageChanged(int index) {
-    if ((index + 3) == videoSource?.listVideos.length) {
+    if ((index + 3) >= length()) {
       videoSource!.addVideos();
       notifyListeners();
     }

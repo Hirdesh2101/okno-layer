@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/creator_section.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
@@ -9,8 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../services/dynamic_link.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
@@ -20,53 +21,38 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
+  final DynamicLinkService _dynamicLinkService = DynamicLinkService();
+  Timer? _timerLink;
 
-  Future<void> initDynamicLinks() async {
-    FirebaseDynamicLinks.instance.onLink(
-        onSuccess: (PendingDynamicLinkData? dynamicLink) async {
-      final Uri? deepLink = dynamicLink?.link;
+  @override
+  void initState() {
+    WidgetsBinding.instance!.addObserver(this);
+    super.initState();
+  }
 
-      if (deepLink != null) {
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.SUCCES,
-          animType: AnimType.BOTTOMSLIDE,
-          title: 'Thanks For Downloading',
-          desc: 'Description',
-          btnOkOnPress: () {},
-        ).show();
-        // ignore: unawaited_futures
-        //Navigator.pushNamed(context, deepLink.path);
-      }
-    }, onError: (OnLinkErrorException e) async {
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.ERROR,
-        animType: AnimType.BOTTOMSLIDE,
-        title: e.message,
-        desc: e.details,
-        btnOkOnPress: () {},
-      ).show();
-    });
-
-    final PendingDynamicLinkData? data =
-        await FirebaseDynamicLinks.instance.getInitialLink();
-    final Uri? deepLink = data?.link;
-
-    if (deepLink != null) {
-      // ignore: unawaited_futures
-      // Navigator.pushNamed(context, deepLink.path)
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _timerLink = Timer(
+        const Duration(milliseconds: 1000),
+        () {
+          _dynamicLinkService.retrieveDynamicLink(context);
+        },
+      );
     }
   }
 
   @override
-  void initState() {
-    initDynamicLinks();
-    super.initState();
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    if (_timerLink != null) {
+      _timerLink!.cancel();
+    }
+    super.dispose();
   }
 
 //   final snackBar = SnackBar(
@@ -117,8 +103,49 @@ class _HomePageState extends State<HomePage> {
         child: Drawer(
           child: ListView(
             children: <Widget>[
-              const DrawerHeader(
-                child: Text("Header"),
+              DrawerHeader(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ClipOval(
+                            child: CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl:
+                                  "https://q5n8c8q9.rocketcdn.me/wp-content/uploads/2018/08/The-20-Best-Royalty-Free-Music-Sites-in-2018.png",
+                              height: 90.0,
+                              width: 90.0,
+                              placeholder: (context, url) =>
+                                  const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "${['Name']}",
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ]),
               ),
               ListTile(
                 leading: const Icon(Icons.thumb_up),
@@ -178,7 +205,7 @@ class _HomePageState extends State<HomePage> {
       body: FutureBuilder(
           future: Future.wait(feedViewModel.videoSource!.loading()),
           builder: (ctx, snapshot) {
-            return snapshot.hasData
+            return snapshot.connectionState == ConnectionState.done
                 ? SafeArea(
                     child: Stack(
                       children: [
