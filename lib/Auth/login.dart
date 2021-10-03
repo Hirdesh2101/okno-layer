@@ -39,6 +39,7 @@ class _LoginscreenState extends State<Loginscreen> {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
+        await _auth.signInWithCredential(credential);
         try {
           final user = FirebaseAuth.instance.currentUser;
           var check = false;
@@ -67,10 +68,9 @@ class _LoginscreenState extends State<Loginscreen> {
               'Balance': 0.0,
               'Encashed': 0.0,
               'WatchedVideo': [],
+              'Image': googleUser.photoUrl,
             });
           }
-
-          await _auth.signInWithCredential(credential);
         } catch (err) {
           var message = 'Try Again Later';
           ScaffoldMessenger.of(ctx).showSnackBar(

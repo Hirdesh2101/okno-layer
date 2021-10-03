@@ -184,26 +184,46 @@ class _ScrollFeedState extends State<ScrollFeed> {
       }
     });
     return video.controller != null && video.controller!.value.isInitialized
-        ? Stack(children: [
-            GestureDetector(
-              onTap: () {
+        ? VisibilityDetector(
+            key: Key(video.id),
+            onVisibilityChanged: (info) {
+              var visiblePercentage = info.visibleFraction * 100;
+              if (visiblePercentage < 100) {
                 if (video.controller!.value.isPlaying) {
-                  video.controller?.pause();
-                } else {
-                  video.controller?.play();
+                  feedViewModel.pauseDrawer();
                 }
-              },
-              child: SizedBox.expand(
-                  child: FittedBox(
-                fit: BoxFit.cover,
-                child: SizedBox(
-                  width: video.controller?.value.size.width ?? 0,
-                  height: video.controller?.value.size.height ?? 0,
-                  child: VideoPlayer(video.controller!),
-                ),
-              )),
-            ),
-          ])
+              } else {
+                if (!video.controller!.value.isPlaying) {
+                  if (Scaffold.of(context).isDrawerOpen) {
+                    feedViewModel.pauseDrawer();
+                  } else {
+                    feedViewModel.seekZero();
+                    feedViewModel.playDrawer();
+                  }
+                }
+              }
+            },
+            child: Stack(children: [
+              GestureDetector(
+                onTap: () {
+                  if (video.controller!.value.isPlaying) {
+                    video.controller?.pause();
+                  } else {
+                    video.controller?.play();
+                  }
+                },
+                child: SizedBox.expand(
+                    child: FittedBox(
+                  fit: BoxFit.cover,
+                  child: SizedBox(
+                    width: video.controller?.value.size.width ?? 0,
+                    height: video.controller?.value.size.height ?? 0,
+                    child: VideoPlayer(video.controller!),
+                  ),
+                )),
+              ),
+            ]),
+          )
         : const Center(
             child: Text('Loading'),
           );

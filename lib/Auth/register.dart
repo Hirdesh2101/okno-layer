@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:oknoapp/pages/userimage_set.dart';
 import './auth_form_register.dart';
-import '../pages/homepage.dart';
 
 class Register extends StatefulWidget {
   static const routeName = '/register_screen';
@@ -48,8 +48,9 @@ class _RegisterState extends State<Register> {
         'Balance': 0.0,
         'Encashed': 0.0,
         'WatchedVideo': [],
+        'Image': '',
       });
-      Navigator.of(context).pushReplacementNamed(HomePage.routeName);
+      Navigator.of(context).pushReplacementNamed(SetProfileImage.routeName);
     } on FirebaseAuthException catch (err) {
       var message = '${err.message}';
       ScaffoldMessenger.of(ctx).showSnackBar(

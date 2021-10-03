@@ -49,8 +49,8 @@ class ProductDetails {
                   ),
                 ),
               ),
-              Expanded(
-                child: AnimationLimiter(
+              AnimationLimiter(
+                child: Expanded(
                   child: ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,

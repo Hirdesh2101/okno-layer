@@ -4,6 +4,7 @@ import '../providers/feedviewprovider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/video.dart';
+import 'package:ionicons/ionicons.dart';
 
 class SharedVideo extends StatefulWidget {
   final String id;
@@ -54,60 +55,56 @@ class _SharedVideoState extends State<SharedVideo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          padding: MediaQuery.of(context).padding,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Stack(
-                  children: [
-                    Stack(
+      body: Container(
+        padding: MediaQuery.of(context).padding,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Stack(
+                children: [
+                  Stack(
+                    children: [
+                      if (finalVideo!.controller != null &&
+                          finalVideo!.controller!.value.isInitialized)
+                        videoCard(finalVideo!),
+                      if (finalVideo == null ||
+                          finalVideo!.controller == null ||
+                          !finalVideo!.controller!.value.isInitialized)
+                        const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                    ],
+                  ),
+                  Positioned(
+                    left: 10,
+                    top: 10,
+                    child: Row(
                       children: [
-                        if (finalVideo!.controller != null &&
-                            finalVideo!.controller!.value.isInitialized)
-                          videoCard(finalVideo!),
-                        if (finalVideo == null ||
-                            finalVideo!.controller == null ||
-                            !finalVideo!.controller!.value.isInitialized)
-                          const Center(
-                            child: CircularProgressIndicator(),
-                          )
+                        IconButton(
+                            icon: const Icon(
+                              Ionicons.close_outline,
+                            ),
+                            onPressed: () {
+                              if (finalVideo!.controller != null &&
+                                  finalVideo!.controller!.value.isInitialized) {
+                                finalVideo!.controller!.pause();
+                                Navigator.of(context).pop();
+                                feedViewModel.seekZero();
+                                feedViewModel.playDrawer();
+                              }
+                            }),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        const Text('Shared Video'),
                       ],
                     ),
-                    Positioned(
-                      left: 10,
-                      top: 10,
-                      child: Row(
-                        children: [
-                          IconButton(
-                              icon: const Icon(
-                                Icons.cancel_presentation,
-                              ),
-                              onPressed: () {
-                                if (finalVideo!.controller != null &&
-                                    finalVideo!
-                                        .controller!.value.isInitialized) {
-                                  finalVideo!.controller!.pause();
-                                  //finalVideo!.controller!.dispose();
-                                  Navigator.of(context).pop();
-                                  feedViewModel.seekZero();
-                                  feedViewModel.playDrawer();
-                                }
-                              }),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Text('Shared Video'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-        ),
+                  ),
+                ],
+              ),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:oknoapp/pages/comments.dart';
 import 'package:oknoapp/services/dynamic_link.dart';
 import '../providers/feedviewprovider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:like_button/like_button.dart';
 import './bottomsheet.dart';
 import '../firebase functions/sidebar_fun.dart';
@@ -151,7 +152,71 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     height: 10,
                   ),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        feedViewModel.pauseDrawer();
+                        showModalBottomSheet(
+                            context: context,
+                            barrierColor: Colors.black.withOpacity(0.3),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(10)),
+                            ),
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
+                            elevation: 10,
+                            builder: (context) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0.0, 8, 0, 0),
+                                      child: Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.01,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.10,
+                                        decoration: const BoxDecoration(
+                                            color: Colors.grey,
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(20))),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ListTile(
+                                      leading: const Icon(
+                                          Ionicons.alert_circle_outline),
+                                      title: const Text('Report Video'),
+                                      onTap: () {
+                                        Fluttertoast.showToast(
+                                            msg: "Please Wait",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.BOTTOM,
+                                            fontSize: 16.0);
+                                        firebaseServices
+                                            .reportVideo(feedViewModel
+                                                .videoSource!
+                                                .listVideos[widget.index]
+                                                .id
+                                                .trim())
+                                            .whenComplete(() {
+                                          Fluttertoast.showToast(
+                                              msg: "Reported Successfully",
+                                              toastLength: Toast.LENGTH_LONG,
+                                              gravity: ToastGravity.BOTTOM,
+                                              fontSize: 16.0);
+                                        });
+                                      },
+                                    ),
+                                  )
+                                ],
+                              );
+                            }).whenComplete(() => feedViewModel.playDrawer());
+                      },
                       icon: Icon(
                         Ionicons.ellipsis_vertical_outline,
                         size: MediaQuery.of(context).size.width * 0.085,

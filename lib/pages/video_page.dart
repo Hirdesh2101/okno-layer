@@ -336,7 +336,7 @@ class _VideoRecorderState extends State<VideoRecorder>
           .push(MaterialPageRoute(
               builder: (context) => UploadPage(videoFile!, videoPath!)))
           .then((value) {
-        initialize();
+        Navigator.of(context).pop();
       });
     });
   }

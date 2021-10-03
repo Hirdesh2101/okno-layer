@@ -8,6 +8,7 @@ import '../providers/myvideosprovider.dart';
 import 'scrollfeed.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -25,6 +26,8 @@ class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
+  final firebaseAuth = FirebaseAuth.instance;
+  var user = FirebaseAuth.instance.currentUser!.uid;
   final DynamicLinkService _dynamicLinkService = DynamicLinkService();
 
   @override
@@ -82,49 +85,56 @@ class _HomePageState extends State<HomePage> {
           child: ListView(
             children: <Widget>[
               DrawerHeader(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipOval(
-                            child: CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              imageUrl:
-                                  "https://q5n8c8q9.rocketcdn.me/wp-content/uploads/2018/08/The-20-Best-Royalty-Free-Music-Sites-in-2018.png",
-                              height: 90.0,
-                              width: 90.0,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
+                child: FutureBuilder(
+                    future: FirebaseFirestore.instance
+                        .collection('UsersData')
+                        .doc(user)
+                        .get(),
+                    builder: (context, snapshot) {
+                      dynamic data = snapshot.data;
+                      return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              height: 5,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            "${['Name']}",
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ]),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ClipOval(
+                                  child: CachedNetworkImage(
+                                    fit: BoxFit.cover,
+                                    imageUrl: data['Image'],
+                                    height: 90.0,
+                                    width: 90.0,
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  '${data['Name']}',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ]);
+                    }),
               ),
               ListTile(
                 leading: const Icon(Icons.person),

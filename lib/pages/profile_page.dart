@@ -58,8 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ClipOval(
                           child: CachedNetworkImage(
                             fit: BoxFit.cover,
-                            imageUrl:
-                                "https://q5n8c8q9.rocketcdn.me/wp-content/uploads/2018/08/The-20-Best-Royalty-Free-Music-Sites-in-2018.png",
+                            imageUrl: data['Image'],
                             height: 100.0,
                             width: 100.0,
                             placeholder: (context, url) =>

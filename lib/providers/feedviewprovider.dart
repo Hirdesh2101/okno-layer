@@ -23,7 +23,7 @@ class FeedViewModel extends BaseViewModel {
     await _initializeControllerAtIndex(0);
 
     /// Play 1st video
-    _playControllerAtIndex(0);
+    //_playControllerAtIndex(0);
     setBusy(false);
 
     /// Initialize 2nd vide
