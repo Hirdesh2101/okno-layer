@@ -197,7 +197,6 @@ class _ScrollFeedState extends State<ScrollFeed> {
                   if (Scaffold.of(context).isDrawerOpen) {
                     feedViewModel.pauseDrawer();
                   } else {
-                    feedViewModel.seekZero();
                     feedViewModel.playDrawer();
                   }
                 }

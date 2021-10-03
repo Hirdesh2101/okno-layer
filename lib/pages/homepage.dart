@@ -92,6 +92,11 @@ class _HomePageState extends State<HomePage> {
                         .get(),
                     builder: (context, snapshot) {
                       dynamic data = snapshot.data;
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
                       return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

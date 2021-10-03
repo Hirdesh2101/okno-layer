@@ -59,12 +59,6 @@ class _CommentsState extends State<Comments> {
           style: TextStyle(color: Colors.grey),
         ),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.close,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: Column(
         children: [
