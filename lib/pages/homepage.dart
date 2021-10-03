@@ -21,38 +21,16 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final DynamicLinkService _dynamicLinkService = DynamicLinkService();
-  Timer? _timerLink;
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addObserver(this);
+    _dynamicLinkService.retrieveDynamicLink(context);
     super.initState();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _timerLink = Timer(
-        const Duration(milliseconds: 1000),
-        () {
-          _dynamicLinkService.retrieveDynamicLink(context);
-        },
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
-    if (_timerLink != null) {
-      _timerLink!.cancel();
-    }
-    super.dispose();
   }
 
 //   final snackBar = SnackBar(
@@ -111,7 +89,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         height: 5,
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ClipOval(
                             child: CachedNetworkImage(
@@ -132,6 +110,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         height: 10,
                       ),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const SizedBox(
                             width: 5,
@@ -148,18 +127,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ]),
               ),
               ListTile(
-                leading: const Icon(Icons.thumb_up),
-                title: const Text('Liked Videos'),
-                onTap: () {
-                  Navigator.of(context).pushNamed(MyLikedVideos.routeName);
-                  feedViewModel.pauseDrawer();
-                },
-              ),
-              ListTile(
                 leading: const Icon(Icons.person),
                 title: const Text('My Profile'),
                 onTap: () {
                   Navigator.of(context).pushNamed(ProfileScreen.routeName);
+                  feedViewModel.pauseDrawer();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.thumb_up),
+                title: const Text('Liked Videos'),
+                onTap: () {
+                  Navigator.of(context).pushNamed(MyLikedVideos.routeName);
                   feedViewModel.pauseDrawer();
                 },
               ),

@@ -9,9 +9,11 @@ class BinarySearch {
       int mid = ((low + high) / 2).floor();
       var time = DateTime.parse(arr[mid].id);
       if (time.isAtSameMomentAs(time2)) {
-        low = mid + 1;
-      } else {
         ans = mid;
+        break;
+      } else if (time2.isAfter(time)) {
+        low = mid + 1;
+      } else if (time2.isBefore(time)) {
         high = mid - 1;
       }
     }
@@ -26,9 +28,11 @@ class BinarySearch {
       int mid = ((low + high) / 2).floor();
       var time = DateTime.parse(arr[mid]);
       if (time.isAtSameMomentAs(time2)) {
-        low = mid + 1;
-      } else {
         ans = mid;
+        break;
+      } else if (time2.isAfter(time)) {
+        low = mid + 1;
+      } else if (time2.isBefore(time)) {
         high = mid - 1;
       }
     }

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'demodata.dart';
 import '../models/video.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/heap_sort.dart';
+import '../services/merge_sort.dart';
 import '../services/binar_search.dart';
 
 class VideosAPI {
@@ -11,7 +11,7 @@ class VideosAPI {
   late DocumentSnapshot lastData;
   final user = FirebaseAuth.instance.currentUser!.uid;
   List? userlist;
-  final _sorting = HeapSort();
+  final _sorting = MergeSort();
   final _search = BinarySearch();
   final _firebase = FirebaseFirestore.instance.collection("VideosData");
   VideosAPI() {
@@ -40,25 +40,18 @@ class VideosAPI {
   Future<void> load(int flag) async {
     if (flag == 0) {
       userlist = await _viewedProduct();
+      _sorting.mergeSort(userlist!, 0, userlist!.length - 1);
       listVideos = await _getVideoList();
-      _sorting.heapSort(userlist!);
-      if (listVideos.length > userlist!.length) {
-        for (int i = 0; i < userlist!.length; i++) {
-          int temp = _search.count(listVideos, listVideos.length, userlist![0]);
-          if (temp != -1) {
-            listVideos.removeAt(temp);
-          }
-        }
-      } else {
-        for (int i = 0; i < listVideos.length; i++) {
-          int temp =
-              _search.count2(userlist!, userlist!.length, listVideos[i].id);
-          if (temp != -1) {
-            listVideos.removeAt(temp);
-          }
+
+      for (int i = 0; i < listVideos.length; i++) {
+        int temp =
+            _search.count2(userlist!, userlist!.length, listVideos[i].id);
+        if (temp != -1) {
+          listVideos.remove(listVideos[i]);
+          i--;
         }
       }
-      if (listVideos.length == 1) {
+      if (listVideos.length <= 1) {
         addVideos();
       }
       listVideos = shuffle1(listVideos);
@@ -70,21 +63,25 @@ class VideosAPI {
     }
   }
 
+  Future<void> delete() async {
+    var obj2 = [];
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .update({'WatchedVideo': FieldValue.delete()});
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .update({'WatchedVideo': FieldValue.arrayUnion(obj2)});
+  }
+
   void addVideos() async {
     var list = await getMoreVideos();
-    if (list.length > userlist!.length) {
-      for (int i = 0; i < userlist!.length; i++) {
-        int temp = _search.count(list, list.length, userlist![0]);
-        if (temp != -1) {
-          list.removeAt(temp);
-        }
-      }
-    } else {
-      for (int i = 0; i < list.length; i++) {
-        int temp = _search.count2(userlist!, userlist!.length, list[i].id);
-        if (temp != -1) {
-          list.removeAt(temp);
-        }
+    for (int i = 0; i < list.length; i++) {
+      int temp = _search.count2(userlist!, userlist!.length, list[i].id);
+      if (temp != -1) {
+        list.remove(list[i]);
+        i--;
       }
     }
     list = shuffle1(list);
@@ -92,7 +89,7 @@ class VideosAPI {
   }
 
   Future<List> _viewedProduct() async {
-    List? userlist2;
+    List? userlist2 = [];
     await FirebaseFirestore.instance
         .collection('UsersData')
         .doc(user)

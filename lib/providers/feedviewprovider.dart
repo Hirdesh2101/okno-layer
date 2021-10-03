@@ -5,7 +5,7 @@ class FeedViewModel extends BaseViewModel {
   VideosAPI? videoSource;
 
   int prevVideo = 0;
-
+  bool? creatingLink = false;
   int currentscreen = 0;
   // bool loading = true;
 
@@ -41,6 +41,24 @@ class FeedViewModel extends BaseViewModel {
       playPrevious(index);
     }
     currentscreen = index;
+  }
+
+  void startCircularProgess() {
+    creatingLink = true;
+    notifyListeners();
+  }
+
+  void endCircularProgess() {
+    creatingLink = false;
+    notifyListeners();
+  }
+
+  void seekZero() async {
+    if (videoSource!.listVideos.isNotEmpty) {
+      await videoSource!.listVideos[currentscreen].controller
+          ?.seekTo(Duration.zero);
+      notifyListeners();
+    }
   }
 
   Future<void> pauseDrawer() async {

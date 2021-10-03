@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:oknoapp/pages/comments.dart';
+import 'package:oknoapp/services/dynamic_link.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:like_button/like_button.dart';
 import './bottomsheet.dart';
@@ -29,6 +30,7 @@ class _ActionToolBarState extends State<ActionToolBar> {
   final feedViewMode2 = GetIt.instance<LikeProvider>();
   final feedViewMode3 = GetIt.instance<MyVideosProvider>();
   final SideBarFirebase firebaseServices = SideBarFirebase();
+  final DynamicLinkService dynamicLinkService = DynamicLinkService();
 
   @override
   Widget build(BuildContext context) {
@@ -129,8 +131,16 @@ class _ActionToolBarState extends State<ActionToolBar> {
                   IconButton(
                       onPressed: () async {
                         feedViewModel.pauseDrawer();
+                        feedViewModel.startCircularProgess();
+                        Uri uri = await dynamicLinkService
+                            .createDynamicLink(feedViewModel
+                                .videoSource!.listVideos[widget.index].id
+                                .trim())
+                            .whenComplete(() {
+                          feedViewModel.endCircularProgess();
+                        });
                         await Share.share(
-                            'Check out my Application https://oknoapp.page.link/share-video',
+                            'Check out my Application ${uri.toString()}',
                             subject: 'Look at this video!');
                       },
                       icon: Icon(

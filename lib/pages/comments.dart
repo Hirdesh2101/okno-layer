@@ -66,7 +66,8 @@ class _CommentsState extends State<Comments> {
       ),
       body: Column(
         children: [
-          Expanded(
+          Flexible(
+            fit: FlexFit.loose,
             child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('VideosData')

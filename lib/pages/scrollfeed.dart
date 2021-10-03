@@ -9,6 +9,7 @@ import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
 import '../models/video.dart';
 import 'package:stacked/stacked.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import '../providers/likedvideoprovider.dart';
 
 class ScrollFeed extends StatefulWidget {
@@ -75,6 +76,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
                           feedViewModel.videoSource!.listVideos.isEmpty
                       ? RefreshIndicator(
                           onRefresh: () {
+                            feedViewModel.videoSource!.delete();
                             return feedViewModel.videoSource!
                                 .load(0)
                                 .then((val) {
@@ -155,6 +157,13 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                           ))
                                       : ActionToolBar(index, widget.likedPage,
                                           widget.myVideopage),
+                              feedViewModel.creatingLink!
+                                  ? const Center(
+                                      child: CircularProgressIndicator())
+                                  : const SizedBox(
+                                      width: 0,
+                                      height: 0,
+                                    ),
                             ]);
                           })
                   : const Center(
