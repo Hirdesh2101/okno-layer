@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:oknoapp/pages/edit_video.dart';
 import 'package:oknoapp/pages/upload_videopage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -276,20 +277,28 @@ class _VideoRecorderState extends State<VideoRecorder>
 
   void _selectImage() async {
     await controller!.dispose();
-    XFile? imageFile = await imagePicker.pickVideo(
+    await imagePicker
+        .pickVideo(
       source: ImageSource.gallery,
-    );
-    if (imageFile != null) {
-      file = File(imageFile.path);
-      Navigator.of(context)
-          .push(MaterialPageRoute(
-              builder: (context) => UploadPage(file!, file!.path)))
-          .then((value) {
-        initialize();
-      });
-    } else {
-      initialize();
-    }
+    )
+        .then((imageFile) {
+      if (imageFile != null) {
+        file = File(imageFile.path);
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => EditVideo(file!)))
+            .then((value) {
+          initialize();
+        });
+      } else {
+        Fluttertoast.showToast(
+            msg: "No Video Selected",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+        //initialize();
+      }
+    });
   }
 
   void _onSwitchCamera() {
@@ -333,8 +342,7 @@ class _VideoRecorderState extends State<VideoRecorder>
       }
       await controller!.dispose();
       Navigator.of(context)
-          .push(MaterialPageRoute(
-              builder: (context) => UploadPage(videoFile!, videoPath!)))
+          .push(MaterialPageRoute(builder: (context) => EditVideo(videoFile!)))
           .then((value) {
         Navigator.of(context).pop();
       });
