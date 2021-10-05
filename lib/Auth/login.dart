@@ -68,6 +68,7 @@ class _LoginscreenState extends State<Loginscreen> {
               'Balance': 0.0,
               'Encashed': 0.0,
               'WatchedVideo': [],
+              'Saved': [],
               'Image': googleUser.photoUrl,
             });
           }

@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import './liked_scroll.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cache_service.dart';
+import '../providers/savedvideoprovider.dart';
 import 'package:ionicons/ionicons.dart';
 
 class TabBarControllerWidget extends StatefulWidget {
@@ -31,6 +32,7 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
   @override
   Widget build(BuildContext context) {
     final feedViewModel = GetIt.instance<MyVideosProvider>();
+    final feedViewModel2 = GetIt.instance<MySavedVideosProvider>();
     return ListView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -46,7 +48,7 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
             Padding(
               padding: EdgeInsets.all(8.0),
               child: Icon(
-                Icons.favorite_border,
+                Ionicons.bookmark_outline,
               ),
             ),
           ],
@@ -131,9 +133,68 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
               visible: selectedIndex == 0,
             ),
             Visibility(
-              child: const Center(
-                child: Text('Coming SOOn'),
-              ),
+              child: feedViewModel2.videoSource!.listVideos.isEmpty
+                  ? Center(
+                      child: Column(
+                        children: const [
+                          SizedBox(
+                            height: 50,
+                          ),
+                          Text('No Saved Videos'),
+                        ],
+                      ),
+                    )
+                  : ViewModelBuilder.reactive(
+                      disposeViewModel: false,
+                      viewModelBuilder: () => feedViewModel2,
+                      builder: (context, model, child) {
+                        return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount:
+                                feedViewModel2.videoSource!.listVideos.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 1,
+                              mainAxisSpacing: 1,
+                              childAspectRatio: 9 / 15,
+                            ),
+                            itemBuilder: (
+                              context,
+                              index,
+                            ) {
+                              return GestureDetector(
+                                  onTap: () {
+                                    // Navigator.of(context).push(
+                                    //     MaterialPageRoute(builder: (context) {
+                                    //   return LikeScroll(index, true);
+                                    // }));
+                                  },
+                                  child: Card(
+                                    elevation: 3,
+                                    child: SizedBox.expand(
+                                      child: FittedBox(
+                                        fit: BoxFit.fill,
+                                        child: CachedNetworkImage(
+                                          key: Key(feedViewModel2.videoSource!
+                                              .listData[index].thumbnail),
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            color: Colors.grey,
+                                          ),
+                                          fit: BoxFit.fill,
+                                          cacheManager:
+                                              CustomCacheManager.instance2,
+                                          imageUrl: feedViewModel2.videoSource!
+                                              .listData[index].thumbnail,
+                                        ),
+                                      ),
+                                    ),
+                                  ));
+                            });
+                      },
+                    ),
               maintainState: true,
               visible: selectedIndex == 1,
             ),

@@ -48,6 +48,7 @@ class _RegisterState extends State<Register> {
         'Balance': 0.0,
         'Encashed': 0.0,
         'WatchedVideo': [],
+        'Saved': [],
         'Image': '',
       });
       Navigator.of(context).pushReplacementNamed(SetProfileImage.routeName);

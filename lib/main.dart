@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oknoapp/Auth/login.dart';
 import 'package:oknoapp/Auth/register.dart';
-import 'package:oknoapp/pages/edit_video.dart';
 import 'package:oknoapp/pages/creator_section.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/encashed_page.dart';

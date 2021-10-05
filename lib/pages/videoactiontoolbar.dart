@@ -71,11 +71,18 @@ class _ActionToolBarState extends State<ActionToolBar> {
   }
 
   Widget sideButtons() {
-    return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('VideosData').snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-          } else {
+    return Column(children: [
+      StreamBuilder<QuerySnapshot>(
+          stream:
+              FirebaseFirestore.instance.collection('VideosData').snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Icon(
+                Icons.favorite_border,
+                color: Colors.white,
+                size: MediaQuery.of(context).size.width * 0.10,
+              );
+            }
             final documents = snapshot.data!.docs.where((element) {
               return element.id ==
                   feedViewModel.videoSource!.listVideos[widget.index].id.trim();
@@ -93,10 +100,9 @@ class _ActionToolBarState extends State<ActionToolBar> {
             }
 
             return Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: SizedBox(
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  LikeButton(
+                padding: const EdgeInsets.all(12.0),
+                child: SizedBox(
+                  child: LikeButton(
                     size: MediaQuery.of(context).size.width * 0.10,
                     likeBuilder: (bool isLiked) {
                       return Icon(
@@ -109,123 +115,129 @@ class _ActionToolBarState extends State<ActionToolBar> {
                         list.contains(firebaseServices.user) ? true : false,
                     onTap: likeFunc,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        feedViewModel.pauseDrawer();
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(
-                                builder: (context) => Comments(feedViewModel
-                                    .videoSource!.listVideos[widget.index].id
-                                    .trim())))
-                            .then((value) => feedViewModel.playDrawer());
-                      },
-                      icon: Icon(
-                        Ionicons.chatbubble_outline,
-                        size: MediaQuery.of(context).size.width * 0.085,
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  IconButton(
-                      onPressed: () async {
-                        feedViewModel.pauseDrawer();
-                        feedViewModel.startCircularProgess();
-                        Uri uri = await dynamicLinkService
-                            .createDynamicLink(feedViewModel
-                                .videoSource!.listVideos[widget.index].id
-                                .trim())
-                            .whenComplete(() {
-                          feedViewModel.endCircularProgess();
-                        });
-                        await Share.share(
-                            'Check out my Application ${uri.toString()}',
-                            subject: 'Look at this video!');
-                      },
-                      icon: Icon(
-                        Ionicons.paper_plane_outline,
-                        size: MediaQuery.of(context).size.width * 0.085,
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        feedViewModel.pauseDrawer();
-                        showModalBottomSheet(
-                            context: context,
-                            barrierColor: Colors.black.withOpacity(0.3),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(10)),
-                            ),
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            elevation: 10,
-                            builder: (context) {
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          0.0, 8, 0, 0),
-                                      child: Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.01,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.10,
-                                        decoration: const BoxDecoration(
-                                            color: Colors.grey,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(20))),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ListTile(
-                                      leading: const Icon(
-                                          Ionicons.alert_circle_outline),
-                                      title: const Text('Report Video'),
-                                      onTap: () {
-                                        Fluttertoast.showToast(
-                                            msg: "Please Wait",
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            gravity: ToastGravity.BOTTOM,
-                                            fontSize: 16.0);
-                                        firebaseServices
-                                            .reportVideo(feedViewModel
-                                                .videoSource!
-                                                .listVideos[widget.index]
-                                                .id
-                                                .trim())
-                                            .whenComplete(() {
-                                          Fluttertoast.showToast(
-                                              msg: "Reported Successfully",
-                                              toastLength: Toast.LENGTH_LONG,
-                                              gravity: ToastGravity.BOTTOM,
-                                              fontSize: 16.0);
-                                        });
-                                      },
-                                    ),
-                                  )
-                                ],
-                              );
-                            }).whenComplete(() => feedViewModel.playDrawer());
-                      },
-                      icon: Icon(
-                        Ionicons.ellipsis_vertical_outline,
-                        size: MediaQuery.of(context).size.width * 0.085,
-                      )),
-                ]),
-              ),
-            );
-          }
-          return Container();
-        });
+                ));
+          }),
+      const SizedBox(
+        height: 10,
+      ),
+      IconButton(
+          onPressed: () {
+            feedViewModel.pauseDrawer();
+            Navigator.of(context)
+                .push(MaterialPageRoute(
+                    builder: (context) => Comments(feedViewModel
+                        .videoSource!.listVideos[widget.index].id
+                        .trim())))
+                .then((value) => feedViewModel.playDrawer());
+          },
+          icon: Icon(
+            Ionicons.chatbubble_outline,
+            size: MediaQuery.of(context).size.width * 0.085,
+          )),
+      const SizedBox(
+        height: 10,
+      ),
+      IconButton(
+          onPressed: () async {
+            feedViewModel.pauseDrawer();
+            feedViewModel.startCircularProgess();
+            Uri uri = await dynamicLinkService
+                .createDynamicLink(feedViewModel
+                    .videoSource!.listVideos[widget.index].id
+                    .trim())
+                .whenComplete(() {
+              feedViewModel.endCircularProgess();
+            });
+            await Share.share('Check out my Application ${uri.toString()}',
+                subject: 'Look at this video!');
+          },
+          icon: Icon(
+            Ionicons.paper_plane_outline,
+            size: MediaQuery.of(context).size.width * 0.085,
+          )),
+      const SizedBox(
+        height: 10,
+      ),
+      IconButton(
+          onPressed: () {
+            feedViewModel.pauseDrawer();
+            showModalBottomSheet(
+                context: context,
+                barrierColor: Colors.black.withOpacity(0.3),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                ),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                elevation: 10,
+                builder: (context) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(0.0, 8, 0, 0),
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.01,
+                            width: MediaQuery.of(context).size.width * 0.10,
+                            decoration: const BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(children: [
+                          ListTile(
+                            leading: const Icon(Ionicons.bookmark_outline),
+                            title: const Text('Save Video'),
+                            onTap: () {
+                              firebaseServices
+                                  .saveVideo(feedViewModel
+                                      .videoSource!.listVideos[widget.index].id
+                                      .trim())
+                                  .whenComplete(() {
+                                Fluttertoast.showToast(
+                                    msg: "Saved",
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.BOTTOM,
+                                    fontSize: 16.0);
+                              });
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Ionicons.alert_circle_outline),
+                            title: const Text('Report Video'),
+                            onTap: () {
+                              Fluttertoast.showToast(
+                                  msg: "Please Wait",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  fontSize: 16.0);
+                              firebaseServices
+                                  .reportVideo(feedViewModel
+                                      .videoSource!.listVideos[widget.index].id
+                                      .trim())
+                                  .whenComplete(() {
+                                Fluttertoast.showToast(
+                                    msg: "Reported Successfully",
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.BOTTOM,
+                                    fontSize: 16.0);
+                              });
+                            },
+                          ),
+                        ]),
+                      )
+                    ],
+                  );
+                }).whenComplete(() => feedViewModel.playDrawer());
+          },
+          icon: Icon(
+            Ionicons.ellipsis_vertical_outline,
+            size: MediaQuery.of(context).size.width * 0.085,
+          )),
+    ]);
   }
 }

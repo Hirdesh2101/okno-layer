@@ -66,7 +66,6 @@ class _VideoEditorState extends State<VideoEditor> {
 
   Future<File> _exportVideo() async {
     Misc.delayed(1000, () => _isExporting.value = true);
-    //NOTE: To use [-crf 17] and [VideoExportPreset] you need ["min-gpl-lts"] package
     final File? file = await _controller.exportVideo(
       onProgress: (statics) {
         _exportingProgress.value =
@@ -80,9 +79,9 @@ class _VideoEditorState extends State<VideoEditor> {
     } else {
       _exportText = "Error on export video :(";
     }
+    setState(() => _exported = true);
+    Misc.delayed(2000, () => setState(() => _exported = false));
     return file!;
-    // setState(() => _exported = true);
-    // Misc.delayed(2000, () => setState(() => _exported = false));
   }
 
   void _exportCover() async {

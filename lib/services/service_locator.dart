@@ -1,3 +1,5 @@
+import 'package:oknoapp/providers/savedvideoprovider.dart';
+
 import '../providers/feedviewprovider.dart';
 import '../providers/likedvideoprovider.dart';
 import 'package:get_it/get_it.dart';
@@ -14,5 +16,8 @@ void setup() {
   }
   if (!locator.isRegistered<MyVideosProvider>()) {
     locator.registerSingleton<MyVideosProvider>(MyVideosProvider());
+  }
+  if (!locator.isRegistered<MySavedVideosProvider>()) {
+    locator.registerSingleton<MySavedVideosProvider>(MySavedVideosProvider());
   }
 }

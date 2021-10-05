@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cache_service.dart';
 import '../providers/likedvideoprovider.dart';
 import '../providers/myvideosprovider.dart';
+import './webview.dart';
 import '../firebase functions/sidebar_fun.dart';
 
 class ProductDetails {
@@ -125,17 +125,25 @@ class ProductDetails {
                                       .videoSource!.listData[index].store
                               : feedViewModel
                                   .videoSource!.listVideos[index].store;
-                          if (await canLaunch(url)) {
-                            await launch(url);
-                            await firebasefun.viewedUrl(likedVideo
-                                ? feedViewModel2.videoSource!.listVideos[index]
-                                : feedViewModel
-                                    .videoSource!.listVideos[index].id
-                                    .trim());
-                          } else {
-                            // ignore: avoid_print
-                            print("error");
-                          }
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(
+                                  builder: (ctx) => WebViewPage(
+                                      title: likedVideo || myVideo
+                                          ? likedVideo
+                                              ? feedViewModel2.videoSource!
+                                                  .listData[index].seller
+                                              : feedViewModel3.videoSource!
+                                                  .listData[index].seller
+                                          : feedViewModel.videoSource!
+                                              .listVideos[index].seller,
+                                      url: url)))
+                              .then((value) {
+                            Navigator.of(context).pop();
+                          });
+                          await firebasefun.viewedUrl(likedVideo
+                              ? feedViewModel2.videoSource!.listVideos[index]
+                              : feedViewModel.videoSource!.listVideos[index].id
+                                  .trim());
                         },
                         child: const Text('Visit Store')),
                   )),

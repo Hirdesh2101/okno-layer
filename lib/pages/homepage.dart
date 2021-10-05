@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:oknoapp/pages/contact_page.dart';
 import 'package:oknoapp/pages/creator_section.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/pages/profile_page.dart';
@@ -13,6 +14,7 @@ import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/dynamic_link.dart';
+import 'package:ionicons/ionicons.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
@@ -162,6 +164,15 @@ class _HomePageState extends State<HomePage> {
                 title: const Text('Creator Page'),
                 onTap: () {
                   Navigator.of(context).pushNamed(CreatorPage.routeName);
+                  feedViewModel.pauseDrawer();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Ionicons.information_circle_outline),
+                title: const Text('Contact Us'),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const ContactPage()));
                   feedViewModel.pauseDrawer();
                 },
               ),

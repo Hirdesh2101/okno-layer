@@ -91,6 +91,33 @@ class SideBarFirebase {
     }
   }
 
+  Future<void> saveVideo(dynamic docu) async {
+    var obj2 = [docu];
+    int length = 0;
+    FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .get()
+        .then((snapshot) {
+      if (snapshot.exists) {
+        if (snapshot.data()!['Saved'] != null) {
+          length = (snapshot.data()!['Saved'].length);
+        }
+      }
+    });
+    if (length > 0) {
+      FirebaseFirestore.instance
+          .collection('UsersData')
+          .doc(user)
+          .update({'Saved': FieldValue.arrayUnion(obj2)});
+    } else {
+      FirebaseFirestore.instance
+          .collection('UsersData')
+          .doc(user)
+          .update({'Saved': FieldValue.arrayUnion(obj2)});
+    }
+  }
+
   Future<void> viewedProduct(dynamic docu) async {
     var obj = [user];
     int length = 0;
