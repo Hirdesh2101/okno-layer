@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:oknoapp/pages/webview.dart';
+import '../services/launch_url.dart';
 
 class ContactPage extends StatelessWidget {
   const ContactPage({Key? key}) : super(key: key);
@@ -21,10 +22,11 @@ class ContactPage extends StatelessWidget {
                   const Text('Know More About us on the offical website!!'),
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (ctx) => const WebViewPage(
-                              title: 'OkNoApp',
-                              url: 'https://www.oknoapp.com/')));
+                      launchURL(context, 'https://www.oknoapp.com/');
+                      // Navigator.of(context).push(MaterialPageRoute(
+                      //     builder: (ctx) => const WebViewPage(
+                      //         title: 'OkNoApp',
+                      //         url: 'https://www.oknoapp.com/')));
                     },
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

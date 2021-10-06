@@ -188,7 +188,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
             key: Key(video.id),
             onVisibilityChanged: (info) {
               var visiblePercentage = info.visibleFraction * 100;
-              if (visiblePercentage < 100) {
+              if (visiblePercentage < 50) {
                 if (video.controller!.value.isPlaying) {
                   feedViewModel.pauseDrawer();
                 }

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:oknoapp/pages/change_theme.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/tab_viewprofile.dart';
 import 'video_page.dart';
@@ -35,7 +36,23 @@ class _ProfileScreenState extends State<ProfileScreen>
     final _firebase =
         FirebaseFirestore.instance.collection("UsersData").doc(user);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          PopupMenuButton(itemBuilder: (BuildContext context) {
+            return <PopupMenuEntry>[
+              const PopupMenuItem(
+                child: Text('Settings'),
+                value: 1,
+              ),
+            ];
+          }, onSelected: (value) async {
+            if (value == 1) {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const ThemeScreen()));
+            }
+          })
+        ],
+      ),
       body: FutureBuilder(
           future: _firebase.get(),
           builder: (context, snapshot) {

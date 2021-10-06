@@ -43,7 +43,7 @@ class Video {
     data['product1'] = product1;
     data['product2'] = product2;
     data['p1name'] = p1name;
-    data['selller'] = seller;
+    data['seller'] = seller;
     data['store'] = store;
     data['price'] = price;
     return data;

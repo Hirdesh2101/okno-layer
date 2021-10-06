@@ -72,15 +72,12 @@ class _ActionToolBarState extends State<ActionToolBar> {
 
   Widget sideButtons() {
     return Column(children: [
-      StreamBuilder<QuerySnapshot>(
-          stream:
-              FirebaseFirestore.instance.collection('VideosData').snapshots(),
+      FutureBuilder<QuerySnapshot>(
+          future: FirebaseFirestore.instance.collection('VideosData').get(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Icon(
-                Icons.favorite_border,
-                color: Colors.white,
-                size: MediaQuery.of(context).size.width * 0.10,
+              return Container(
+                width: MediaQuery.of(context).size.width * 0.085,
               );
             }
             final documents = snapshot.data!.docs.where((element) {
@@ -103,12 +100,12 @@ class _ActionToolBarState extends State<ActionToolBar> {
                 padding: const EdgeInsets.all(12.0),
                 child: SizedBox(
                   child: LikeButton(
-                    size: MediaQuery.of(context).size.width * 0.10,
+                    size: MediaQuery.of(context).size.width * 0.085,
                     likeBuilder: (bool isLiked) {
                       return Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
                         color: isLiked ? Colors.red : Colors.white,
-                        size: MediaQuery.of(context).size.width * 0.10,
+                        size: MediaQuery.of(context).size.width * 0.085,
                       );
                     },
                     isLiked:
@@ -117,9 +114,6 @@ class _ActionToolBarState extends State<ActionToolBar> {
                   ),
                 ));
           }),
-      const SizedBox(
-        height: 10,
-      ),
       IconButton(
           onPressed: () {
             feedViewModel.pauseDrawer();

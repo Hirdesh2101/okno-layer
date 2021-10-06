@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/Auth/login.dart';
 import 'package:oknoapp/Auth/register.dart';
@@ -6,6 +7,7 @@ import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/encashed_page.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/pages/profile_page.dart';
+import 'package:oknoapp/pages/splash_screen.dart';
 import 'package:oknoapp/pages/userimage_set.dart';
 import 'pages/homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,35 +16,63 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import './providers/theme_provider.dart';
+import './constants/themes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  //setup();
+  // bool? darkModeOn;
+  // SharedPreferences.getInstance().then((prefs) {
+  //   darkModeOn = prefs.getBool('darkMode') ?? true;
+  //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  //       systemNavigationBarColor: darkModeOn! ? Colors.black : Colors.white,
+  //       systemNavigationBarIconBrightness:
+  //           darkModeOn! ? Brightness.light : Brightness.dark));
+  //   // ));
+  // });
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(const MyApp());
+  runApp(
+    const MyApp(),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isTimerDone = false;
+
+  @override
+  void initState() {
+    Timer(
+        const Duration(seconds: 2), () => setState(() => _isTimerDone = true));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     FirebaseAnalytics analytics = FirebaseAnalytics();
     return MaterialApp(
         title: 'OkNoApp',
-        themeMode: ThemeMode.dark,
         theme: ThemeData.dark(),
+        //darkTheme: darkTheme,
         debugShowCheckedModeBanner: false,
         home: StreamBuilder(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (ctx, userSnapshot) {
-              if (userSnapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+              if (userSnapshot.connectionState == ConnectionState.waiting ||
+                  !_isTimerDone) {
+                return const SplashScreen();
               }
               if (userSnapshot.hasData) {
                 WidgetsFlutterBinding.ensureInitialized();

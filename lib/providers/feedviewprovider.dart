@@ -64,28 +64,28 @@ class FeedViewModel extends BaseViewModel {
   Future<void> pauseDrawer() async {
     if (videoSource!.listVideos.isNotEmpty) {
       await videoSource!.listVideos[currentscreen].controller?.pause();
-      notifyListeners();
+      // notifyListeners();
     }
   }
 
   Future<void> playDrawer() async {
     if (videoSource!.listVideos.isNotEmpty) {
       videoSource!.listVideos[currentscreen].controller?.play();
-      notifyListeners();
+      // notifyListeners();
     }
   }
 
   void pauseVideo(int index) async {
     if (videoSource!.listVideos.length > index) {
       await videoSource!.listVideos[index].controller?.pause();
-      notifyListeners();
+      // notifyListeners();
     }
   }
 
   void playVideo(int index) async {
     if (videoSource!.listVideos.length > index) {
       videoSource!.listVideos[index].controller?.play();
-      notifyListeners();
+      //notifyListeners();
     }
   }
 
@@ -121,7 +121,7 @@ class FeedViewModel extends BaseViewModel {
     if (videoSource!.listVideos.length > index && index >= 0) {
       /// Create new controller
       await videoSource!.listVideos[index].loadController();
-      notifyListeners();
+      //notifyListeners();
       //log('🚀🚀🚀 INITIALIZED $index');
     }
   }
@@ -130,7 +130,7 @@ class FeedViewModel extends BaseViewModel {
     if (videoSource!.listVideos.length > index && index >= 0) {
       /// Get controller at [index]
       videoSource!.listVideos[index].controller?.play();
-      notifyListeners();
+      //notifyListeners();
       //log('🚀🚀🚀 PLAYING $index');
     }
   }
@@ -139,7 +139,7 @@ class FeedViewModel extends BaseViewModel {
     if (videoSource!.listVideos.length > index && index >= 0) {
       /// Get controller at [index]
       videoSource!.listVideos[index].controller?.pause();
-      notifyListeners();
+      //notifyListeners();
 
       //log('🚀🚀🚀 STOPPED $index');
     }
@@ -149,7 +149,7 @@ class FeedViewModel extends BaseViewModel {
     if (videoSource!.listVideos.length > index && index >= 0) {
       /// Get controller at [index]
       videoSource!.listVideos[index].controller?.dispose();
-      notifyListeners();
+      // notifyListeners();
       //log('🚀🚀🚀 DISPOSED $index');
     }
   }
@@ -162,6 +162,6 @@ class FeedViewModel extends BaseViewModel {
     if (currentscreen - 1 >= 0) {
       await videoSource!.listVideos[currentscreen - 1].controller?.dispose();
     }
-    notifyListeners();
+    //notifyListeners();
   }
 }
