@@ -58,6 +58,12 @@ class _ScrollFeedState extends State<ScrollFeed> {
   }
 
   Widget feedVideos() {
+    final PageController pageController = PageController(
+      keepPage: true,
+      initialPage:
+          widget.likedPage || widget.myVideopage ? widget.startIndex : 0,
+      viewportFraction: 1,
+    );
     return Stack(
       children: [
         ViewModelBuilder.reactive(
@@ -103,13 +109,9 @@ class _ScrollFeedState extends State<ScrollFeed> {
                           ),
                         )
                       : PageView.builder(
+                          key: const PageStorageKey('page_key'),
                           physics: const BouncingScrollPhysics(),
-                          controller: PageController(
-                            initialPage: widget.likedPage || widget.myVideopage
-                                ? widget.startIndex
-                                : 0,
-                            viewportFraction: 1,
-                          ),
+                          controller: pageController,
                           itemCount: widget.likedPage || widget.myVideopage
                               ? widget.likedPage
                                   ? feedViewModel2.length()

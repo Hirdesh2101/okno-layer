@@ -1,14 +1,33 @@
 import 'package:flutter/material.dart';
+import '../services/sharedpref.dart';
+import '../constants/themes.dart';
 
-class ThemeNotifier with ChangeNotifier {
-  ThemeData _themeData;
+class ThemeModel extends ChangeNotifier {
+  bool? _isDark;
+  ThemePreferences? _preferences;
+  bool get isDark => _isDark!;
 
-  ThemeNotifier(this._themeData);
+  ThemeModel() {
+    _isDark = false;
+    _preferences = ThemePreferences();
+    getPreferences();
+  }
+  set isDark(bool value) {
+    _isDark = value;
+    _preferences!.setTheme(value);
+    notifyListeners();
+  }
 
-  getTheme() => _themeData;
+  get getTheme {
+    if (_isDark!) {
+      return darkTheme;
+    } else {
+      return lightTheme;
+    }
+  }
 
-  setTheme(ThemeData themeData) async {
-    _themeData = themeData;
+  getPreferences() async {
+    _isDark = await _preferences!.getTheme();
     notifyListeners();
   }
 }

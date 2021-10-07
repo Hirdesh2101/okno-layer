@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import '../providers/theme_provider.dart';
-import '../constants/themes.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeScreen extends StatefulWidget {
   const ThemeScreen({Key? key}) : super(key: key);
@@ -14,13 +11,12 @@ class ThemeScreen extends StatefulWidget {
 }
 
 class _ThemeScreenState extends State<ThemeScreen> {
-  var _darkTheme = true;
+  var _darkTheme = false;
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
-    print(themeNotifier.getTheme());
-    // _darkTheme = (themeNotifier.getTheme() == darkTheme);
+    final themeNotifier = Provider.of<ThemeModel>(context);
+    _darkTheme = themeNotifier.isDark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Set Theme'),
@@ -29,12 +25,12 @@ class _ThemeScreenState extends State<ThemeScreen> {
         children: <Widget>[
           GestureDetector(
             onTap: () {
-              if (_darkTheme) {
-                setState(() {
-                  _darkTheme = false;
-                });
-                onThemeChanged(_darkTheme, themeNotifier);
-              }
+              setState(() {
+                _darkTheme = false;
+              });
+              themeNotifier.isDark
+                  ? themeNotifier.isDark = false
+                  : themeNotifier.isDark = true;
             },
             child: ListTile(
               title: const Text('Light'),
@@ -65,12 +61,13 @@ class _ThemeScreenState extends State<ThemeScreen> {
           ),
           GestureDetector(
             onTap: () {
-              if (!_darkTheme) {
-                setState(() {
-                  _darkTheme = true;
-                });
-                onThemeChanged(_darkTheme, themeNotifier);
-              }
+              setState(() {
+                _darkTheme = true;
+              });
+
+              themeNotifier.isDark
+                  ? themeNotifier.isDark = false
+                  : themeNotifier.isDark = true;
             },
             child: ListTile(
               title: const Text('Dark'),
@@ -101,19 +98,5 @@ class _ThemeScreenState extends State<ThemeScreen> {
         ],
       ),
     );
-  }
-
-  void onThemeChanged(bool value, ThemeNotifier themeNotifier) async {
-    (value)
-        ? themeNotifier.setTheme(darkTheme)
-        : themeNotifier.setTheme(lightTheme);
-    var prefs = await SharedPreferences.getInstance();
-    prefs.setBool('darkMode', value);
-
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemNavigationBarColor: value ? Colors.black : Colors.white,
-      // systemNavigationBarIconBrightness:
-      //     value ? Brightness.light : Brightness.light
-    ));
   }
 }

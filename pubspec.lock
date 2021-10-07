@@ -301,7 +301,7 @@ packages:
     source: hosted
     version: "1.0.0"
   flutter_ffmpeg:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: flutter_ffmpeg
       url: "https://pub.dartlang.org"

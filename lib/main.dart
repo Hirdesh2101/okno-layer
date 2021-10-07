@@ -17,27 +17,18 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import './providers/theme_provider.dart';
 import './constants/themes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  // bool? darkModeOn;
-  // SharedPreferences.getInstance().then((prefs) {
-  //   darkModeOn = prefs.getBool('darkMode') ?? true;
-  //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-  //       systemNavigationBarColor: darkModeOn! ? Colors.black : Colors.white,
-  //       systemNavigationBarIconBrightness:
-  //           darkModeOn! ? Brightness.light : Brightness.dark));
-  //   // ));
-  // });
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(
-    const MyApp(),
-  );
+  runApp(ChangeNotifierProvider(
+    create: (_) => ThemeModel(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -62,43 +53,44 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     FirebaseAnalytics analytics = FirebaseAnalytics();
-    return MaterialApp(
-        title: 'OkNoApp',
-        theme: ThemeData.dark(),
-        //darkTheme: darkTheme,
-        debugShowCheckedModeBanner: false,
-        home: StreamBuilder(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (ctx, userSnapshot) {
-              if (userSnapshot.connectionState == ConnectionState.waiting ||
-                  !_isTimerDone) {
-                return const SplashScreen();
-              }
-              if (userSnapshot.hasData) {
-                WidgetsFlutterBinding.ensureInitialized();
-                setup();
-                return const HomePage();
-              }
-              return const Loginscreen();
-            }),
-        routes: {
-          HomePage.routeName: (ctx) => const HomePage(),
-          Loginscreen.routeName: (ctx) => const Loginscreen(),
-          Register.routeName: (ctx) => const Register(),
-          MyLikedVideos.routeName: (ctx) => const MyLikedVideos(),
-          ProfileScreen.routeName: (ctx) => const ProfileScreen(),
-          EditProfile.routeName: (ctx) => const EditProfile(),
-          CreatorPage.routeName: (ctx) => const CreatorPage(),
-          EncashedPage.routeName: (ctx) => const EncashedPage(),
-          SetProfileImage.routeName: (ctx) => const SetProfileImage(),
-        },
-        navigatorObservers: [
-          FirebaseAnalyticsObserver(analytics: analytics),
-        ],
-        onUnknownRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (ctx) => const Loginscreen(),
-          );
-        });
+    return Consumer(builder: (context, ThemeModel themeNotifier, child) {
+      return MaterialApp(
+          title: 'OkNoApp',
+          theme: themeNotifier.isDark ? darkTheme : lightTheme,
+          debugShowCheckedModeBanner: false,
+          home: StreamBuilder(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (ctx, userSnapshot) {
+                if (userSnapshot.connectionState == ConnectionState.waiting ||
+                    !_isTimerDone) {
+                  return const SplashScreen();
+                }
+                if (userSnapshot.hasData) {
+                  WidgetsFlutterBinding.ensureInitialized();
+                  setup();
+                  return const HomePage();
+                }
+                return const Loginscreen();
+              }),
+          routes: {
+            HomePage.routeName: (ctx) => const HomePage(),
+            Loginscreen.routeName: (ctx) => const Loginscreen(),
+            Register.routeName: (ctx) => const Register(),
+            MyLikedVideos.routeName: (ctx) => const MyLikedVideos(),
+            ProfileScreen.routeName: (ctx) => const ProfileScreen(),
+            EditProfile.routeName: (ctx) => const EditProfile(),
+            CreatorPage.routeName: (ctx) => const CreatorPage(),
+            EncashedPage.routeName: (ctx) => const EncashedPage(),
+            SetProfileImage.routeName: (ctx) => const SetProfileImage(),
+          },
+          navigatorObservers: [
+            FirebaseAnalyticsObserver(analytics: analytics),
+          ],
+          onUnknownRoute: (settings) {
+            return MaterialPageRoute(
+              builder: (ctx) => const Loginscreen(),
+            );
+          });
+    });
   }
 }

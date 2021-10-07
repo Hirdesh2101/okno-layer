@@ -66,6 +66,7 @@ dev_dependencies:
   visibility_detector: ^0.2.0
   awesome_dialog: ^2.1.1
   shared_preferences: ^2.0.8
+  flutter_ffmpeg: ^0.4.2
   video_editor: ^1.2.0
   helpers: ^1.1.4
   webview_flutter: ^2.1.1

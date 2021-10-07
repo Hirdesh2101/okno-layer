@@ -122,7 +122,13 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     builder: (context) => Comments(feedViewModel
                         .videoSource!.listVideos[widget.index].id
                         .trim())))
-                .then((value) => feedViewModel.playDrawer());
+                .then((value) {
+              feedViewModel.seekZero();
+              if (mounted) {
+                setState(() {});
+              }
+              feedViewModel.playDrawer();
+            });
           },
           icon: Icon(
             Ionicons.chatbubble_outline,

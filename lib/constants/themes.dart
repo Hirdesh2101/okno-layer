@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 final darkTheme = ThemeData(
   primaryColor: Colors.black,
-  brightness: Brightness.dark,
+  //brightness: Brightness.dark,
   backgroundColor: Colors.black,
   appBarTheme: const AppBarTheme(color: Color(0xFF212121)),
   scaffoldBackgroundColor: Colors.black,
@@ -24,14 +24,15 @@ final darkTheme = ThemeData(
     ),
   ),
   cardColor: Colors.grey[800],
-  colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.white),
+  colorScheme: ColorScheme.fromSwatch()
+      .copyWith(secondary: Colors.white, brightness: Brightness.dark),
   textSelectionTheme:
       const TextSelectionThemeData(selectionColor: Colors.white54),
 );
 
 final lightTheme = ThemeData(
   primaryColor: Colors.white,
-  brightness: Brightness.light,
+  //brightness: Brightness.light,
   backgroundColor: Colors.white,
   appBarTheme: const AppBarTheme(color: Colors.white),
   scaffoldBackgroundColor: Colors.white,
@@ -53,7 +54,8 @@ final lightTheme = ThemeData(
     ),
   ),
   cardColor: Colors.grey[300],
-  colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.black),
+  colorScheme: ColorScheme.fromSwatch()
+      .copyWith(secondary: Colors.black, brightness: Brightness.light),
   textSelectionTheme:
       const TextSelectionThemeData(selectionColor: Colors.black38),
 );

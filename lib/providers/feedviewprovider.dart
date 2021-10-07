@@ -57,7 +57,7 @@ class FeedViewModel extends BaseViewModel {
     if (videoSource!.listVideos.isNotEmpty) {
       await videoSource!.listVideos[currentscreen].controller
           ?.seekTo(Duration.zero);
-      notifyListeners();
+      // notifyListeners();
     }
   }
 
@@ -110,7 +110,10 @@ class FeedViewModel extends BaseViewModel {
     /// Dispose [index + 2] controller
     _disposeControllerAtIndex(index + 2);
 
-    /// Play current video (already initialized)
+    /// Play current video (already initialized
+    if (!videoSource!.listVideos[index].controller!.value.isInitialized) {
+      _initializeControllerAtIndex(index);
+    }
     _playControllerAtIndex(index);
 
     /// Initialize [index - 1] controller
@@ -121,7 +124,7 @@ class FeedViewModel extends BaseViewModel {
     if (videoSource!.listVideos.length > index && index >= 0) {
       /// Create new controller
       await videoSource!.listVideos[index].loadController();
-      //notifyListeners();
+      // notifyListeners();
       //log('🚀🚀🚀 INITIALIZED $index');
     }
   }
@@ -149,7 +152,7 @@ class FeedViewModel extends BaseViewModel {
     if (videoSource!.listVideos.length > index && index >= 0) {
       /// Get controller at [index]
       videoSource!.listVideos[index].controller?.dispose();
-      // notifyListeners();
+      //notifyListeners();
       //log('🚀🚀🚀 DISPOSED $index');
     }
   }

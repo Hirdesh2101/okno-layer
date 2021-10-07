@@ -67,6 +67,8 @@ class _VideoEditorState extends State<VideoEditor> {
   Future<File> _exportVideo() async {
     Misc.delayed(1000, () => _isExporting.value = true);
     final File? file = await _controller.exportVideo(
+      preset: VideoExportPreset.medium,
+      customInstruction: "-crf 17",
       onProgress: (statics) {
         _exportingProgress.value =
             statics.time / _controller.video.value.duration.inMilliseconds;

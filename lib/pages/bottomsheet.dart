@@ -7,6 +7,7 @@ import '../services/cache_service.dart';
 import '../providers/likedvideoprovider.dart';
 import '../providers/myvideosprovider.dart';
 import './webview.dart';
+import '../services/launch_url.dart';
 import '../firebase functions/sidebar_fun.dart';
 
 class ProductDetails {
@@ -125,21 +126,23 @@ class ProductDetails {
                                       .videoSource!.listData[index].store
                               : feedViewModel
                                   .videoSource!.listVideos[index].store;
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(
-                                  builder: (ctx) => WebViewPage(
-                                      title: likedVideo || myVideo
-                                          ? likedVideo
-                                              ? feedViewModel2.videoSource!
-                                                  .listData[index].seller
-                                              : feedViewModel3.videoSource!
-                                                  .listData[index].seller
-                                          : feedViewModel.videoSource!
-                                              .listVideos[index].seller,
-                                      url: url)))
-                              .then((value) {
-                            Navigator.of(context).pop();
-                          });
+                          launchURL(context, url);
+                          // Navigator.of(context)
+                          //     .push(MaterialPageRoute(
+
+                          //         builder: (ctx) => WebViewPage(
+                          //             title: likedVideo || myVideo
+                          //                 ? likedVideo
+                          //                     ? feedViewModel2.videoSource!
+                          //                         .listData[index].seller
+                          //                     : feedViewModel3.videoSource!
+                          //                         .listData[index].seller
+                          //                 : feedViewModel.videoSource!
+                          //                     .listVideos[index].seller,
+                          //             url: url)))
+                          //     .then((value) {
+                          //   Navigator.of(context).pop();
+                          // });
                           await firebasefun.viewedUrl(likedVideo
                               ? feedViewModel2.videoSource!.listVideos[index]
                               : feedViewModel.videoSource!.listVideos[index].id
