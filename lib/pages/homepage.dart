@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/contact_page.dart';
 import 'package:oknoapp/pages/creator_section.dart';
@@ -213,12 +212,6 @@ class _HomePageState extends State<HomePage> {
       body: FutureBuilder(
           future: future,
           builder: (ctx, snapshot) {
-            print('refresh');
-            print('refresh');
-            print('refresh');
-            print('refresh');
-            print('refresh');
-            print('refresh');
             return snapshot.connectionState == ConnectionState.done
                 ? SafeArea(
                     child: Stack(

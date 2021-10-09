@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:oknoapp/pages/webview.dart';
 import '../services/launch_url.dart';
 
 class ContactPage extends StatelessWidget {

@@ -75,12 +75,6 @@ class _ScrollFeedState extends State<ScrollFeed> {
                     : feedViewModel3
                 : feedViewModel,
             builder: (context, model, child) {
-              print('refresh2');
-              print('refresh2');
-              print('refresh2');
-              print('refresh2');
-              print('refresh2');
-              print('refresh2');
               return !feedViewModel.isBusy &&
                       !feedViewModel2.isBusy &&
                       !feedViewModel3.isBusy
@@ -289,11 +283,5 @@ class _ScrollFeedState extends State<ScrollFeed> {
         : const Center(
             child: Text('Loading'),
           );
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
   }
 }
