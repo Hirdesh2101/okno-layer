@@ -67,7 +67,7 @@ class _VideoEditorState extends State<VideoEditor> {
   Future<File> _exportVideo() async {
     Misc.delayed(1000, () => _isExporting.value = true);
     final File? file = await _controller.exportVideo(
-      preset: VideoExportPreset.medium,
+      preset: VideoExportPreset.slow,
       customInstruction: "-crf 17",
       onProgress: (statics) {
         _exportingProgress.value =
@@ -118,7 +118,7 @@ class _VideoEditorState extends State<VideoEditor> {
               icon: const Icon(Icons.done))
         ],
       ),
-      backgroundColor: Colors.black,
+      //backgroundColor: Colors.black,
       body: _controller.initialized
           ? SafeArea(
               child: Stack(children: [
@@ -147,11 +147,13 @@ class _VideoEditorState extends State<VideoEditor> {
                                         width: 40,
                                         height: 40,
                                         decoration: const BoxDecoration(
-                                          color: Colors.white,
+                                          //color: Colors.white,
                                           shape: BoxShape.circle,
                                         ),
-                                        child: const Icon(Icons.play_arrow,
-                                            color: Colors.black),
+                                        child: const Icon(
+                                          Icons.play_arrow,
+                                          //color: Colors.black
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -208,7 +210,7 @@ class _VideoEditorState extends State<VideoEditor> {
                             builder: (_, bool export, __) => OpacityTransition(
                               visible: export,
                               child: AlertDialog(
-                                backgroundColor: Colors.white,
+                                // backgroundColor: Colors.white,
                                 title: ValueListenableBuilder(
                                   valueListenable: _exportingProgress,
                                   builder: (_, double value, __) => Text(
@@ -254,7 +256,10 @@ class _VideoEditorState extends State<VideoEditor> {
             Expanded(
               child: GestureDetector(
                 onTap: _exportCover,
-                child: const Icon(Icons.save_alt, color: Colors.white),
+                child: const Icon(
+                  Icons.save_alt,
+                  //color: Colors.white
+                ),
               ),
             ),
           ],
@@ -349,7 +354,7 @@ class CropScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      // backgroundColor: Colors.black,
       body: SafeArea(
         child: Padding(
           padding: const Margin.all(30),
@@ -417,7 +422,10 @@ class CropScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.aspect_ratio, color: Colors.white),
+            const Icon(
+              Icons.aspect_ratio,
+              //color: Colors.white
+            ),
             Text(
               title,
             ),

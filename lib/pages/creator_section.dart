@@ -104,12 +104,13 @@ class _CreatorPageState extends State<CreatorPage> {
                                 width: MediaQuery.of(context).size.width * 0.1,
                                 height: MediaQuery.of(context).size.width * 0.1,
                                 decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white12)),
+                                    //  border: Border.all(color: Colors.white12)
+                                    ),
                                 child: const Center(
                                     child: Icon(
                                   Icons.add_a_photo_outlined,
                                   size: 20,
-                                  color: Colors.white,
+                                  //   color: Colors.white,
                                 ))),
                             onPressed: () {
                               Navigator.push(
@@ -143,7 +144,8 @@ class _CreatorPageState extends State<CreatorPage> {
                                           Container(
                                               decoration: BoxDecoration(
                                                   border: Border.all(
-                                                      color: Colors.white24)),
+                                                      //color: Colors.white24
+                                                      )),
                                               height: MediaQuery.of(context)
                                                       .size
                                                       .height *
@@ -199,7 +201,7 @@ class _CreatorPageState extends State<CreatorPage> {
                               child: Text(
                                 "Become a Creator",
                                 style: TextStyle(
-                                    color: Colors.white,
+                                    // color: Colors.white,
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold),
                               ),

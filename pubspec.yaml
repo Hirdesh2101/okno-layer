@@ -66,10 +66,11 @@ dev_dependencies:
   visibility_detector: ^0.2.0
   awesome_dialog: ^2.1.1
   shared_preferences: ^2.0.8
-  flutter_ffmpeg: ^0.4.2
+  #flutter_ffmpeg: ^0.4.2
   video_editor: ^1.2.0
   helpers: ^1.1.4
   webview_flutter: ^2.1.1
+  comment_box: ^0.0.16
   readmore: ^2.1.0
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

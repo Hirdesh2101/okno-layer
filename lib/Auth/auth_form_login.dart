@@ -64,7 +64,7 @@ class _AuthFormLoginState extends State<AuthFormLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
+      //backgroundColor: Colors.blue,
       appBar: AppBar(
         elevation: 0,
       ),
@@ -130,8 +130,8 @@ class _AuthFormLoginState extends State<AuthFormLogin> {
                           child: const Text(
                             'Login',
                             style: TextStyle(
-                              color: Colors.white,
-                            ),
+                                // color: Colors.white,
+                                ),
                           ),
                           onPressed: _trySubmit,
                         ),

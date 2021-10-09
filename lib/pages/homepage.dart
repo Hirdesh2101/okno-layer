@@ -31,10 +31,13 @@ class _HomePageState extends State<HomePage> {
   final firebaseAuth = FirebaseAuth.instance;
   var user = FirebaseAuth.instance.currentUser!.uid;
   final DynamicLinkService _dynamicLinkService = DynamicLinkService();
+  // ignore: prefer_typing_uninitialized_variables
+  var future;
 
   @override
   void initState() {
     _dynamicLinkService.retrieveDynamicLink(context);
+    future = feedViewModel.videoSource!.load(0);
     super.initState();
   }
 
@@ -134,7 +137,7 @@ class _HomePageState extends State<HomePage> {
                                 Text(
                                   '${data['Name']}',
                                   style: const TextStyle(
-                                      color: Colors.white,
+                                      //  color: Colors.white,
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -208,8 +211,14 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: FutureBuilder(
-          future: Future.wait(feedViewModel.videoSource!.loading()),
+          future: future,
           builder: (ctx, snapshot) {
+            print('refresh');
+            print('refresh');
+            print('refresh');
+            print('refresh');
+            print('refresh');
+            print('refresh');
             return snapshot.connectionState == ConnectionState.done
                 ? SafeArea(
                     child: Stack(

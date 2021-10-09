@@ -103,7 +103,7 @@ class _AuthFormState extends State<AuthForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
+      //backgroundColor: Colors.blue,
       appBar: AppBar(
         elevation: 0,
       ),
@@ -164,8 +164,8 @@ class _AuthFormState extends State<AuthForm> {
                           height: MediaQuery.of(context).size.height * 0.07,
                           decoration: BoxDecoration(
                               border: Border.all(
-                                color: Colors.white,
-                              ),
+                                  // color: Colors.white,
+                                  ),
                               borderRadius: BorderRadius.circular(0)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -261,11 +261,12 @@ class _AuthFormState extends State<AuthForm> {
                         width: MediaQuery.of(context).size.width * 0.58,
                         height: MediaQuery.of(context).size.height * 0.07,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: const LinearGradient(colors: [
-                              Color.fromARGB(255, 52, 63, 95),
-                              Color.fromARGB(200, 32, 29, 48)
-                            ])),
+                          borderRadius: BorderRadius.circular(20),
+                          // gradient: const LinearGradient(colors: [
+                          //   Color.fromARGB(255, 52, 63, 95),
+                          //   Color.fromARGB(200, 32, 29, 48)
+                          // ])
+                        ),
                         child: ElevatedButton(
                           //shape: RoundedRectangleBorder(
                           // borderRadius: BorderRadius.circular(20)),
@@ -273,8 +274,8 @@ class _AuthFormState extends State<AuthForm> {
                           child: const Text(
                             'SIGNUP',
                             style: TextStyle(
-                              color: Colors.white,
-                            ),
+                                // color: Colors.white,
+                                ),
                           ),
                           onPressed: _trySubmit,
                         ),

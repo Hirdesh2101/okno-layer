@@ -90,10 +90,10 @@ class _UploadPageState extends State<UploadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white70,
+        //backgroundColor: Colors.white70,
         title: const Text(
           'Post Video',
-          style: TextStyle(color: Colors.black),
+          //style: TextStyle(color: Colors.black),
         ),
         actions: <Widget>[
           TextButton(

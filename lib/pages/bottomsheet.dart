@@ -19,7 +19,7 @@ class ProductDetails {
   void sheet(context, int index, bool likedVideo, bool myVideo) {
     showModalBottomSheet(
         context: context,
-        barrierColor: Colors.black.withOpacity(0.3),
+        //barrierColor: Colors.black.withOpacity(0.3),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
         ),
@@ -36,7 +36,7 @@ class ProductDetails {
                     height: MediaQuery.of(context).size.height * 0.01,
                     width: MediaQuery.of(context).size.width * 0.10,
                     decoration: const BoxDecoration(
-                        color: Colors.grey,
+                        //color: Colors.grey,
                         borderRadius: BorderRadius.all(Radius.circular(20))),
                   ),
                 ),
@@ -71,8 +71,8 @@ class ProductDetails {
                                       const EdgeInsets.fromLTRB(9, 18, 9, 18),
                                   child: CachedNetworkImage(
                                     placeholder: (context, url) => Container(
-                                      color: Colors.grey,
-                                    ),
+                                        //color: Colors.grey,
+                                        ),
                                     cacheManager: CustomCacheManager.instance2,
                                     imageUrl: likedVideo || myVideo
                                         ? likedVideo

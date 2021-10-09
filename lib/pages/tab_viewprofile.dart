@@ -52,9 +52,9 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
               ),
             ),
           ],
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white24,
-          indicatorColor: Colors.white,
+          //labelColor: Colors.white,
+          // unselectedLabelColor: Colors.white24,
+          //indicatorColor: Colors.white,
           controller: _tabController,
           onTap: (int index) {
             setState(() {
@@ -115,8 +115,8 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
                                               .listData[index].thumbnail),
                                           placeholder: (context, url) =>
                                               Container(
-                                            color: Colors.grey,
-                                          ),
+                                                  // color: Colors.grey,
+                                                  ),
                                           fit: BoxFit.fill,
                                           cacheManager:
                                               CustomCacheManager.instance2,
@@ -181,8 +181,8 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
                                               .listData[index].thumbnail),
                                           placeholder: (context, url) =>
                                               Container(
-                                            color: Colors.grey,
-                                          ),
+                                                  //: Colors.grey,
+                                                  ),
                                           fit: BoxFit.fill,
                                           cacheManager:
                                               CustomCacheManager.instance2,

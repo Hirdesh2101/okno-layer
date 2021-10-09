@@ -286,7 +286,7 @@ class _VideoRecorderState extends State<VideoRecorder>
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => EditVideo(file!)))
             .then((value) {
-          initialize();
+          Navigator.of(context).pop();
         });
       } else {
         Fluttertoast.showToast(

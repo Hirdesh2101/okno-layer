@@ -33,11 +33,11 @@ class ContactPage extends StatelessWidget {
                         children: const [
                           Text(
                             'oknoapp.com',
-                            style: TextStyle(color: Colors.blue, fontSize: 16),
+                            style: TextStyle(fontSize: 16),
                           ),
                           Icon(
                             Ionicons.open_outline,
-                            color: Colors.blue,
+                            //color: Colors.blue,
                             size: 16,
                           )
                         ]),

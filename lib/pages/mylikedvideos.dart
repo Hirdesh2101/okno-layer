@@ -70,8 +70,8 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                                     key: Key(feedViewModel
                                         .videoSource!.listData[index].product1),
                                     placeholder: (context, url) => Container(
-                                      color: Colors.grey,
-                                    ),
+                                        // color: Colors.grey,
+                                        ),
                                     fit: BoxFit.fill,
                                     cacheManager: CustomCacheManager.instance2,
                                     imageUrl: feedViewModel

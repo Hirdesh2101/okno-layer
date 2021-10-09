@@ -60,8 +60,9 @@ class _ScrollFeedState extends State<ScrollFeed> {
   Widget feedVideos() {
     final PageController pageController = PageController(
       keepPage: true,
-      initialPage:
-          widget.likedPage || widget.myVideopage ? widget.startIndex : 0,
+      initialPage: widget.likedPage || widget.myVideopage
+          ? widget.startIndex
+          : feedViewModel.currentscreen,
       viewportFraction: 1,
     );
     return Stack(
@@ -74,6 +75,12 @@ class _ScrollFeedState extends State<ScrollFeed> {
                     : feedViewModel3
                 : feedViewModel,
             builder: (context, model, child) {
+              print('refresh2');
+              print('refresh2');
+              print('refresh2');
+              print('refresh2');
+              print('refresh2');
+              print('refresh2');
               return !feedViewModel.isBusy &&
                       !feedViewModel2.isBusy &&
                       !feedViewModel3.isBusy
@@ -109,7 +116,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
                           ),
                         )
                       : PageView.builder(
-                          key: const PageStorageKey('page_key'),
+                          //key: const PageStorageKey('page_key'),
                           physics: const BouncingScrollPhysics(),
                           controller: pageController,
                           itemCount: widget.likedPage || widget.myVideopage
@@ -140,7 +147,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                           .videoSource!.listVideos[index].id),
                               !widget.myVideopage
                                   ? ActionToolBar(index, widget.likedPage,
-                                      widget.myVideopage)
+                                      widget.myVideopage, context)
                                   : (widget.myVideopage &&
                                           !feedViewModel3.videoSource!
                                               .listData[index].approved)
@@ -158,7 +165,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                             ],
                                           ))
                                       : ActionToolBar(index, widget.likedPage,
-                                          widget.myVideopage),
+                                          widget.myVideopage, context),
                               feedViewModel.creatingLink!
                                   ? const Center(
                                       child: CircularProgressIndicator())
@@ -282,5 +289,11 @@ class _ScrollFeedState extends State<ScrollFeed> {
         : const Center(
             child: Text('Loading'),
           );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

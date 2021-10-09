@@ -72,7 +72,7 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
+      //backgroundColor: Colors.blue,
       body: AuthForm(
         _submitAuthForm,
         _isLoading,
