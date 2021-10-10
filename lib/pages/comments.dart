@@ -108,18 +108,30 @@ class _CommentsState extends State<Comments> {
                                   );
                                 }
                                 return ListTile(
-                                  leading: ClipOval(
-                                    child: CircleAvatar(
-                                      radius: 15,
-                                      child: CachedNetworkImage(
-                                        imageUrl: data['Image'],
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
-                                        cacheManager:
-                                            CustomCacheManager.instance2,
-                                      ),
-                                    ),
-                                  ),
+                                  leading: (data['Image'] == 'Male' ||
+                                          data['Image'] == 'Female')
+                                      ? data['Image'] == 'Male'
+                                          ? const CircleAvatar(
+                                              radius: 15,
+                                              backgroundImage:
+                                                  AssetImage("assets/male.jpg"))
+                                          : const CircleAvatar(
+                                              radius: 15,
+                                              backgroundImage: AssetImage(
+                                                  "assets/female.jpg"))
+                                      : ClipOval(
+                                          child: CachedNetworkImage(
+                                            fit: BoxFit.cover,
+                                            imageUrl: data['Image'],
+                                            height: 15,
+                                            width: 15,
+                                            placeholder: (context, url) =>
+                                                const CircularProgressIndicator(),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Icon(Icons.error),
+                                          ),
+                                        ),
                                   title: Text('${data['Name']}'),
                                 );
                               }),

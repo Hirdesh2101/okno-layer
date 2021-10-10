@@ -110,16 +110,6 @@ class ActionToolBar extends StatelessWidget {
       IconButton(
           onPressed: () {
             feedViewModel.pauseDrawer();
-
-            // showGeneralDialog(
-            //     context: context,
-            //     pageBuilder: (context, animation, secondaryAnimation) {
-            //       return StatefulBuilder(builder: (context, setState) {
-            //         return Comments(feedViewModel
-            //             .videoSource!.listVideos[index].id
-            //             .trim());
-            //       });
-            //     }).then((value) => feedViewModel.playDrawer());
             Navigator.of(context)
                 .push(MaterialPageRoute(
                     builder: (context) => Comments(feedViewModel

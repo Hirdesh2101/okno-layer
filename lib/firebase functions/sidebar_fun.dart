@@ -30,145 +30,100 @@ class SideBarFirebase {
   }
 
   Future<void> watchedVideo(dynamic docu) async {
-    // print('aya');
     var obj = [docu];
     var obj2 = [user];
-    int length = 0;
-    await FirebaseFirestore.instance
-        .collection('UsersData')
-        .doc(user)
-        .update({'WatchedVideo': FieldValue.arrayUnion(obj)}).whenComplete(() {
-      //  print('done');
-    });
+    await FirebaseFirestore.instance.collection('UsersData').doc(user).update(
+        {'WatchedVideo': FieldValue.arrayUnion(obj)}).whenComplete(() {});
     FirebaseFirestore.instance
         .collection('VideosDataAdmin')
         .doc(docu)
         .get()
         .then((snapshot) {
       if (snapshot.exists) {
-        if (snapshot.data()!['WatchedVideo'] != null) {
-          length = (snapshot.data()!['WatchedVideo'].length);
-        }
+        FirebaseFirestore.instance
+            .collection('VideosDataAdmin')
+            .doc(docu)
+            .update({'WatchedVideo': FieldValue.arrayUnion(obj2)});
+      } else {
+        FirebaseFirestore.instance
+            .collection('VideosDataAdmin')
+            .doc(docu)
+            .set({'WatchedVideo': FieldValue.arrayUnion(obj2)});
       }
     });
-    if (length > 0) {
-      FirebaseFirestore.instance
-          .collection('VideosDataAdmin')
-          .doc(docu)
-          .update({'WatchedVideo': FieldValue.arrayUnion(obj2)});
-    } else {
-      FirebaseFirestore.instance
-          .collection('VideosDataAdmin')
-          .doc(docu)
-          .set({'WatchedVideo': FieldValue.arrayUnion(obj2)});
-    }
   }
 
   Future<void> reportVideo(dynamic docu) async {
     var obj2 = [user];
-    int length = 0;
     FirebaseFirestore.instance
         .collection('VideosDataAdmin')
         .doc(docu)
         .get()
         .then((snapshot) {
       if (snapshot.exists) {
-        if (snapshot.data()!['ReportedBy'] != null) {
-          length = (snapshot.data()!['ReportedBy'].length);
-        }
+        FirebaseFirestore.instance
+            .collection('VideosDataAdmin')
+            .doc(docu)
+            .update({'ReportedBy': FieldValue.arrayUnion(obj2)});
+      } else {
+        FirebaseFirestore.instance
+            .collection('VideosDataAdmin')
+            .doc(docu)
+            .set({'ReportedBy': FieldValue.arrayUnion(obj2)});
       }
     });
-    if (length > 0) {
-      FirebaseFirestore.instance
-          .collection('VideosDataAdmin')
-          .doc(docu)
-          .update({'ReportedBy': FieldValue.arrayUnion(obj2)});
-    } else {
-      FirebaseFirestore.instance
-          .collection('VideosDataAdmin')
-          .doc(docu)
-          .set({'ReportedBy': FieldValue.arrayUnion(obj2)});
-    }
   }
 
   Future<void> saveVideo(dynamic docu) async {
     var obj2 = [docu];
-    int length = 0;
     FirebaseFirestore.instance
         .collection('UsersData')
         .doc(user)
         .get()
         .then((snapshot) {
       if (snapshot.exists) {
-        if (snapshot.data()!['Saved'] != null) {
-          length = (snapshot.data()!['Saved'].length);
-        }
+        FirebaseFirestore.instance
+            .collection('UsersData')
+            .doc(user)
+            .update({'Saved': FieldValue.arrayUnion(obj2)});
       }
     });
-    if (length > 0) {
-      FirebaseFirestore.instance
-          .collection('UsersData')
-          .doc(user)
-          .update({'Saved': FieldValue.arrayUnion(obj2)});
-    } else {
-      FirebaseFirestore.instance
-          .collection('UsersData')
-          .doc(user)
-          .update({'Saved': FieldValue.arrayUnion(obj2)});
-    }
   }
 
   Future<void> viewedProduct(dynamic docu) async {
     var obj = [user];
-    int length = 0;
     await FirebaseFirestore.instance
         .collection('VideosDataAdmin')
         .doc(docu)
         .get()
-        .then((snapshot) {
+        .then((snapshot) async {
       if (snapshot.exists) {
-        if (snapshot.data()!['ViewedProduct'] != null) {
-          length = (snapshot.data()!['ViewedProduct'].length);
-        }
+        await FirebaseFirestore.instance
+            .collection('VideosDataAdmin')
+            .doc(docu)
+            .update({'ViewedProduct': FieldValue.arrayUnion(obj)});
+      } else {
+        await FirebaseFirestore.instance
+            .collection('VideosDataAdmin')
+            .doc(docu)
+            .set({'ViewedProduct': FieldValue.arrayUnion(obj)});
       }
     });
-    if (length > 0) {
-      await FirebaseFirestore.instance
-          .collection('VideosDataAdmin')
-          .doc(docu)
-          .update({'ViewedProduct': FieldValue.arrayUnion(obj)});
-    } else {
-      await FirebaseFirestore.instance
-          .collection('VideosDataAdmin')
-          .doc(docu)
-          .set({'ViewedProduct': FieldValue.arrayUnion(obj)});
-    }
   }
 
   Future<void> viewedUrl(dynamic docu) async {
     var obj = [user];
-    int length = 0;
     await FirebaseFirestore.instance
         .collection('VideosDataAdmin')
         .doc(docu)
         .get()
-        .then((snapshot) {
+        .then((snapshot) async {
       if (snapshot.exists) {
-        if (snapshot.data()!['ViewedUrl'] != null) {
-          length = (snapshot.data()!['ViewedUrl'].length);
-        }
+        await FirebaseFirestore.instance
+            .collection('VideosDataAdmin')
+            .doc(docu)
+            .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
       }
     });
-    if (length > 0) {
-      await FirebaseFirestore.instance
-          .collection('VideosDataAdmin')
-          .doc(docu)
-          .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
-    } else {
-      await FirebaseFirestore.instance
-          .collection('VideosDataAdmin')
-          .doc(docu)
-          .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
-    }
   }
 }

@@ -102,26 +102,36 @@ class _HomePageState extends State<HomePage> {
                         );
                       }
                       return Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
                           children: [
-                            const SizedBox(
-                              height: 5,
-                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                ClipOval(
-                                  child: CachedNetworkImage(
-                                    fit: BoxFit.cover,
-                                    imageUrl: data['Image'],
-                                    height: 90.0,
-                                    width: 90.0,
-                                    placeholder: (context, url) =>
-                                        const CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error),
-                                  ),
-                                ),
+                                (data['Image'] == 'Male' ||
+                                        data['Image'] == 'Female')
+                                    ? data['Image'] == 'Male'
+                                        ? const CircleAvatar(
+                                            radius: 45,
+                                            backgroundImage:
+                                                AssetImage("assets/male.jpg"))
+                                        : const CircleAvatar(
+                                            radius: 45,
+                                            backgroundImage:
+                                                AssetImage("assets/female.jpg"))
+                                    : ClipOval(
+                                        child: CachedNetworkImage(
+                                          fit: BoxFit.cover,
+                                          imageUrl: data['Image'],
+                                          height: 90.0,
+                                          width: 90.0,
+                                          placeholder: (context, url) =>
+                                              const CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
+                                        ),
+                                      ),
                               ],
                             ),
                             const SizedBox(

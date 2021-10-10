@@ -30,6 +30,12 @@ class _TabBarControllerWidgetState extends State<TabBarControllerWidget>
   }
 
   @override
+  void dispose() {
+    _tabController!.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final feedViewModel = GetIt.instance<MyVideosProvider>();
     final feedViewModel2 = GetIt.instance<MySavedVideosProvider>();

@@ -3,7 +3,6 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:get_it/get_it.dart';
 import 'package:oknoapp/pages/shared_video.dart';
 import '../providers/feedviewprovider.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
 
 class DynamicLinkService {
   final feedViewModel = GetIt.instance<FeedViewModel>();
@@ -32,14 +31,7 @@ class DynamicLinkService {
             context, MaterialPageRoute(builder: (context) => SharedVideo(id!)));
       });
     } catch (e) {
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.ERROR,
-        animType: AnimType.BOTTOMSLIDE,
-        title: e.toString(),
-        desc: e.toString(),
-        btnOkOnPress: () {},
-      ).show();
+      print(e);
     }
   }
 

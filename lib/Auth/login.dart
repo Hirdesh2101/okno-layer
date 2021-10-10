@@ -70,6 +70,8 @@ class _LoginscreenState extends State<Loginscreen> {
               'WatchedVideo': [],
               'Saved': [],
               'Image': googleUser.photoUrl,
+              'BrandEnabled': false,
+              'BrandAssociated': [],
             });
           }
         } catch (err) {

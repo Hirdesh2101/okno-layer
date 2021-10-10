@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:oknoapp/pages/change_theme.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/tab_viewprofile.dart';
+import 'package:oknoapp/pages/webview.dart';
 import 'video_page.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -72,18 +73,28 @@ class _ProfileScreenState extends State<ProfileScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ClipOval(
-                          child: CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            imageUrl: data['Image'],
-                            height: 100.0,
-                            width: 100.0,
-                            placeholder: (context, url) =>
-                                const CircularProgressIndicator(),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                          ),
-                        ),
+                        (data['Image'] == 'Male' || data['Image'] == 'Female')
+                            ? data['Image'] == 'Male'
+                                ? const CircleAvatar(
+                                    radius: 50,
+                                    backgroundImage:
+                                        AssetImage("assets/male.jpg"))
+                                : const CircleAvatar(
+                                    radius: 50,
+                                    backgroundImage:
+                                        AssetImage("assets/female.jpg"))
+                            : ClipOval(
+                                child: CachedNetworkImage(
+                                  fit: BoxFit.cover,
+                                  imageUrl: data['Image'],
+                                  height: 50.0,
+                                  width: 50.0,
+                                  placeholder: (context, url) =>
+                                      const CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
+                              ),
                       ],
                     ),
                     const SizedBox(
@@ -168,69 +179,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(),
                             onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('Terms and Conditions'),
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      // color: Colors.white24
-                                                      )),
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.25,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: ListView.builder(
-                                                  itemBuilder: (ctx, index) {
-                                                    return Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Text(
-                                                            'Terms And Conditions $index'),
-                                                        const SizedBox(
-                                                          height: 5,
-                                                        )
-                                                      ],
-                                                    );
-                                                  },
-                                                  itemCount: 10,
-                                                ),
-                                              )),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(),
-                                                child: const Text('Cancel'),
-                                              ),
-                                              TextButton(
-                                                  child: const Text('Accept'),
-                                                  onPressed: () {
-                                                    _firebase.update({
-                                                      'Creator': true
-                                                    }).whenComplete(() {
-                                                      setState(() {});
-                                                    });
-
-                                                    Navigator.of(context).pop();
-                                                  }),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  });
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (cotext) {
+                                return const WebViewPage(
+                                    title: 'Terms and Conditions',
+                                    url: 'https://www.oknoapp.com/');
+                              })).whenComplete(() {
+                                setState(() {});
+                              });
                             },
                             child: const Center(
                               child: Text(

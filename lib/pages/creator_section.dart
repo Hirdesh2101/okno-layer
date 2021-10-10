@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:oknoapp/pages/brand/brands_page.dart';
 import 'package:oknoapp/pages/encashed_page.dart';
+import './webview.dart';
 import 'video_page.dart';
 import 'package:oknoapp/pages/tab_viewprofile.dart';
+import 'package:ionicons/ionicons.dart';
 
 class CreatorPage extends StatefulWidget {
   static const routeName = '/creator_page';
@@ -44,18 +47,29 @@ class _CreatorPageState extends State<CreatorPage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: ClipOval(
-                            child: CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              imageUrl: data['Image'],
-                              height: 100.0,
-                              width: 100.0,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
-                            ),
-                          ),
+                          child: (data['Image'] == 'Male' ||
+                                  data['Image'] == 'Female')
+                              ? data['Image'] == 'Male'
+                                  ? const CircleAvatar(
+                                      radius: 50,
+                                      backgroundImage:
+                                          AssetImage("assets/male.jpg"))
+                                  : const CircleAvatar(
+                                      radius: 50,
+                                      backgroundImage:
+                                          AssetImage("assets/female.jpg"))
+                              : ClipOval(
+                                  child: CachedNetworkImage(
+                                    fit: BoxFit.cover,
+                                    imageUrl: data['Image'],
+                                    height: 50.0,
+                                    width: 50.0,
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                ),
                         ),
                         const SizedBox(
                           width: 25,
@@ -99,28 +113,58 @@ class _CreatorPageState extends State<CreatorPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (data['Creator'] == true)
-                          IconButton(
-                            icon: Container(
-                                width: MediaQuery.of(context).size.width * 0.1,
-                                height: MediaQuery.of(context).size.width * 0.1,
-                                decoration: BoxDecoration(
-                                    //  border: Border.all(color: Colors.white12)
-                                    ),
-                                child: const Center(
-                                    child: Icon(
-                                  Icons.add_a_photo_outlined,
-                                  size: 20,
-                                  //   color: Colors.white,
-                                ))),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const VideoRecorder()),
-                              );
-                            },
-                          )
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                    height:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                    decoration: BoxDecoration(
+                                        //  border: Border.all(color: Colors.white12)
+                                        ),
+                                    child: const Center(
+                                        child: Icon(
+                                      Icons.add_a_photo_outlined,
+                                      size: 20,
+                                      //   color: Colors.white,
+                                    ))),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const VideoRecorder()),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                    height:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                    decoration: BoxDecoration(
+                                        //  border: Border.all(color: Colors.white12)
+                                        ),
+                                    child: const Center(
+                                        child: Icon(
+                                      Ionicons.storefront,
+                                      size: 20,
+                                      //   color: Colors.white,
+                                    ))),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const BrandPage()),
+                                  );
+                                },
+                              )
+                            ],
+                          ),
                       ],
                     ),
                     const SizedBox(
@@ -133,69 +177,14 @@ class _CreatorPageState extends State<CreatorPage> {
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(),
                             onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('Terms and Conditions'),
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      //color: Colors.white24
-                                                      )),
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.25,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: ListView.builder(
-                                                  itemBuilder: (ctx, index) {
-                                                    return Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Text(
-                                                            'Terms And Conditions $index'),
-                                                        const SizedBox(
-                                                          height: 5,
-                                                        )
-                                                      ],
-                                                    );
-                                                  },
-                                                  itemCount: 10,
-                                                ),
-                                              )),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(),
-                                                child: const Text('Cancel'),
-                                              ),
-                                              TextButton(
-                                                  child: const Text('Accept'),
-                                                  onPressed: () {
-                                                    _firebase.update({
-                                                      'Creator': true
-                                                    }).whenComplete(() {
-                                                      setState(() {});
-                                                    });
-
-                                                    Navigator.of(context).pop();
-                                                  }),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  });
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (cotext) {
+                                return const WebViewPage(
+                                    title: 'Terms and Conditions',
+                                    url: 'https://www.oknoapp.com/');
+                              })).whenComplete(() {
+                                setState(() {});
+                              });
                             },
                             child: const Center(
                               child: Text(

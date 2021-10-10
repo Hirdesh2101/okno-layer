@@ -1,7 +1,10 @@
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EditProfile extends StatefulWidget {
   static const routeName = '/edit_profile';
@@ -13,6 +16,8 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   bool _isUploading = false;
+  File? _image;
+  final _picker = ImagePicker();
   final firebaseAuth = FirebaseAuth.instance;
   final TextEditingController _textEditingController = TextEditingController();
   final TextEditingController _textEditingController2 = TextEditingController();
@@ -64,6 +69,52 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
+  _imgFromCamera() async {
+    File image = await _picker.pickImage(
+        source: ImageSource.camera, imageQuality: 50) as File;
+
+    setState(() {
+      _image = image;
+    });
+  }
+
+  _imgFromGallery() async {
+    File image = (await _picker.pickImage(
+        source: ImageSource.gallery, imageQuality: 50)) as File;
+
+    setState(() {
+      _image = image;
+    });
+  }
+
+  void _showPicker(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Gallery'),
+                    onTap: () {
+                      _imgFromGallery();
+                      Navigator.of(context).pop();
+                    }),
+                ListTile(
+                  leading: const Icon(Icons.photo_camera),
+                  title: const Text('Camera'),
+                  onTap: () {
+                    _imgFromCamera();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,6 +144,38 @@ class _EditProfileState extends State<EditProfile> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                            onTap: () => _showPicker(context),
+                            child: _image != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(90),
+                                    child: Image.file(
+                                      _image!,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.fitHeight,
+                                    ),
+                                  )
+                                : (data['Image'] == 'Male' ||
+                                        data['Image'] == 'Female')
+                                    ? data['Image'] == 'Male'
+                                        ? const CircleAvatar(
+                                            radius: 90,
+                                            backgroundImage:
+                                                AssetImage("assets/male.jpg"))
+                                        : const CircleAvatar(
+                                            radius: 90,
+                                            backgroundImage:
+                                                AssetImage("assets/female.jpg"))
+                                    : CircleAvatar(
+                                        radius: 90,
+                                        backgroundImage: NetworkImage(
+                                          data['Image'],
+                                        ),
+                                      )),
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/Auth/login.dart';
 import 'package:oknoapp/Auth/register.dart';
+import 'package:oknoapp/pages/brand/brands_page.dart';
 import 'package:oknoapp/pages/creator_section.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/encashed_page.dart';
@@ -82,6 +83,7 @@ class _MyAppState extends State<MyApp> {
             CreatorPage.routeName: (ctx) => const CreatorPage(),
             EncashedPage.routeName: (ctx) => const EncashedPage(),
             SetProfileImage.routeName: (ctx) => const SetProfileImage(),
+            BrandPage.routeName: (ctx) => const BrandPage(),
           },
           navigatorObservers: [
             FirebaseAnalyticsObserver(analytics: analytics),

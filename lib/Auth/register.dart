@@ -49,7 +49,9 @@ class _RegisterState extends State<Register> {
         'Encashed': 0.0,
         'WatchedVideo': [],
         'Saved': [],
-        'Image': '',
+        'Image': gender,
+        'BrandEnabled': false,
+        'BrandAssociated': [],
       });
       Navigator.of(context).pushReplacementNamed(SetProfileImage.routeName);
     } on FirebaseAuthException catch (err) {
