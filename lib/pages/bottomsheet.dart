@@ -7,15 +7,26 @@ import '../services/cache_service.dart';
 import '../providers/likedvideoprovider.dart';
 import '../providers/myvideosprovider.dart';
 import '../services/launch_url.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../firebase functions/sidebar_fun.dart';
 
 class ProductDetails {
-  //final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final feedViewModel2 = GetIt.instance<LikeProvider>();
   final feedViewModel3 = GetIt.instance<MyVideosProvider>();
   SideBarFirebase firebasefun = SideBarFirebase();
-  void sheet(context, int index, bool likedVideo, bool myVideo) {
+
+  Future<String> getname(String id) async {
+    return await FirebaseFirestore.instance
+        .collection('BrandData')
+        .doc(id.trim())
+        .get()
+        .then((value) {
+      return value.data()!['Name'];
+    });
+  }
+
+  void sheet(context, int index, bool likedVideo, bool myVideo) async {
     showModalBottomSheet(
         context: context,
         //barrierColor: Colors.black.withOpacity(0.3),
@@ -126,22 +137,6 @@ class ProductDetails {
                               : feedViewModel
                                   .videoSource!.listVideos[index].store;
                           launchURL(context, url);
-                          // Navigator.of(context)
-                          //     .push(MaterialPageRoute(
-
-                          //         builder: (ctx) => WebViewPage(
-                          //             title: likedVideo || myVideo
-                          //                 ? likedVideo
-                          //                     ? feedViewModel2.videoSource!
-                          //                         .listData[index].seller
-                          //                     : feedViewModel3.videoSource!
-                          //                         .listData[index].seller
-                          //                 : feedViewModel.videoSource!
-                          //                     .listVideos[index].seller,
-                          //             url: url)))
-                          //     .then((value) {
-                          //   Navigator.of(context).pop();
-                          // });
                           await firebasefun.viewedUrl(likedVideo
                               ? feedViewModel2.videoSource!.listVideos[index]
                               : feedViewModel.videoSource!.listVideos[index].id
@@ -151,11 +146,18 @@ class ProductDetails {
                   )),
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                child: Text(likedVideo || myVideo
-                    ? likedVideo
-                        ? feedViewModel2.videoSource!.listData[index].seller
-                        : feedViewModel3.videoSource!.listData[index].seller
-                    : feedViewModel.videoSource!.listVideos[index].seller),
+                child: FutureBuilder(
+                    future: getname(likedVideo || myVideo
+                        ? likedVideo
+                            ? feedViewModel2.videoSource!.listData[index].seller
+                            : feedViewModel3.videoSource!.listData[index].seller
+                        : feedViewModel.videoSource!.listVideos[index].seller),
+                    builder: (context, snapsot) {
+                      if (snapsot.connectionState == ConnectionState.waiting) {
+                        return const Text('Loading');
+                      }
+                      return Text(snapsot.data.toString());
+                    }),
               ),
             ],
           );

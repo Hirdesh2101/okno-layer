@@ -211,6 +211,9 @@ Future<void> postToFireStore(
     "product2": "",
     "seller": "Myself",
     "store": url,
+    "value": '',
+    "userupload": true,
+    "uploadedby": user,
     "Comments": [],
   }).then((val) {
     var obj2 = [timestamp];

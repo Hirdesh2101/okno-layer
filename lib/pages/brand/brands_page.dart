@@ -39,7 +39,7 @@ class _BrandPageState extends State<BrandPage> {
             dynamic data = snapshot.data;
             var check = data!['BrandEnabled'];
             if (check) {
-              return BrandDetails();
+              return const BrandDetails();
             }
             return Center(
               child: Column(

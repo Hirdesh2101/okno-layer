@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:oknoapp/providers/brand_provider.dart';
+import 'package:get_it/get_it.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../services/cache_service.dart';
+import 'package:stacked/stacked.dart';
 
 class BrandDetails extends StatefulWidget {
   const BrandDetails({Key? key}) : super(key: key);
@@ -16,7 +21,7 @@ class _BrandDetailsState extends State<BrandDetails>
   void initState() {
     _tabController = TabController(
       initialIndex: selectedIndex,
-      length: 5,
+      length: 2,
       vsync: this,
     );
     super.initState();
@@ -30,10 +35,11 @@ class _BrandDetailsState extends State<BrandDetails>
 
   @override
   Widget build(BuildContext context) {
+    final feedViewModel = GetIt.instance<BrandVideoProvider>();
     return Column(
       children: [
         TabBar(
-          isScrollable: true,
+          isScrollable: false,
           tabs: const [
             Padding(
               padding: EdgeInsets.all(8.0),
@@ -41,19 +47,7 @@ class _BrandDetailsState extends State<BrandDetails>
             ),
             Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text('Views'),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('Likes'),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('Clicks'),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('Store Visit'),
+              child: Text('DashBoard'),
             ),
           ],
           labelColor: Colors.white,
@@ -71,38 +65,76 @@ class _BrandDetailsState extends State<BrandDetails>
         IndexedStack(
           children: <Widget>[
             Visibility(
-              child: Container(
-                child: Text('1'),
-              ),
-              visible: selectedIndex == 0,
+              child: feedViewModel.videoSource!.listVideos.isEmpty
+                  ? Center(
+                      child: Column(
+                        children: const [
+                          SizedBox(
+                            height: 50,
+                          ),
+                          Text('No Videos Created'),
+                        ],
+                      ),
+                    )
+                  : ViewModelBuilder.reactive(
+                      disposeViewModel: false,
+                      viewModelBuilder: () => feedViewModel,
+                      builder: (context, model, child) {
+                        return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount:
+                                feedViewModel.videoSource!.listVideos.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 1.5,
+                              mainAxisSpacing: 1.5,
+                              childAspectRatio: 9 / 15,
+                            ),
+                            itemBuilder: (
+                              context,
+                              index,
+                            ) {
+                              return GestureDetector(
+                                  onTap: () {
+                                    // Navigator.of(context).push(
+                                    //     MaterialPageRoute(builder: (context) {
+                                    //   return LikeScroll(index, true);
+                                    // }));
+                                  },
+                                  child: Card(
+                                    elevation: 3,
+                                    child: SizedBox.expand(
+                                      child: FittedBox(
+                                        fit: BoxFit.fill,
+                                        child: CachedNetworkImage(
+                                          key: Key(feedViewModel.videoSource!
+                                              .listData[index].thumbnail),
+                                          placeholder: (context, url) =>
+                                              Container(
+                                                  // color: Colors.grey,
+                                                  ),
+                                          fit: BoxFit.fill,
+                                          cacheManager:
+                                              CustomCacheManager.instance2,
+                                          imageUrl: feedViewModel.videoSource!
+                                              .listData[index].thumbnail,
+                                        ),
+                                      ),
+                                    ),
+                                  ));
+                            });
+                      },
+                    ),
               maintainState: true,
+              visible: selectedIndex == 0,
             ),
             Visibility(
               child: Container(
                 child: Text('2'),
               ),
               visible: selectedIndex == 1,
-              maintainState: true,
-            ),
-            Visibility(
-              child: Container(
-                child: Text('3'),
-              ),
-              visible: selectedIndex == 2,
-              maintainState: true,
-            ),
-            Visibility(
-              child: Container(
-                child: Text('4'),
-              ),
-              visible: selectedIndex == 3,
-              maintainState: true,
-            ),
-            Visibility(
-              child: Container(
-                child: Text('5'),
-              ),
-              visible: selectedIndex == 4,
               maintainState: true,
             ),
           ],

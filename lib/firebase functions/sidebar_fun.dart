@@ -91,7 +91,12 @@ class SideBarFirebase {
   }
 
   Future<void> viewedProduct(dynamic docu) async {
-    var obj = [user];
+    var obj = [
+      {
+        'user': user,
+        'timestamp': DateTime.now(),
+      }
+    ];
     await FirebaseFirestore.instance
         .collection('VideosDataAdmin')
         .doc(docu)
@@ -112,7 +117,12 @@ class SideBarFirebase {
   }
 
   Future<void> viewedUrl(dynamic docu) async {
-    var obj = [user];
+    var obj = [
+      {
+        'user': user,
+        'timestamp': DateTime.now(),
+      }
+    ];
     await FirebaseFirestore.instance
         .collection('VideosDataAdmin')
         .doc(docu)
@@ -123,6 +133,32 @@ class SideBarFirebase {
             .collection('VideosDataAdmin')
             .doc(docu)
             .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('VideosData')
+        .doc(docu)
+        .get()
+        .then((value) async {
+      if (value.data()!['userupload']) {
+        if (value.data()!['uploadedby'] != user) {
+          var user = value.data()!['uploadedby'];
+          var price = value.data()!['value'];
+          double finalprice = double.parse('$price');
+          double balance = 0;
+          await FirebaseFirestore.instance
+              .collection('UsersData')
+              .doc(user)
+              .get()
+              .then((value) {
+            balance = value.data()!['Balance'];
+            balance += finalprice;
+          });
+          await FirebaseFirestore.instance
+              .collection('UsersData')
+              .doc(user)
+              .update({'Balance': balance});
+        }
       }
     });
   }

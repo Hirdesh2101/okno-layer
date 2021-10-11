@@ -31,7 +31,7 @@ class DynamicLinkService {
             context, MaterialPageRoute(builder: (context) => SharedVideo(id!)));
       });
     } catch (e) {
-      print(e);
+      // print(e);
     }
   }
 

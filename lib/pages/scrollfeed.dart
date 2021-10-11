@@ -178,14 +178,6 @@ class _ScrollFeedState extends State<ScrollFeed> {
   }
 
   Widget videoCard(Video video, var id) {
-    video.controller!.addListener(() {
-      if (video.controller!.value.position ==
-          const Duration(seconds: 0, minutes: 0, hours: 0)) {}
-      if (video.controller!.value.position.inSeconds ==
-          video.controller!.value.duration.inSeconds - 1) {
-        firebaseServices.watchedVideo(id);
-      }
-    });
     return video.controller != null && video.controller!.value.isInitialized
         ? VisibilityDetector(
             key: Key(video.id),

@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:readmore/readmore.dart';
-import '../services/cache_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class Comments extends StatefulWidget {
