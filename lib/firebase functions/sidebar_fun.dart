@@ -151,7 +151,7 @@ class SideBarFirebase {
               .doc(user)
               .get()
               .then((value) {
-            balance = value.data()!['Balance'];
+            balance = (value.data()!['Balance']);
             balance += finalprice;
           });
           await FirebaseFirestore.instance
@@ -159,6 +159,39 @@ class SideBarFirebase {
               .doc(user)
               .update({'Balance': balance});
         }
+      }
+    });
+    var storeid = '';
+    double? finalprice;
+    await FirebaseFirestore.instance
+        .collection('VideosData')
+        .doc(docu)
+        .get()
+        .then((value) {
+      storeid = value.data()!['seller'];
+      var price = value.data()!['value'];
+      finalprice = double.parse('$price');
+    });
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .get()
+        .then((value) async {
+      if (!value.data()!['BrandAssociated'].contains(storeid)) {
+        double balance = 0;
+        await FirebaseFirestore.instance
+            .collection('BrandData')
+            .doc(storeid)
+            .get()
+            .then((value) {
+          var value1 = value.data()!['balance'].toDouble();
+          balance = value1;
+          balance -= finalprice!;
+        });
+        await FirebaseFirestore.instance
+            .collection('BrandData')
+            .doc(storeid)
+            .update({'balance': balance});
       }
     });
   }

@@ -213,6 +213,7 @@ Future<void> postToFireStore(
     "store": url,
     "value": '',
     "userupload": true,
+    "storeupload": false,
     "uploadedby": user,
     "Comments": [],
   }).then((val) {
