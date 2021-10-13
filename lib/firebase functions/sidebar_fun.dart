@@ -234,23 +234,23 @@ class SideBarFirebase {
             .doc(docu)
             .get()
             .then((value) async {
-          if (value.data()!['userupload']) {
-            if (value.data()!['uploadedby'] != user) {
-              double balance = 0;
-              await FirebaseFirestore.instance
-                  .collection('BrandData')
-                  .doc(storeid)
-                  .get()
-                  .then((value) {
-                var value1 = value.data()!['balance'].toDouble();
-                balance = value1;
-                balance -= finalprice!;
-              });
-              await FirebaseFirestore.instance
-                  .collection('BrandData')
-                  .doc(storeid)
-                  .update({'balance': balance});
-            }
+          if (value.data()!['userupload'] &&
+                  value.data()!['uploadedby'] != user ||
+              !value.data()!['userupload']) {
+            double balance = 0;
+            await FirebaseFirestore.instance
+                .collection('BrandData')
+                .doc(storeid)
+                .get()
+                .then((value) {
+              var value1 = value.data()!['balance'].toDouble();
+              balance = value1;
+              balance -= finalprice!;
+            });
+            await FirebaseFirestore.instance
+                .collection('BrandData')
+                .doc(storeid)
+                .update({'balance': balance});
           }
         });
       }
