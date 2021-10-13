@@ -110,34 +110,33 @@ class SideBarFirebase {
         .doc(docu)
         .get()
         .then((value) async {
-      if (value.data()!['userupload']) {
-        if (value.data()!['uploadedby'] != user) {
-          await FirebaseFirestore.instance
-              .collection('UsersData')
-              .doc(user)
-              .get()
-              .then((value2) async {
-            if (!value2.data()!['BrandAssociated'].contains(storeid)) {
-              await FirebaseFirestore.instance
-                  .collection('VideosDataAdmin')
-                  .doc(docu)
-                  .get()
-                  .then((snapshot) async {
-                if (snapshot.exists) {
-                  await FirebaseFirestore.instance
-                      .collection('VideosDataAdmin')
-                      .doc(docu)
-                      .update({'ViewedProduct': FieldValue.arrayUnion(obj)});
-                } else {
-                  await FirebaseFirestore.instance
-                      .collection('VideosDataAdmin')
-                      .doc(docu)
-                      .set({'ViewedProduct': FieldValue.arrayUnion(obj)});
-                }
-              });
-            }
-          });
-        }
+      if (value.data()!['userupload'] && value.data()!['uploadedby'] != user ||
+          !value.data()!['userupload']) {
+        await FirebaseFirestore.instance
+            .collection('UsersData')
+            .doc(user)
+            .get()
+            .then((value2) async {
+          if (!value2.data()!['BrandAssociated'].contains(storeid)) {
+            await FirebaseFirestore.instance
+                .collection('VideosDataAdmin')
+                .doc(docu)
+                .get()
+                .then((snapshot) async {
+              if (snapshot.exists) {
+                await FirebaseFirestore.instance
+                    .collection('VideosDataAdmin')
+                    .doc(docu)
+                    .update({'ViewedProduct': FieldValue.arrayUnion(obj)});
+              } else {
+                await FirebaseFirestore.instance
+                    .collection('VideosDataAdmin')
+                    .doc(docu)
+                    .set({'ViewedProduct': FieldValue.arrayUnion(obj)});
+              }
+            });
+          }
+        });
       }
     });
   }
@@ -165,29 +164,28 @@ class SideBarFirebase {
         .doc(docu)
         .get()
         .then((value) async {
-      if (value.data()!['userupload']) {
-        if (value.data()!['uploadedby'] != user) {
-          await FirebaseFirestore.instance
-              .collection('UsersData')
-              .doc(user)
-              .get()
-              .then((value2) async {
-            if (!value2.data()!['BrandAssociated'].contains(storeid)) {
-              await FirebaseFirestore.instance
-                  .collection('VideosDataAdmin')
-                  .doc(docu)
-                  .get()
-                  .then((snapshot) async {
-                if (snapshot.exists) {
-                  await FirebaseFirestore.instance
-                      .collection('VideosDataAdmin')
-                      .doc(docu)
-                      .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
-                }
-              });
-            }
-          });
-        }
+      if (value.data()!['userupload'] && value.data()!['uploadedby'] != user ||
+          !value.data()!['userupload']) {
+        await FirebaseFirestore.instance
+            .collection('UsersData')
+            .doc(user)
+            .get()
+            .then((value2) async {
+          if (!value2.data()!['BrandAssociated'].contains(storeid)) {
+            await FirebaseFirestore.instance
+                .collection('VideosDataAdmin')
+                .doc(docu)
+                .get()
+                .then((snapshot) async {
+              if (snapshot.exists) {
+                await FirebaseFirestore.instance
+                    .collection('VideosDataAdmin')
+                    .doc(docu)
+                    .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
+              }
+            });
+          }
+        });
       }
     });
     await FirebaseFirestore.instance
