@@ -7,7 +7,8 @@ import '../../services/cache_service.dart';
 import 'package:stacked/stacked.dart';
 
 class BrandDetails extends StatefulWidget {
-  const BrandDetails({Key? key}) : super(key: key);
+  final bool switchval;
+  const BrandDetails(this.switchval, {Key? key}) : super(key: key);
 
   @override
   _BrandDetailsState createState() => _BrandDetailsState();
@@ -44,11 +45,11 @@ class _BrandDetailsState extends State<BrandDetails>
           tabs: const [
             Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text('Videos'),
+              child: Text('DashBoard'),
             ),
             Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text('DashBoard'),
+              child: Text('Videos'),
             ),
           ],
           labelColor: Colors.white,
@@ -66,6 +67,11 @@ class _BrandDetailsState extends State<BrandDetails>
         Expanded(
           child: IndexedStack(
             children: <Widget>[
+              Visibility(
+                child: BrandSpecifications(widget.switchval),
+                visible: selectedIndex == 0,
+                maintainState: true,
+              ),
               Visibility(
                 child: feedViewModel.videoSource!.listVideos.isEmpty
                     ? Center(
@@ -130,12 +136,7 @@ class _BrandDetailsState extends State<BrandDetails>
                         },
                       ),
                 maintainState: true,
-                visible: selectedIndex == 0,
-              ),
-              Visibility(
-                child: const BrandSpecifications(),
                 visible: selectedIndex == 1,
-                maintainState: true,
               ),
             ],
             index: selectedIndex,

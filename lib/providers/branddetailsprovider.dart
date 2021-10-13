@@ -12,7 +12,21 @@ class BrandDetailsProvider extends BaseViewModel {
   Future<void> refresh() async {
     setBusy(true);
     await videoSource!.load();
-    //notifyListeners();
+    notifyListeners();
+    setBusy(false);
+  }
+
+  Future<void> applyFilter() async {
+    setBusy(true);
+    await videoSource!.applyFilter();
+    notifyListeners();
+    setBusy(false);
+  }
+
+  Future<void> removeFilter() async {
+    setBusy(true);
+    await videoSource!.load();
+    notifyListeners();
     setBusy(false);
   }
 }

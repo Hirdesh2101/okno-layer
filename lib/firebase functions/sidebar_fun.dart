@@ -97,21 +97,47 @@ class SideBarFirebase {
         'timestamp': DateTime.now(),
       }
     ];
+    var storeid = '';
     await FirebaseFirestore.instance
-        .collection('VideosDataAdmin')
+        .collection('VideosData')
         .doc(docu)
         .get()
-        .then((snapshot) async {
-      if (snapshot.exists) {
-        await FirebaseFirestore.instance
-            .collection('VideosDataAdmin')
-            .doc(docu)
-            .update({'ViewedProduct': FieldValue.arrayUnion(obj)});
-      } else {
-        await FirebaseFirestore.instance
-            .collection('VideosDataAdmin')
-            .doc(docu)
-            .set({'ViewedProduct': FieldValue.arrayUnion(obj)});
+        .then((value) {
+      storeid = value.data()!['seller'];
+    });
+    await FirebaseFirestore.instance
+        .collection('VideosData')
+        .doc(docu)
+        .get()
+        .then((value) async {
+      if (value.data()!['userupload']) {
+        if (value.data()!['uploadedby'] != user) {
+          await FirebaseFirestore.instance
+              .collection('UsersData')
+              .doc(user)
+              .get()
+              .then((value2) async {
+            if (!value2.data()!['BrandAssociated'].contains(storeid)) {
+              await FirebaseFirestore.instance
+                  .collection('VideosDataAdmin')
+                  .doc(docu)
+                  .get()
+                  .then((snapshot) async {
+                if (snapshot.exists) {
+                  await FirebaseFirestore.instance
+                      .collection('VideosDataAdmin')
+                      .doc(docu)
+                      .update({'ViewedProduct': FieldValue.arrayUnion(obj)});
+                } else {
+                  await FirebaseFirestore.instance
+                      .collection('VideosDataAdmin')
+                      .doc(docu)
+                      .set({'ViewedProduct': FieldValue.arrayUnion(obj)});
+                }
+              });
+            }
+          });
+        }
       }
     });
   }
@@ -123,44 +149,6 @@ class SideBarFirebase {
         'timestamp': DateTime.now(),
       }
     ];
-    await FirebaseFirestore.instance
-        .collection('VideosDataAdmin')
-        .doc(docu)
-        .get()
-        .then((snapshot) async {
-      if (snapshot.exists) {
-        await FirebaseFirestore.instance
-            .collection('VideosDataAdmin')
-            .doc(docu)
-            .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
-      }
-    });
-    await FirebaseFirestore.instance
-        .collection('VideosData')
-        .doc(docu)
-        .get()
-        .then((value) async {
-      if (value.data()!['userupload']) {
-        if (value.data()!['uploadedby'] != user) {
-          var user = value.data()!['uploadedby'];
-          var price = value.data()!['value'];
-          double finalprice = double.parse('$price');
-          double balance = 0;
-          await FirebaseFirestore.instance
-              .collection('UsersData')
-              .doc(user)
-              .get()
-              .then((value) {
-            balance = (value.data()!['Balance']);
-            balance += finalprice;
-          });
-          await FirebaseFirestore.instance
-              .collection('UsersData')
-              .doc(user)
-              .update({'Balance': balance});
-        }
-      }
-    });
     var storeid = '';
     double? finalprice;
     await FirebaseFirestore.instance
@@ -173,25 +161,100 @@ class SideBarFirebase {
       finalprice = double.parse('$price');
     });
     await FirebaseFirestore.instance
+        .collection('VideosData')
+        .doc(docu)
+        .get()
+        .then((value) async {
+      if (value.data()!['userupload']) {
+        if (value.data()!['uploadedby'] != user) {
+          await FirebaseFirestore.instance
+              .collection('UsersData')
+              .doc(user)
+              .get()
+              .then((value2) async {
+            if (!value2.data()!['BrandAssociated'].contains(storeid)) {
+              await FirebaseFirestore.instance
+                  .collection('VideosDataAdmin')
+                  .doc(docu)
+                  .get()
+                  .then((snapshot) async {
+                if (snapshot.exists) {
+                  await FirebaseFirestore.instance
+                      .collection('VideosDataAdmin')
+                      .doc(docu)
+                      .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
+                }
+              });
+            }
+          });
+        }
+      }
+    });
+    await FirebaseFirestore.instance
+        .collection('VideosData')
+        .doc(docu)
+        .get()
+        .then((value) async {
+      if (value.data()!['userupload']) {
+        if (value.data()!['uploadedby'] != user) {
+          var user = value.data()!['uploadedby'];
+          var price = value.data()!['value'];
+          await FirebaseFirestore.instance
+              .collection('UsersData')
+              .doc(user)
+              .get()
+              .then((value2) async {
+            if (!value2.data()!['BrandAssociated'].contains(storeid)) {
+              double finalprice = double.parse('$price');
+              double balance = 0;
+              await FirebaseFirestore.instance
+                  .collection('UsersData')
+                  .doc(user)
+                  .get()
+                  .then((value) {
+                balance = (value.data()!['Balance']);
+                balance += finalprice;
+              });
+              await FirebaseFirestore.instance
+                  .collection('UsersData')
+                  .doc(user)
+                  .update({'Balance': balance});
+            }
+          });
+        }
+      }
+    });
+
+    await FirebaseFirestore.instance
         .collection('UsersData')
         .doc(user)
         .get()
         .then((value) async {
       if (!value.data()!['BrandAssociated'].contains(storeid)) {
-        double balance = 0;
         await FirebaseFirestore.instance
-            .collection('BrandData')
-            .doc(storeid)
+            .collection('VideosData')
+            .doc(docu)
             .get()
-            .then((value) {
-          var value1 = value.data()!['balance'].toDouble();
-          balance = value1;
-          balance -= finalprice!;
+            .then((value) async {
+          if (value.data()!['userupload']) {
+            if (value.data()!['uploadedby'] != user) {
+              double balance = 0;
+              await FirebaseFirestore.instance
+                  .collection('BrandData')
+                  .doc(storeid)
+                  .get()
+                  .then((value) {
+                var value1 = value.data()!['balance'].toDouble();
+                balance = value1;
+                balance -= finalprice!;
+              });
+              await FirebaseFirestore.instance
+                  .collection('BrandData')
+                  .doc(storeid)
+                  .update({'balance': balance});
+            }
+          }
         });
-        await FirebaseFirestore.instance
-            .collection('BrandData')
-            .doc(storeid)
-            .update({'balance': balance});
       }
     });
   }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/brand_model.dart';
+import 'package:jiffy/jiffy.dart';
 
 class BrandDeatilsAPI {
   List<String> listBrand = <String>[];
@@ -9,6 +10,37 @@ class BrandDeatilsAPI {
 
   BrandDeatilsAPI() {
     load();
+  }
+
+  Future<void> applyFilter() async {
+    var now = DateTime.now();
+    var previous = Jiffy(now).subtract(months: 1);
+    for (int i = listData.length - 1; i >= 0; i--) {
+      for (int j = listData[i].viewedproduct.length - 1; j >= 0; j--) {
+        if (listData[i]
+            .viewedproduct[j]['timestamp']
+            .toDate()
+            .isAfter(previous.dateTime)) {
+          continue;
+        } else {
+          listData[i].viewedproduct.removeRange(0, j + 1);
+          break;
+        }
+      }
+    }
+    for (int i = listData.length - 1; i >= 0; i--) {
+      for (int j = listData[i].viewedurl.length - 1; j >= 0; j--) {
+        if (listData[i]
+            .viewedurl[j]['timestamp']
+            .toDate()
+            .isAfter(previous.dateTime)) {
+          continue;
+        } else {
+          listData[i].viewedurl.removeRange(0, j + 1);
+          break;
+        }
+      }
+    }
   }
 
   Future<void> load() async {

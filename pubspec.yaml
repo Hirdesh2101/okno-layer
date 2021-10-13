@@ -69,6 +69,7 @@ dev_dependencies:
   #flutter_ffmpeg: ^0.4.2
   video_editor: ^1.2.0
   helpers: ^1.1.4
+  jiffy: ^4.1.0
   webview_flutter: ^2.1.1
   #comment_box: ^0.0.16
   readmore: ^2.1.0

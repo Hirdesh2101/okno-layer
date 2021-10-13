@@ -4,7 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:stacked/stacked.dart';
 
 class BrandSpecifications extends StatefulWidget {
-  const BrandSpecifications({Key? key}) : super(key: key);
+  final bool switchvalue;
+  const BrandSpecifications(this.switchvalue, {Key? key}) : super(key: key);
 
   @override
   _BrandSpecificationsState createState() => _BrandSpecificationsState();
@@ -28,12 +29,29 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
 
   @override
   void initState() {
-    init();
+    // init();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.switchvalue) {
+      feedViewModel.applyFilter();
+      viewedurl = 0;
+      reported = 0;
+      viewedproduct = 0;
+      viewedvideo = 0;
+      init();
+      feedViewModel.refresh();
+    } else {
+      feedViewModel.removeFilter();
+      feedViewModel.refresh();
+      viewedurl = 0;
+      reported = 0;
+      viewedproduct = 0;
+      viewedvideo = 0;
+      init();
+    }
     return ViewModelBuilder.reactive(
         disposeViewModel: false,
         viewModelBuilder: () => feedViewModel,
@@ -59,9 +77,12 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const Text('No of users viewed product:'),
+                          const Expanded(
+                            child: SizedBox(),
+                          ),
                           Text('$viewedproduct'),
                         ],
                       ),
@@ -69,9 +90,12 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
                         height: 6,
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const Text('No of users viewed url:'),
+                          const Expanded(
+                            child: SizedBox(),
+                          ),
                           Text('$viewedurl'),
                         ],
                       ),
@@ -79,9 +103,12 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
                         height: 6,
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const Text('No of users reporting video:'),
+                          const Expanded(
+                            child: SizedBox(),
+                          ),
                           Text('$reported'),
                         ],
                       ),
@@ -89,9 +116,12 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
                         height: 6,
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const Text('Total Views:'),
+                          const Expanded(
+                            child: SizedBox(),
+                          ),
                           Text('$viewedvideo'),
                         ],
                       ),
