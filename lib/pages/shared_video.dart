@@ -8,7 +8,7 @@ import 'package:ionicons/ionicons.dart';
 
 class SharedVideo extends StatefulWidget {
   final String id;
-  static const routeName = '/routeName';
+  static const routeName = '/SharedVideo';
   const SharedVideo(this.id, {Key? key}) : super(key: key);
 
   @override

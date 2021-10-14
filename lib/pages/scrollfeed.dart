@@ -37,7 +37,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
       feedViewModel2.initial(widget.startIndex);
     }
     if (widget.myVideopage) {
-      feedViewModel3.initial(widget.startIndex);
+      feedViewModel3.initial(widget.startIndex, false, false);
     }
   }
 
@@ -116,13 +116,14 @@ class _ScrollFeedState extends State<ScrollFeed> {
                           itemCount: widget.likedPage || widget.myVideopage
                               ? widget.likedPage
                                   ? feedViewModel2.length()
-                                  : feedViewModel3.length()
+                                  : feedViewModel3.videoSource!.listData.length
                               : feedViewModel.length(),
                           onPageChanged: (index) {
                             widget.likedPage || widget.myVideopage
                                 ? widget.likedPage
                                     ? feedViewModel2.onpageChanged(index)
-                                    : feedViewModel3.onpageChanged(index)
+                                    : feedViewModel3.onpageChanged(
+                                        index, false, false)
                                 : feedViewModel.onpageChanged(index);
                           },
                           scrollDirection: Axis.vertical,

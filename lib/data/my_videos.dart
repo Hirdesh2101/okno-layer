@@ -5,6 +5,8 @@ import 'package:oknoapp/models/my_videos.dart';
 class MyVideosAPI {
   List<String> listVideos = <String>[];
   List<MyVideos> listData = <MyVideos>[];
+  List<MyVideos> approvedData = <MyVideos>[];
+  List<MyVideos> nonapprovedData = <MyVideos>[];
 
   MyVideosAPI() {
     load();
@@ -28,6 +30,8 @@ class MyVideosAPI {
   Future<List<MyVideos>> getData() async {
     var videoList = <MyVideos>[];
     MyVideos video;
+    // MyVideos approved;
+    // MyVideos nonapproved;
     for (var element in listVideos) {
       await _firestore
           .collection("VideosData")
@@ -36,6 +40,11 @@ class MyVideosAPI {
           .then((snapshot) {
         video = MyVideos.fromJson(snapshot.data()!);
         videoList.add(video);
+        if (video.approved) {
+          approvedData.add(video);
+        } else {
+          nonapprovedData.add(video);
+        }
       });
     }
     return videoList;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/brand/brand_detilstab.dart';
+import 'package:oknoapp/pages/brand/brand_videopage.dart';
 import 'package:oknoapp/providers/brand_provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -106,10 +107,10 @@ class _BrandDetailsState extends State<BrandDetails>
                               ) {
                                 return GestureDetector(
                                     onTap: () {
-                                      // Navigator.of(context).push(
-                                      //     MaterialPageRoute(builder: (context) {
-                                      //   return LikeScroll(index, true);
-                                      // }));
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (context) {
+                                        return BrandScroll(index);
+                                      }));
                                     },
                                     child: Card(
                                       elevation: 3,

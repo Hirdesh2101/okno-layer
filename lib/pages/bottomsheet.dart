@@ -164,7 +164,7 @@ class ProductDetails {
         }).whenComplete(() => likedVideo || myVideo
         ? likedVideo
             ? feedViewModel2.playVideo(index)
-            : feedViewModel3.playVideo(index)
+            : feedViewModel3.playDrawer(false, false)
         : feedViewModel.playVideo(index));
   }
 }

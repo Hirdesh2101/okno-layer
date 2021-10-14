@@ -122,8 +122,8 @@ class _CommentsState extends State<Comments> {
                                           child: CachedNetworkImage(
                                             fit: BoxFit.cover,
                                             imageUrl: data['Image'],
-                                            height: 15,
-                                            width: 15,
+                                            height: 30,
+                                            width: 30,
                                             placeholder: (context, url) =>
                                                 const CircularProgressIndicator(),
                                             errorWidget:

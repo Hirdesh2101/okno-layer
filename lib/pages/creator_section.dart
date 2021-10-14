@@ -62,8 +62,8 @@ class _CreatorPageState extends State<CreatorPage> {
                                   child: CachedNetworkImage(
                                     fit: BoxFit.cover,
                                     imageUrl: data['Image'],
-                                    height: 50.0,
-                                    width: 50.0,
+                                    height: 100.0,
+                                    width: 100.0,
                                     placeholder: (context, url) =>
                                         const CircularProgressIndicator(),
                                     errorWidget: (context, url, error) =>
@@ -200,7 +200,7 @@ class _CreatorPageState extends State<CreatorPage> {
                       ),
                   ],
                 ),
-                if (data['Creator'] == true) const TabBarControllerWidget(),
+                if (data['Creator'] == true) const TabBarControllerWidget(true),
               ],
             );
           }),

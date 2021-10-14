@@ -12,7 +12,6 @@ class ThemeScreen extends StatefulWidget {
 
 class _ThemeScreenState extends State<ThemeScreen> {
   var _darkTheme = false;
-
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeModel>(context);

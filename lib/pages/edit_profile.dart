@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class EditProfile extends StatefulWidget {
   static const routeName = '/edit_profile';
@@ -16,6 +18,7 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   bool _isUploading = false;
   File? _image;
+  String? url;
   final _picker = ImagePicker();
   final firebaseAuth = FirebaseAuth.instance;
   final TextEditingController _textEditingController = TextEditingController();
@@ -25,18 +28,58 @@ class _EditProfileState extends State<EditProfile> {
   void dispose() {
     _textEditingController.dispose();
     _textEditingController2.dispose();
+    _textEditingController3.dispose();
     super.dispose();
   }
 
   var user = FirebaseAuth.instance.currentUser!.uid;
+  Future<void> _uploadFile(File img) async {
+    try {
+      await firebase_storage.FirebaseStorage.instance
+          .ref('profiles/$user')
+          .putFile(img);
+      String downloadURL = await firebase_storage.FirebaseStorage.instance
+          .ref('profiles/$user')
+          .getDownloadURL();
+      url = downloadURL;
+      await FirebaseFirestore.instance
+          .collection('UsersData')
+          .doc(user)
+          .update({"Image": downloadURL});
+      setState(() {
+        _image = null;
+      });
+      Navigator.of(context).pop();
+    } on firebase_core.FirebaseException {
+      Fluttertoast.showToast(
+          msg: "Error.. Please Try again later",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
+    }
+  }
 
-  _updateDis() async {
-    setState(() {
-      _isUploading = true;
-    });
+  Future<void> _updateDis() async {
     String _password = _textEditingController3.text;
     String _email = _textEditingController2.text;
     String _name = _textEditingController.text;
+    String? previousMail;
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .get()
+        .then((value) {
+      previousMail = value.data()!['Email'];
+    });
+    if (previousMail != _email && _password == '') {
+      Fluttertoast.showToast(
+          msg: "Please enter the current password to change email!!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
+    }
     if (_email != '' && _textEditingController3.text != "") {
       User? user = FirebaseAuth.instance.currentUser;
       UserCredential authResult = await user!.reauthenticateWithCredential(
@@ -57,32 +100,23 @@ class _EditProfileState extends State<EditProfile> {
           .doc(user)
           .update({'Name': _name});
     }
-    Fluttertoast.showToast(
-        msg: "Profile Updated Success. Please Close the tab",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        fontSize: 16.0);
-    setState(() {
-      _isUploading = false;
-      _textEditingController3.clear();
-    });
   }
 
   _imgFromCamera() async {
-    File image = await _picker.pickImage(
-        source: ImageSource.camera, imageQuality: 50) as File;
-
+    var image =
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+    File imagesource = File(image!.path);
     setState(() {
-      _image = image;
+      _image = imagesource;
     });
   }
 
   _imgFromGallery() async {
-    File image = (await _picker.pickImage(
-        source: ImageSource.gallery, imageQuality: 50)) as File;
-
+    var image = (await _picker.pickImage(
+        source: ImageSource.gallery, imageQuality: 50));
+    File imagesource = File(image!.path);
     setState(() {
-      _image = image;
+      _image = imagesource;
     });
   }
 
@@ -120,26 +154,24 @@ class _EditProfileState extends State<EditProfile> {
       appBar: AppBar(
         title: const Text('Edit Profile'),
       ),
-      body: Stack(
-        children: [
-          FutureBuilder(
-              future: FirebaseFirestore.instance
-                  .collection('UsersData')
-                  .doc(user)
-                  .get(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            FutureBuilder(
+                future: FirebaseFirestore.instance
+                    .collection('UsersData')
+                    .doc(user)
+                    .get(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-                dynamic data = snapshot.data;
-                return Container(
-                  margin: MediaQuery.of(context).padding,
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
+                  dynamic data = snapshot.data;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -232,8 +264,23 @@ class _EditProfileState extends State<EditProfile> {
                         child: const Text('Update Profile'),
                         onPressed: _isUploading
                             ? null
-                            : () {
-                                _updateDis();
+                            : () async {
+                                setState(() {
+                                  _isUploading = true;
+                                });
+                                await _updateDis();
+                                if (_image != null) {
+                                  await _uploadFile(_image!);
+                                }
+                                Fluttertoast.showToast(
+                                    msg: "Profile Updated Success.",
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.BOTTOM,
+                                    fontSize: 16.0);
+                                setState(() {
+                                  _isUploading = false;
+                                  _textEditingController3.clear();
+                                });
                               },
                       ),
                       ElevatedButton(
@@ -245,15 +292,15 @@ class _EditProfileState extends State<EditProfile> {
                         child: const Text('Cancel'),
                       ),
                     ],
-                  ),
-                );
-              }),
-          if (_isUploading)
-            const Align(
-              alignment: Alignment.center,
-              child: Center(child: CircularProgressIndicator()),
-            ),
-        ],
+                  );
+                }),
+            if (_isUploading)
+              const Align(
+                alignment: Alignment.center,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        ),
       ),
     );
   }

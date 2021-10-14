@@ -25,8 +25,8 @@ class _LikeScrollState extends State<LikeScroll> {
         child: WillPopScope(
           onWillPop: () async {
             if (widget.isMyVideo) {
-              await feedViewModel2.pauseDrawer();
-              await feedViewModel2.disposingall();
+              await feedViewModel2.pauseDrawer(false, false);
+              await feedViewModel2.disposingall(false, false);
             } else {
               await feedViewModel.pauseDrawer();
               await feedViewModel.disposingall();
@@ -45,7 +45,7 @@ class _LikeScrollState extends State<LikeScroll> {
                         icon: const Icon(Icons.arrow_back),
                         onPressed: () {
                           if (widget.isMyVideo) {
-                            feedViewModel2.disposingall();
+                            feedViewModel2.disposingall(false, false);
                           } else {
                             feedViewModel.disposingall();
                           }

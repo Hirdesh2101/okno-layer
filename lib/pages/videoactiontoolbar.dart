@@ -11,6 +11,7 @@ import '../firebase functions/sidebar_fun.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/likedvideoprovider.dart';
 import 'package:ionicons/ionicons.dart';
+import '../constants/themes.dart';
 import '../providers/myvideosprovider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -46,7 +47,7 @@ class ActionToolBar extends StatelessWidget {
             likedPage || mypage
                 ? likedPage
                     ? feedViewMode2.pauseDrawer()
-                    : feedViewMode3.pauseDrawer()
+                    : feedViewMode3.pauseDrawer(false, false)
                 : feedViewModel.pauseDrawer();
             ProductDetails().sheet(context, index, likedPage, mypage);
             await firebaseServices.viewedProduct(likedPage
@@ -97,7 +98,9 @@ class ActionToolBar extends StatelessWidget {
                     likeBuilder: (bool isLiked) {
                       return Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
-                        color: isLiked ? Colors.red : Colors.white,
+                        color: isLiked
+                            ? Colors.red
+                            : Theme.of(context).iconTheme.color,
                         size: MediaQuery.of(context).size.width * 0.085,
                       );
                     },
