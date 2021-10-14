@@ -16,6 +16,8 @@ class MyVideosAPI {
     getLiked().listen((listofstring) async {
       listVideos = listofstring;
       listData = await getData();
+      approvedData = await getApprovedData();
+      nonapprovedData = await getNonApprovedData();
     });
   }
 
@@ -30,8 +32,6 @@ class MyVideosAPI {
   Future<List<MyVideos>> getData() async {
     var videoList = <MyVideos>[];
     MyVideos video;
-    // MyVideos approved;
-    // MyVideos nonapproved;
     for (var element in listVideos) {
       await _firestore
           .collection("VideosData")
@@ -40,10 +40,41 @@ class MyVideosAPI {
           .then((snapshot) {
         video = MyVideos.fromJson(snapshot.data()!);
         videoList.add(video);
+      });
+    }
+    return videoList;
+  }
+
+  Future<List<MyVideos>> getApprovedData() async {
+    var videoList = <MyVideos>[];
+    MyVideos video;
+    for (var element in listVideos) {
+      await _firestore
+          .collection("VideosData")
+          .doc(element)
+          .get()
+          .then((snapshot) {
+        video = MyVideos.fromJson(snapshot.data()!);
         if (video.approved) {
-          approvedData.add(video);
-        } else {
-          nonapprovedData.add(video);
+          videoList.add(video);
+        }
+      });
+    }
+    return videoList;
+  }
+
+  Future<List<MyVideos>> getNonApprovedData() async {
+    var videoList = <MyVideos>[];
+    MyVideos video;
+    for (var element in listVideos) {
+      await _firestore
+          .collection("VideosData")
+          .doc(element)
+          .get()
+          .then((snapshot) {
+        video = MyVideos.fromJson(snapshot.data()!);
+        if (!video.approved) {
+          videoList.add(video);
         }
       });
     }
