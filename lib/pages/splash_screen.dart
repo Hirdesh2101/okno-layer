@@ -29,7 +29,7 @@ class SplashScreenState extends State<SplashScreen> {
               const SizedBox(
                 height: 20,
               ),
-              Text('OkNoApp',
+              Text('OkNo',
                   style: kBillabongFamilyTextStyle.copyWith(fontSize: 20)),
             ],
           ),

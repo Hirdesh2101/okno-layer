@@ -43,19 +43,25 @@ class _BrandDetailsState extends State<BrandDetails>
       children: [
         TabBar(
           isScrollable: false,
-          tabs: const [
+          tabs: [
             Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('DashBoard'),
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'DashBoard',
+                style: TextStyle(color: Theme.of(context).iconTheme.color),
+              ),
             ),
             Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('Videos'),
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Videos',
+                style: TextStyle(color: Theme.of(context).iconTheme.color),
+              ),
             ),
           ],
-          labelColor: Colors.white,
+          labelColor: Theme.of(context).iconTheme.color,
           unselectedLabelColor: Colors.white24,
-          indicatorColor: Colors.white,
+          indicatorColor: Theme.of(context).iconTheme.color,
           controller: _tabController,
           onTap: (int index) {
             setState(() {
@@ -64,7 +70,10 @@ class _BrandDetailsState extends State<BrandDetails>
             });
           },
         ),
-        const Divider(height: 0),
+        Divider(
+          height: 0,
+          color: Theme.of(context).iconTheme.color,
+        ),
         Expanded(
           child: IndexedStack(
             children: <Widget>[

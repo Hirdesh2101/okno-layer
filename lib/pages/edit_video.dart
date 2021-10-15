@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:video_editor/video_editor.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:helpers/helpers.dart';
+import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import './upload_videopage.dart';
 
 class EditVideo extends StatefulWidget {
@@ -38,7 +40,9 @@ class _VideoEditorState extends State<VideoEditor> {
   final _exportingProgress = ValueNotifier<double>(0.0);
   final _isExporting = ValueNotifier<bool>(false);
   final double height = 60;
+  final GlobalKey _globalKey = GlobalKey();
   bool _exported = false;
+  final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
   String _exportText = "";
   late VideoEditorController _controller;
 
@@ -67,13 +71,20 @@ class _VideoEditorState extends State<VideoEditor> {
   Future<File> _exportVideo() async {
     Misc.delayed(1000, () => _isExporting.value = true);
     final File? file = await _controller.exportVideo(
-      preset: VideoExportPreset.slow,
+      preset: VideoExportPreset.ultrafast,
       customInstruction: "-crf 17",
       onProgress: (statics) {
         _exportingProgress.value =
             statics.time / _controller.video.value.duration.inMilliseconds;
       },
     );
+    // final Directory? appDirectory = await getExternalStorageDirectory();
+    // final String videoDirectory = '${appDirectory!.path}/Videos';
+    // await Directory(videoDirectory).create(recursive: true);
+    // final String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
+    // final String filePath = '$videoDirectory/$currentTime.mp4';
+    // await _flutterFFmpeg.execute(
+    //     '-i ${file!.path} -vf "colorbalance=gs=.5:bh=1" -pix_fmt yuv420p -preset ultrafast -y $filePath');
     _isExporting.value = false;
 
     if (file != null) {
@@ -81,8 +92,9 @@ class _VideoEditorState extends State<VideoEditor> {
     } else {
       _exportText = "Error on export video :(";
     }
+    // File? finalFile = File(filePath);
     setState(() => _exported = true);
-    Misc.delayed(2000, () => setState(() => _exported = false));
+    Misc.delayed(8000, () => setState(() => _exported = false));
     return file!;
   }
 
@@ -137,27 +149,52 @@ class _VideoEditorState extends State<VideoEditor> {
                                   controller: _controller,
                                   showGrid: false,
                                 ),
-                                AnimatedBuilder(
-                                  animation: _controller.video,
-                                  builder: (_, __) => OpacityTransition(
-                                    visible: !_controller.isPlaying,
-                                    child: GestureDetector(
-                                      onTap: _controller.video.play,
-                                      child: Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: const BoxDecoration(
-                                          //color: Colors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.play_arrow,
-                                          //color: Colors.black
+                                Stack(alignment: Alignment.center, children: [
+                                  AnimatedBuilder(
+                                    animation: _controller.video,
+                                    builder: (_, __) => OpacityTransition(
+                                      visible: !_controller.isPlaying,
+                                      child: GestureDetector(
+                                        onTap: _controller.video.play,
+                                        child: Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: const BoxDecoration(
+                                            //color: Colors.white,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.play_arrow,
+                                            //color: Colors.black
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                  // PageView(
+                                  //   scrollDirection: Axis.horizontal,
+                                  //   children: [
+                                  //     Container(
+                                  //       height:
+                                  //           MediaQuery.of(context).size.height *
+                                  //               0.3,
+                                  //       width:
+                                  //           MediaQuery.of(context).size.width,
+                                  //       decoration: const BoxDecoration(
+                                  //           color: Colors.white10),
+                                  //     ),
+                                  //     Container(
+                                  //       height:
+                                  //           MediaQuery.of(context).size.height *
+                                  //               0.3,
+                                  //       width:
+                                  //           MediaQuery.of(context).size.width,
+                                  //       decoration: BoxDecoration(
+                                  //           color: Colors.green.shade50),
+                                  //     ),
+                                  //   ],
+                                  // )
+                                ]),
                               ]),
                               CoverViewer(controller: _controller)
                             ],

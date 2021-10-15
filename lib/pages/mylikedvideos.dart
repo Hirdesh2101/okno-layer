@@ -24,6 +24,7 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('My Liked Videos'),
         elevation: 0,
       ),
       body: feedViewModel.videoSource!.listVideos.isEmpty
@@ -72,7 +73,7 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                                     placeholder: (context, url) => Container(
                                         // color: Colors.grey,
                                         ),
-                                    fit: BoxFit.fill,
+                                    fit: BoxFit.fitHeight,
                                     cacheManager: CustomCacheManager.instance2,
                                     imageUrl: feedViewModel
                                         .videoSource!.listData[index].product1,

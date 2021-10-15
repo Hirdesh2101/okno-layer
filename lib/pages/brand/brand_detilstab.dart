@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../providers/branddetailsprovider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:stacked/stacked.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BrandSpecifications extends StatefulWidget {
   final bool switchvalue;
@@ -13,6 +15,8 @@ class BrandSpecifications extends StatefulWidget {
 
 class _BrandSpecificationsState extends State<BrandSpecifications> {
   final feedViewModel = GetIt.instance<BrandDetailsProvider>();
+
+  final user = FirebaseAuth.instance.currentUser!.uid;
   int viewedurl = 0;
   int reported = 0;
   int viewedproduct = 0;
@@ -27,6 +31,24 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
     }
   }
 
+  Future<String> getname() async {
+    dynamic storeid;
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .get()
+        .then((value) {
+      storeid = value.data()!['BrandAssociated'];
+    });
+    return await FirebaseFirestore.instance
+        .collection('BrandData')
+        .doc(storeid.first)
+        .get()
+        .then((value) {
+      return value.data()!['balance'].toString();
+    });
+  }
+
   @override
   void initState() {
     // init();
@@ -35,7 +57,7 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.switchvalue) {
+    if (!widget.switchvalue) {
       feedViewModel.applyFilter();
       viewedurl = 0;
       reported = 0;
@@ -76,53 +98,165 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
                     padding: const EdgeInsets.all(8.0),
                     physics: const AlwaysScrollableScrollPhysics(),
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                      FutureBuilder(
+                          future: getname(),
+                          builder: (context, snapsot) {
+                            if (snapsot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: const [
+                                      Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text('Total Balance:'),
+                                      ),
+                                      Divider(),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text('Loading...',
+                                            style: TextStyle(fontSize: 25)),
+                                      ),
+                                    ],
+                                  ));
+                            }
+                            return Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text('Total Balance:'),
+                                    ),
+                                    const Divider(),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(snapsot.data.toString(),
+                                          style: const TextStyle(fontSize: 25)),
+                                    ),
+                                  ],
+                                ));
+                          }),
+                      GridView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                childAspectRatio: 16 / 12, crossAxisCount: 2),
                         children: [
-                          const Text('No of users viewed product:'),
-                          const Expanded(
-                            child: SizedBox(),
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text('No of users viewed product:'),
+                                ),
+                                const Divider(),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                Text(
+                                  '$viewedproduct',
+                                  style: const TextStyle(fontSize: 25),
+                                ),
+                              ],
+                            ),
                           ),
-                          Text('$viewedproduct'),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 6,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Text('No of users viewed url:'),
-                          const Expanded(
-                            child: SizedBox(),
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: SizedBox(
+                              width: 200,
+                              height: 200,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('No of users viewed url:'),
+                                  ),
+                                  const Divider(),
+                                  const SizedBox(
+                                    height: 15,
+                                  ),
+                                  Text(
+                                    '$viewedurl',
+                                    style: const TextStyle(fontSize: 25),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          Text('$viewedurl'),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 6,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Text('No of users reporting video:'),
-                          const Expanded(
-                            child: SizedBox(),
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: SizedBox(
+                              width: 200,
+                              height: 200,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('No of users reporting video:'),
+                                  ),
+                                  const Divider(),
+                                  const SizedBox(
+                                    height: 15,
+                                  ),
+                                  Text(
+                                    '$reported',
+                                    style: const TextStyle(fontSize: 25),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          Text('$reported'),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 6,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Text('Total Views:'),
-                          const Expanded(
-                            child: SizedBox(),
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: SizedBox(
+                              width: 200,
+                              height: 200,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('Total Views:'),
+                                  ),
+                                  const Divider(),
+                                  const SizedBox(
+                                    height: 15,
+                                  ),
+                                  Text(
+                                    '$viewedvideo',
+                                    style: const TextStyle(fontSize: 25),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          Text('$viewedvideo'),
                         ],
                       ),
                     ],

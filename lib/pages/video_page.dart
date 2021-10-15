@@ -275,29 +275,35 @@ class _VideoRecorderState extends State<VideoRecorder>
   }
 
   void _selectImage() async {
+    if (mounted) setState(() {});
+    if (controller!.value.isStreamingImages) {
+      await controller!.stopImageStream();
+    }
     await controller!.dispose();
-    await imagePicker
-        .pickVideo(
+    var imageFile = await imagePicker.pickVideo(
       source: ImageSource.gallery,
-    )
-        .then((imageFile) {
-      if (imageFile != null) {
-        file = File(imageFile.path);
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => EditVideo(file!)))
-            .then((value) {
-          Navigator.of(context).pop();
-        });
-      } else {
-        Fluttertoast.showToast(
-            msg: "No Video Selected",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            fontSize: 16.0);
-        //initialize();
-      }
-    });
+    );
+    if (mounted) setState(() {});
+    if (controller!.value.isStreamingImages) {
+      await controller!.stopImageStream();
+    }
+    await controller!.dispose();
+    if (imageFile != null) {
+      file = File(imageFile.path);
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => EditVideo(file!)))
+          .then((value) {
+        Navigator.of(context).pop();
+      });
+    } else {
+      Fluttertoast.showToast(
+          msg: "No Video Selected",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
+      //initialize();
+    }
   }
 
   void _onSwitchCamera() {

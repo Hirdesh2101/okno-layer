@@ -131,7 +131,11 @@ class _CommentsState extends State<Comments> {
                                                     const Icon(Icons.error),
                                           ),
                                         ),
-                                  title: Text('${data['Name']}'),
+                                  title: Text(
+                                    '${data['Name']}',
+                                    style: const TextStyle(
+                                        fontStyle: FontStyle.italic),
+                                  ),
                                 );
                               }),
                           Padding(
@@ -143,6 +147,9 @@ class _CommentsState extends State<Comments> {
                                   list[index]['Comment'],
                                   trimLines: 3,
                                   trimMode: TrimMode.Line,
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: Theme.of(context).iconTheme.color),
                                 )),
                           ),
                           const Divider()

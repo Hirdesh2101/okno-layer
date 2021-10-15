@@ -256,4 +256,36 @@ class SideBarFirebase {
       }
     });
   }
+
+  Future<void> encashedSub(var phoneNumber) async {
+    double balance = 0.0;
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .get()
+        .then((value) {
+      balance = (value.data()!['Balance']).toDouble();
+    });
+    await FirebaseFirestore.instance.collection('Requests').doc().set({
+      'Amount': balance,
+      'timestamp': DateTime.now(),
+      'paytmNo': phoneNumber,
+      'id': user,
+    });
+
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .update({'Balance': 0.0});
+  }
+
+  Future<void> contactInfo(var email, var phoneNumber, var company) async {
+    await FirebaseFirestore.instance.collection('Requests').doc().set({
+      'email': email,
+      'timestamp': DateTime.now(),
+      'phoneno': phoneNumber,
+      'company': company,
+      'id': user,
+    });
+  }
 }

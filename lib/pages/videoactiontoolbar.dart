@@ -94,14 +94,12 @@ class ActionToolBar extends StatelessWidget {
                 padding: const EdgeInsets.all(12.0),
                 child: SizedBox(
                   child: LikeButton(
-                    size: MediaQuery.of(context).size.width * 0.085,
+                    size: MediaQuery.of(context).size.width * 0.1,
                     likeBuilder: (bool isLiked) {
                       return Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
-                        color: isLiked
-                            ? Colors.red
-                            : Theme.of(context).iconTheme.color,
-                        size: MediaQuery.of(context).size.width * 0.085,
+                        color: isLiked ? Colors.red : Colors.white,
+                        size: MediaQuery.of(context).size.width * 0.1,
                       );
                     },
                     isLiked:
@@ -126,6 +124,7 @@ class ActionToolBar extends StatelessWidget {
           },
           icon: Icon(
             Ionicons.chatbubble_outline,
+            color: Colors.white,
             size: MediaQuery.of(context).size.width * 0.085,
           )),
       const SizedBox(
@@ -146,6 +145,7 @@ class ActionToolBar extends StatelessWidget {
           },
           icon: Icon(
             Ionicons.paper_plane_outline,
+            color: Colors.white,
             size: MediaQuery.of(context).size.width * 0.085,
           )),
       const SizedBox(
@@ -229,6 +229,7 @@ class ActionToolBar extends StatelessWidget {
           },
           icon: Icon(
             Ionicons.ellipsis_vertical_outline,
+            color: Colors.white,
             size: MediaQuery.of(context).size.width * 0.085,
           )),
     ]);

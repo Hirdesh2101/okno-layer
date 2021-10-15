@@ -61,7 +61,7 @@ final lightTheme = ThemeData(
       borderSide: BorderSide(color: Colors.black),
     ),
   ),
-  cardColor: Colors.grey[300],
+  cardColor: Colors.grey[500],
   colorScheme: ColorScheme.fromSwatch()
       .copyWith(secondary: Colors.black, brightness: Brightness.light),
   textSelectionTheme:

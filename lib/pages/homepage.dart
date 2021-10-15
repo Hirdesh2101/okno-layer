@@ -231,7 +231,10 @@ class _HomePageState extends State<HomePage> {
                           left: 10,
                           top: 20,
                           child: IconButton(
-                              icon: const Icon(Icons.menu),
+                              icon: const Icon(
+                                Icons.menu,
+                                color: Colors.white,
+                              ),
                               onPressed: () {
                                 _scaffoldKey.currentState!.openDrawer();
                               }),

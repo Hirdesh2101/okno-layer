@@ -44,6 +44,7 @@ class _BrandPageState extends State<BrandPage> {
               actions: [
                 if (check)
                   CupertinoSwitch(
+                    // title: const Text('View All'),
                     value: _switchval,
                     onChanged: (value) {
                       setState(() {
@@ -89,135 +90,134 @@ class _BrandPageState extends State<BrandPage> {
                     : Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                                'You are not associated with any brand!!'),
-                            TextButton(
-                                onPressed: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          title: const Text('Join Brand'),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          //color: Colors.white24
-                                                          )),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: TextFormField(
-                                                      controller:
-                                                          _textEditingController,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        labelText: 'Brand Name',
-                                                        enabledBorder:
-                                                            UnderlineInputBorder(
-                                                                borderSide: BorderSide(
-                                                                    color: Colors
-                                                                        .grey)),
-                                                        focusedBorder:
-                                                            UnderlineInputBorder(
-                                                                borderSide: BorderSide(
-                                                                    color: Colors
-                                                                        .grey)),
-                                                      ),
-                                                    ),
-                                                  )),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  TextButton(
-                                                    onPressed: () =>
-                                                        Navigator.of(context)
-                                                            .pop(),
-                                                    child: const Text('Cancel'),
-                                                  ),
-                                                  TextButton(
-                                                      child:
-                                                          const Text('Submit'),
-                                                      onPressed: () async {
-                                                        var snapsot =
-                                                            await FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'Requests')
-                                                                .doc(user)
-                                                                .get();
-                                                        if (snapsot.exists) {
-                                                          FirebaseFirestore
-                                                              .instance
-                                                              .collection(
-                                                                  'Requests')
-                                                              .doc(user)
-                                                              .update({
-                                                            'Brand': FieldValue
-                                                                .arrayUnion([
-                                                              _textEditingController
-                                                                  .text
-                                                                  .trim()
-                                                            ])
-                                                          }).whenComplete(() {
-                                                            _textEditingController
-                                                                .clear();
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                                    const SnackBar(
-                                                              content: Text(
-                                                                  'Your request has been successfully submitted. Please wait for the approval'),
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .greenAccent,
-                                                            ));
-                                                          });
-                                                        } else {
-                                                          FirebaseFirestore
-                                                              .instance
-                                                              .collection(
-                                                                  'Requests')
-                                                              .doc(user)
-                                                              .set({
-                                                            'Brand': FieldValue
-                                                                .arrayUnion([
-                                                              _textEditingController
-                                                                  .text
-                                                                  .trim()
-                                                            ])
-                                                          }).whenComplete(() {
-                                                            _textEditingController
-                                                                .clear();
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                                    const SnackBar(
-                                                              content: Text(
-                                                                  'Your request has been successfully submitted. Please wait for the approval'),
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .greenAccent,
-                                                            ));
-                                                          });
-                                                        }
+                          children: const [
+                            Text('You are not associated with any brand!!'),
+                            // TextButton(
+                            //     onPressed: () {
+                            //       showDialog(
+                            //           context: context,
+                            //           builder: (context) {
+                            //             return AlertDialog(
+                            //               title: const Text('Join Brand'),
+                            //               content: Column(
+                            //                 mainAxisSize: MainAxisSize.min,
+                            //                 children: [
+                            //                   Container(
+                            //                       decoration: BoxDecoration(
+                            //                           border: Border.all(
+                            //                               //color: Colors.white24
+                            //                               )),
+                            //                       child: Padding(
+                            //                         padding:
+                            //                             const EdgeInsets.all(
+                            //                                 8.0),
+                            //                         child: TextFormField(
+                            //                           controller:
+                            //                               _textEditingController,
+                            //                           decoration:
+                            //                               const InputDecoration(
+                            //                             labelText: 'Brand Name',
+                            //                             enabledBorder:
+                            //                                 UnderlineInputBorder(
+                            //                                     borderSide: BorderSide(
+                            //                                         color: Colors
+                            //                                             .grey)),
+                            //                             focusedBorder:
+                            //                                 UnderlineInputBorder(
+                            //                                     borderSide: BorderSide(
+                            //                                         color: Colors
+                            //                                             .grey)),
+                            //                           ),
+                            //                         ),
+                            //                       )),
+                            //                   Row(
+                            //                     mainAxisAlignment:
+                            //                         MainAxisAlignment.end,
+                            //                     children: [
+                            //                       TextButton(
+                            //                         onPressed: () =>
+                            //                             Navigator.of(context)
+                            //                                 .pop(),
+                            //                         child: const Text('Cancel'),
+                            //                       ),
+                            //                       TextButton(
+                            //                           child:
+                            //                               const Text('Submit'),
+                            //                           onPressed: () async {
+                            //                             var snapsot =
+                            //                                 await FirebaseFirestore
+                            //                                     .instance
+                            //                                     .collection(
+                            //                                         'Requests')
+                            //                                     .doc(user)
+                            //                                     .get();
+                            //                             if (snapsot.exists) {
+                            //                               FirebaseFirestore
+                            //                                   .instance
+                            //                                   .collection(
+                            //                                       'Requests')
+                            //                                   .doc(user)
+                            //                                   .update({
+                            //                                 'Brand': FieldValue
+                            //                                     .arrayUnion([
+                            //                                   _textEditingController
+                            //                                       .text
+                            //                                       .trim()
+                            //                                 ])
+                            //                               }).whenComplete(() {
+                            //                                 _textEditingController
+                            //                                     .clear();
+                            //                                 ScaffoldMessenger
+                            //                                         .of(context)
+                            //                                     .showSnackBar(
+                            //                                         const SnackBar(
+                            //                                   content: Text(
+                            //                                       'Your request has been successfully submitted. Please wait for the approval'),
+                            //                                   backgroundColor:
+                            //                                       Colors
+                            //                                           .greenAccent,
+                            //                                 ));
+                            //                               });
+                            //                             } else {
+                            //                               FirebaseFirestore
+                            //                                   .instance
+                            //                                   .collection(
+                            //                                       'Requests')
+                            //                                   .doc(user)
+                            //                                   .set({
+                            //                                 'Brand': FieldValue
+                            //                                     .arrayUnion([
+                            //                                   _textEditingController
+                            //                                       .text
+                            //                                       .trim()
+                            //                                 ])
+                            //                               }).whenComplete(() {
+                            //                                 _textEditingController
+                            //                                     .clear();
+                            //                                 ScaffoldMessenger
+                            //                                         .of(context)
+                            //                                     .showSnackBar(
+                            //                                         const SnackBar(
+                            //                                   content: Text(
+                            //                                       'Your request has been successfully submitted. Please wait for the approval'),
+                            //                                   backgroundColor:
+                            //                                       Colors
+                            //                                           .greenAccent,
+                            //                                 ));
+                            //                               });
+                            //                             }
 
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      }),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      });
-                                },
-                                child: const Text('Join Brand'))
+                            //                             Navigator.of(context)
+                            //                                 .pop();
+                            //                           }),
+                            //                     ],
+                            //                   ),
+                            //                 ],
+                            //               ),
+                            //             );
+                            //           });
+                            //     },
+                            //     child: const Text('Join Brand'))
                           ],
                         ),
                       )),
