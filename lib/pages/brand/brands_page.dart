@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:ionicons/ionicons.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:oknoapp/pages/brand/brand_details.dart';
 
 class BrandPage extends StatefulWidget {
@@ -42,45 +42,74 @@ class _BrandPageState extends State<BrandPage> {
           return Scaffold(
             appBar: AppBar(
               actions: [
-                if (check)
-                  CupertinoSwitch(
-                    // title: const Text('View All'),
-                    value: _switchval,
-                    onChanged: (value) {
-                      setState(() {
-                        _switchval = value;
-                      });
-                      //Navigator.of(context).pop();
-                    },
-                  )
-                // IconButton(
-                //     onPressed: () {
-                //       showDialog(
-                //           context: context,
-                //           builder: (context) {
-                //             return StatefulBuilder(
-                //                 builder: (context, setState) {
-                //               return AlertDialog(
-                //                 title: const Text('Apply Filters'),
-                //                 content: Column(
-                //                   mainAxisSize: MainAxisSize.min,
-                //                   children: [
-                //                     Row(
-                //                       mainAxisAlignment:
-                //                           MainAxisAlignment.spaceEvenly,
-                //                       children: [
-                //                         const Text(
-                //                             "View records of one month: "),
-
-                //                       ],
-                //                     )
-                //                   ],
-                //                 ),
-                //               );
-                //             });
-                //           });
+                // if (check)
+                //   CupertinoSwitch(
+                //     // title: const Text('View All'),
+                //     value: _switchval,
+                //     onChanged: (value) {
+                //       setState(() {
+                //         _switchval = value;
+                //       });
+                //       //Navigator.of(context).pop();
                 //     },
-                //     icon: const Icon(Ionicons.filter_outline))
+                //   ),
+                if (check)
+                  IconButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return StatefulBuilder(
+                                  builder: (context, setState) {
+                                return AlertDialog(
+                                  title: const Text('Apply Filters'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          const Text("View all records: "),
+                                          CupertinoSwitch(
+                                            // title: const Text('View All'),
+                                            value: _switchval,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _switchval = value;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  actions: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(
+                                              context, [true, _switchval]);
+                                        },
+                                        child: const Text('Apply Filters')),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(
+                                              context, [false, _switchval]);
+                                        },
+                                        child: const Text('Cancel')),
+                                  ],
+                                );
+                              });
+                            }).then((value) {
+                          if (value == null) return;
+                          if (value[0]) {
+                            setState(() {
+                              _switchval = value[1];
+                            });
+                          }
+                        });
+                      },
+                      icon: const Icon(Ionicons.filter_outline))
               ],
             ),
             body: SizedBox(
