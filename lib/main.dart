@@ -26,10 +26,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(ChangeNotifierProvider(
-    create: (_) => ThemeModel(),
-    child: const MyApp(),
-  ));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -42,6 +39,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  ThemeModel themeModel = ThemeModel();
   bool _isTimerDone = false;
 
   @override
@@ -54,7 +52,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     FirebaseAnalytics analytics = FirebaseAnalytics();
-    return Consumer(builder: (context, ThemeModel themeNotifier, child) {
+    return ChangeNotifierProvider(create: (_) {
+      return themeModel;
+    }, child: Consumer<ThemeModel>(
+        builder: (context, ThemeModel themeNotifier, child) {
       return MaterialApp(
           title: 'OkNoApp',
           theme: themeNotifier.isDark ? darkTheme : lightTheme,
@@ -93,6 +94,6 @@ class _MyAppState extends State<MyApp> {
               builder: (ctx) => const Loginscreen(),
             );
           });
-    });
+    }));
   }
 }
