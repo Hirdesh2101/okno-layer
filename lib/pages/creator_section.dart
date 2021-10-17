@@ -121,7 +121,7 @@ class _CreatorPageState extends State<CreatorPage> {
                                         MediaQuery.of(context).size.width * 0.1,
                                     height:
                                         MediaQuery.of(context).size.width * 0.1,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                         //  border: Border.all(color: Colors.white12)
                                         ),
                                     child: const Center(
@@ -145,7 +145,7 @@ class _CreatorPageState extends State<CreatorPage> {
                                         MediaQuery.of(context).size.width * 0.1,
                                     height:
                                         MediaQuery.of(context).size.width * 0.1,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                         //  border: Border.all(color: Colors.white12)
                                         ),
                                     child: const Center(

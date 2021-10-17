@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:stacked/stacked.dart';
 import '../../models/brand_videos.dart';
 import '../../providers/brand_provider.dart';
-import '../videoactiontoolbar.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class BrandFeed extends StatefulWidget {
