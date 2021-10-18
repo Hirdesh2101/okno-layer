@@ -3,9 +3,13 @@ import 'dart:io';
 import 'package:video_editor/video_editor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:helpers/helpers.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import './upload_videopage.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
+import './audio_sheet.dart';
+import 'package:get_it/get_it.dart';
+import '../providers/audioprovider.dart';
 import 'package:video_player/video_player.dart';
 
 class EditVideo extends StatefulWidget {
@@ -105,6 +109,24 @@ class _VideoEditorState extends State<VideoEditor> {
     Colors.pink.withOpacity(0.2),
     Colors.yellow.withOpacity(0.2),
   ];
+
+  Future<String> downloadURL(String extend) async {
+    String finalPlace = 'audio/$extend.mp3';
+    String downloadURL = await firebase_storage.FirebaseStorage.instance
+        .ref(finalPlace)
+        .getDownloadURL();
+    return downloadURL;
+  }
+
+  void addAudio(int index) async {
+    final feedViewModel = GetIt.instance<AudioProvider>();
+    print(index);
+
+    String s = feedViewModel.videoSource!.audioData[index].songname;
+    print(s);
+    await downloadURL(s);
+    //ffmpeg -i v.mp4 -i a.wav -c:v copy -map 0:v:0 -map 1:a:0 new.mp4
+  }
 
   Future<File> _exportVideo() async {
     Misc.delayed(1000, () => _isExporting.value = true);
@@ -349,7 +371,7 @@ class _VideoEditorState extends State<VideoEditor> {
           ),
           Expanded(
             child: IconButton(
-              onPressed: _openCropScreen,
+              onPressed: () => AudioSheet().sheet(context, addAudio),
               icon: const Icon(Icons.audiotrack),
             ),
           ),

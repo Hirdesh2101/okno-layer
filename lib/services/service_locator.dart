@@ -1,3 +1,4 @@
+import 'package:oknoapp/providers/audioprovider.dart';
 import 'package:oknoapp/providers/brand_provider.dart';
 import 'package:oknoapp/providers/branddetailsprovider.dart';
 import 'package:oknoapp/providers/savedvideoprovider.dart';
@@ -26,5 +27,8 @@ void setup() {
   }
   if (!locator.isRegistered<BrandDetailsProvider>()) {
     locator.registerSingleton<BrandDetailsProvider>(BrandDetailsProvider());
+  }
+  if (!locator.isRegistered<AudioProvider>()) {
+    locator.registerSingleton<AudioProvider>(AudioProvider());
   }
 }
