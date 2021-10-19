@@ -102,7 +102,11 @@ class _MyItemState extends State<MyItem> {
             }
           },
           child: ListTile(
-            leading: const Icon(Icons.music_note_outlined),
+            leading: audiolist[index].thumbnail != ''
+                ? CircleAvatar(
+                    backgroundImage: NetworkImage(audiolist[index].thumbnail),
+                  )
+                : const Icon(Icons.music_note_outlined),
             title: Text(audiolist[index].songname),
             subtitle: Text(audiolist[index].artistname),
             trailing: Row(
@@ -114,6 +118,7 @@ class _MyItemState extends State<MyItem> {
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
+                    Navigator.of(context).pop();
                     _trySubmit(index);
                   },
                 )

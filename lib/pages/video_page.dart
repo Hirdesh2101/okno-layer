@@ -55,6 +55,7 @@ class _VideoRecorderState extends State<VideoRecorder>
   @override
   void dispose() {
     WidgetsBinding.instance!.removeObserver(this);
+    controller!.stopImageStream();
     controller!.dispose();
     super.dispose();
   }
@@ -275,23 +276,15 @@ class _VideoRecorderState extends State<VideoRecorder>
   }
 
   void _selectImage() async {
-    if (mounted) setState(() {});
-    if (controller!.value.isStreamingImages) {
-      await controller!.stopImageStream();
-    }
-    await controller!.dispose();
     var imageFile = await imagePicker.pickVideo(
       source: ImageSource.gallery,
     );
-    if (mounted) setState(() {});
-    if (controller!.value.isStreamingImages) {
-      await controller!.stopImageStream();
-    }
-    await controller!.dispose();
+    //await Future.delayed(Duration(seconds: 1));
     if (imageFile != null) {
       file = File(imageFile.path);
       Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => EditVideo(file!)))
+          .pushReplacement(
+              MaterialPageRoute(builder: (context) => EditVideo(file!)))
           .then((value) {
         Navigator.of(context).pop();
       });

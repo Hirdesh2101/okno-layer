@@ -73,8 +73,10 @@ dev_dependencies:
   #comment_box: ^0.0.16
   readmore: ^2.1.0
   flutter_video_info: ^1.2.0
-  just_audio: ^0.9.13
   audioplayers: ^0.20.1
+  dio: ^4.0.0
+  #super_easy_permissions: ^0.1.1
+  #permission_handler: ^8.2.5
   awesome_dialog: ^2.1.1
   flutter_launcher_icons: ^0.9.2
   # The "flutter_lints" package below contains a set of recommended lints to

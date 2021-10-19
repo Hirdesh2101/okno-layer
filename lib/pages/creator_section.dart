@@ -99,7 +99,10 @@ class _CreatorPageState extends State<CreatorPage> {
                               OutlinedButton(
                                   onPressed: () {
                                     Navigator.of(context)
-                                        .pushNamed(EncashedPage.routeName);
+                                        .pushNamed(EncashedPage.routeName)
+                                        .whenComplete(() {
+                                      setState(() {});
+                                    });
                                   },
                                   child: const Text('Encash'))
                           ],

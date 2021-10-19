@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:video_editor/video_editor.dart';
@@ -6,10 +7,10 @@ import 'package:helpers/helpers.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import './upload_videopage.dart';
+import 'package:dio/dio.dart';
+//import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import './audio_sheet.dart';
-import 'package:get_it/get_it.dart';
-import '../providers/audioprovider.dart';
 import 'package:video_player/video_player.dart';
 
 class EditVideo extends StatefulWidget {
@@ -45,12 +46,17 @@ class VideoEditor extends StatefulWidget {
 class _VideoEditorState extends State<VideoEditor> {
   final _exportingProgress = ValueNotifier<double>(0.0);
   final _isExporting = ValueNotifier<bool>(false);
+  final _exportingProgress2 = ValueNotifier<double>(0.0);
+  final _isExporting2 = ValueNotifier<bool>(false);
   final double height = 60;
   var _visible = 0;
+  var showFilterName = false;
   final videoInfo = FlutterVideoInfo();
   bool _exported = false;
   var _page = 0;
+  var showDismiss = false;
   var coloring = false;
+  var addingAudio = false;
   final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
   String _exportText = "";
   late VideoEditorController _controller;
@@ -101,6 +107,30 @@ class _VideoEditorState extends State<VideoEditor> {
     return newBackground;
   }
 
+  String _getColorBackgroundName(int index) {
+    String newBackground = "";
+
+    switch (index) {
+      case 1:
+        newBackground = "Green";
+        break;
+      case 2:
+        newBackground = "Blue";
+        break;
+      case 3:
+        newBackground = "Red";
+        break;
+      case 4:
+        newBackground = "Pink";
+        break;
+      case 5:
+        newBackground = "Yellow";
+        break;
+    }
+
+    return newBackground;
+  }
+
   final List<Color> _pages = [
     Colors.transparent,
     Colors.green.withOpacity(0.2),
@@ -110,22 +140,122 @@ class _VideoEditorState extends State<VideoEditor> {
     Colors.yellow.withOpacity(0.2),
   ];
 
-  Future<String> downloadURL(String extend) async {
+  Future<String> downloadURL(String extend, File file) async {
     String finalPlace = 'audio/$extend.mp3';
-    String downloadURL = await firebase_storage.FirebaseStorage.instance
+    await firebase_storage.FirebaseStorage.instance
         .ref(finalPlace)
-        .getDownloadURL();
-    return downloadURL;
+        .writeToFile(file);
+    return file.path;
   }
 
   void addAudio(int index) async {
-    final feedViewModel = GetIt.instance<AudioProvider>();
-    print(index);
-
-    String s = feedViewModel.videoSource!.audioData[index].songname;
-    print(s);
-    await downloadURL(s);
+    downloadFile(index);
     //ffmpeg -i v.mp4 -i a.wav -c:v copy -map 0:v:0 -map 1:a:0 new.mp4
+  }
+
+  Future<void> downloadFile(int index) async {
+    //Permission permission1 = Permission.manageExternalStorage;
+    Dio dio = Dio();
+    // bool checkPermission1 = await permission1.isGranted;
+    // if (checkPermission1 == false) {
+    //   openAppSettings();
+    //   checkPermission1 = await permission1.isGranted;
+    // }
+    final Directory? appDirectory = await getExternalStorageDirectory();
+    final String videoDirectory = '${appDirectory!.path}/audios';
+    await Directory(videoDirectory).create(recursive: true);
+    final String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
+    final String filePath = '$videoDirectory/$currentTime.mp3';
+
+    try {
+      _isExporting2.value = true;
+
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Please Wait...'),
+              content: ValueListenableBuilder(
+                  valueListenable: _exportingProgress2,
+                  builder: (_, double value, __) {
+                    return !addingAudio
+                        ? Text(
+                            value * 100 < 100
+                                ? "Adding audio ${(value * 100).ceil()}%"
+                                : "Finalizing Audio1....",
+                            // color: Colors.black,
+                            // bold: true,
+                          )
+                        : showDismiss
+                            ? const Text('Added SuccessFully!!!')
+                            : const Text('Finalizing Audio...'
+                                // color: Colors.black,
+                                // bold: true,
+                                );
+                  }),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Dismiss'))
+              ],
+            );
+          });
+      await dio
+          .download(feedViewModel.videoSource!.audioData[index].url, filePath,
+              onReceiveProgress: (receivedBytes, totalBytes) async {
+        // setState(() {
+        //   downloading = true;
+        //   progress =
+        //       ((receivedBytes / totalBytes) * 100).toStringAsFixed(0) + "%";
+        _exportingProgress2.value = (receivedBytes / totalBytes);
+        if (receivedBytes == totalBytes) {
+          setState(() {
+            addingAudio = true;
+          });
+          await _exportAudio(filePath).then((value) => null);
+        }
+      }).then((value) {
+        setState(() {
+          showDismiss = true;
+        });
+      });
+      _isExporting2.value = false;
+    } catch (e) {
+      // print(e);
+    }
+  }
+
+  Future<void> _exportAudio(String audio) async {
+    final Directory? appDirectory = await getExternalStorageDirectory();
+    final String videoDirectory = '${appDirectory!.path}/Videos';
+    await Directory(videoDirectory).create(recursive: true);
+    final String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
+    final String filePath = '$videoDirectory/$currentTime.mp4';
+    await _flutterFFmpeg
+        .execute(
+            '-i ${widget.file.path} -i $audio -c:v copy -map 0:v:0 -map 1:a:0 -shortest $filePath')
+        .whenComplete(() async {
+      _controller = VideoEditorController.file(
+        File(filePath),
+      );
+      await _controller.initialize().then((_) {
+        setState(() {});
+      });
+    });
+  }
+
+  void _filterNameFun() {
+    setState(() {
+      showFilterName = true;
+    });
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        showFilterName = false;
+      });
+    });
   }
 
   Future<File> _exportVideo() async {
@@ -195,7 +325,7 @@ class _VideoEditorState extends State<VideoEditor> {
                 Stack(children: [
                   DefaultTabController(
                       length: 2,
-                      child: Column(children: [
+                      child: Column(mainAxisSize: MainAxisSize.max, children: [
                         Expanded(
                             child: TabBarView(
                           physics: const NeverScrollableScrollPhysics(),
@@ -208,10 +338,17 @@ class _VideoEditorState extends State<VideoEditor> {
                               AnimatedContainer(
                                   duration: const Duration(seconds: 1),
                                   curve: Curves.fastOutSlowIn,
-                                  child: AspectRatio(
-                                      aspectRatio:
-                                          _controller.video.value.aspectRatio,
-                                      child: VideoPlayer(_controller.video))),
+                                  child: SizedBox.expand(
+                                      child: FittedBox(
+                                          fit: BoxFit.cover,
+                                          child: SizedBox(
+                                            width: _controller
+                                                .video.value.size.width,
+                                            height: _controller
+                                                .video.value.size.height,
+                                            child:
+                                                VideoPlayer(_controller.video),
+                                          )))),
                               // AnimatedBuilder(
                               //   animation: _controller.video,
                               //   builder: (_, __) => OpacityTransition(
@@ -221,36 +358,72 @@ class _VideoEditorState extends State<VideoEditor> {
                               //     ),
                               //   ),
                               // ),
-                              AspectRatio(
-                                aspectRatio:
-                                    _controller.video.value.aspectRatio,
-                                child: PageView.builder(
-                                  itemCount: _pages.length,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        if (_controller.video.value.isPlaying) {
-                                          _controller.video.pause();
-                                        } else {
-                                          _controller.video.play();
-                                        }
-                                      },
-                                      child: Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.3,
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        decoration:
-                                            BoxDecoration(color: _pages[index]),
-                                      ),
-                                    );
-                                  },
-                                  scrollDirection: Axis.horizontal,
-                                  onPageChanged: (value) {
-                                    _page = value;
-                                  },
+                              // if (!_controller.video.value.isPlaying)
+                              OpacityTransition(
+                                visible: !_controller.video.value.isPlaying,
+                                child: Center(
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.07,
+                                    width: MediaQuery.of(context).size.height *
+                                        0.07,
+                                    child: const Icon(Icons.play_arrow),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50),
+                                      color: Colors.grey.withOpacity(0.5),
+                                    ),
+                                  ),
                                 ),
+                              ),
+                              PageView.builder(
+                                itemCount: _pages.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      if (_controller.video.value.isPlaying) {
+                                        _controller.video.pause();
+                                        setState(() {});
+                                      } else {
+                                        _controller.video.play();
+                                        setState(() {});
+                                      }
+                                    },
+                                    child: SizedBox.expand(
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: SizedBox(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height: _controller
+                                              .video.value.size.height,
+                                          child: Container(
+                                            child: Center(
+                                              child: OpacityTransition(
+                                                visible: showFilterName,
+                                                child: Text(
+                                                  _getColorBackgroundName(
+                                                      index),
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            decoration: BoxDecoration(
+                                                color: _pages[index]),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                scrollDirection: Axis.horizontal,
+                                onPageChanged: (value) {
+                                  _page = value;
+                                  _filterNameFun();
+                                },
                               ),
                             ]),
                             CoverViewer(controller: _controller)
@@ -258,7 +431,6 @@ class _VideoEditorState extends State<VideoEditor> {
                         )),
                         AnimatedContainer(
                             height: _visible.toDouble(),
-                            margin: const Margin.top(10),
                             duration: const Duration(seconds: 1),
                             curve: Curves.fastOutSlowIn,
                             child: Column(children: [
@@ -346,7 +518,7 @@ class _VideoEditorState extends State<VideoEditor> {
           Expanded(
             child: IconButton(
               onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.close),
+              icon: const Icon(Icons.close, color: Colors.white),
             ),
           ),
           Expanded(
@@ -360,28 +532,31 @@ class _VideoEditorState extends State<VideoEditor> {
                   }
                 });
               },
-              icon: const Icon(Icons.cut),
+              icon: const Icon(Icons.cut, color: Colors.white),
             ),
           ),
           Expanded(
             child: IconButton(
               onPressed: _openCropScreen,
-              icon: const Icon(Icons.crop),
+              icon: const Icon(Icons.crop, color: Colors.white),
             ),
           ),
           Expanded(
             child: IconButton(
-              onPressed: () => AudioSheet().sheet(context, addAudio),
-              icon: const Icon(Icons.audiotrack),
+              onPressed: () {
+                if (_controller.video.value.isPlaying) {
+                  _controller.video.pause();
+                  setState(() {});
+                }
+                AudioSheet().sheet(context, addAudio);
+              },
+              icon: const Icon(Icons.audiotrack, color: Colors.white),
             ),
           ),
           Expanded(
             child: IconButton(
               onPressed: _exportCover,
-              icon: const Icon(
-                Icons.save_alt,
-                //color: Colors.white
-              ),
+              icon: const Icon(Icons.save_alt, color: Colors.white),
             ),
           ),
           Expanded(
@@ -395,7 +570,7 @@ class _VideoEditorState extends State<VideoEditor> {
                   Navigator.of(context).pop();
                 });
               },
-              icon: const Icon(Icons.done),
+              icon: const Icon(Icons.done, color: Colors.white),
             ),
           ),
         ],
@@ -529,6 +704,8 @@ class CropScreen extends StatelessWidget {
                     controller.minCrop = controller.cacheMinCrop;
                     controller.maxCrop = controller.cacheMaxCrop;
                     */
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Crop will be visible after export!!!')));
                     context.navigator.pop();
                   },
                   child: const Center(
