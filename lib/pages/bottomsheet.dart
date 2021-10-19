@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cache_service.dart';
 import '../providers/likedvideoprovider.dart';
 import '../providers/myvideosprovider.dart';
+import '../providers/filter_provider.dart';
 import '../services/launch_url.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../firebase functions/sidebar_fun.dart';
@@ -14,6 +15,7 @@ class ProductDetails {
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final feedViewModel2 = GetIt.instance<LikeProvider>();
   final feedViewModel3 = GetIt.instance<MyVideosProvider>();
+  final feedViewModel4 = GetIt.instance<FilterViewModel>();
   SideBarFirebase firebasefun = SideBarFirebase();
 
   Future<String> getname(String id) async {
@@ -26,7 +28,8 @@ class ProductDetails {
     });
   }
 
-  void sheet(context, int index, bool likedVideo, bool myVideo) async {
+  void sheet(context, int index, bool likedVideo, bool myVideo,
+      bool filterVideo) async {
     showModalBottomSheet(
         context: context,
         //barrierColor: Colors.black.withOpacity(0.3),
@@ -46,7 +49,7 @@ class ProductDetails {
                     height: MediaQuery.of(context).size.height * 0.01,
                     width: MediaQuery.of(context).size.width * 0.10,
                     decoration: const BoxDecoration(
-                        //color: Colors.grey,
+                        color: Colors.grey,
                         borderRadius: BorderRadius.all(Radius.circular(20))),
                   ),
                 ),
@@ -90,8 +93,11 @@ class ProductDetails {
                                                 .listData[index].product1
                                             : feedViewModel3.videoSource!
                                                 .listData[index].product1
-                                        : feedViewModel.videoSource!
-                                            .listVideos[index].product1,
+                                        : filterVideo
+                                            ? feedViewModel4.videoSource!
+                                                .listVideos[index].product1
+                                            : feedViewModel.videoSource!
+                                                .listVideos[index].product1,
                                     height: MediaQuery.of(context).size.height *
                                         0.2,
                                     width: MediaQuery.of(context).size.height *
@@ -105,13 +111,16 @@ class ProductDetails {
                                             .videoSource!.listData[index].p1name
                                         : feedViewModel3
                                             .videoSource!.listData[index].p1name
-                                    : feedViewModel
-                                        .videoSource!.listVideos[index].p1name),
+                                    : filterVideo
+                                        ? feedViewModel4.videoSource!
+                                            .listVideos[index].p1name
+                                        : feedViewModel.videoSource!
+                                            .listVideos[index].p1name),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Text(
-                                    'Price - ₹${likedVideo || myVideo ? likedVideo ? feedViewModel2.videoSource!.listData[index].price : feedViewModel3.videoSource!.listData[index].price : feedViewModel.videoSource!.listVideos[index].price}'),
+                                    'Price - ₹${likedVideo || myVideo ? likedVideo ? feedViewModel2.videoSource!.listData[index].price : feedViewModel3.videoSource!.listData[index].price : filterVideo ? feedViewModel4.videoSource!.listVideos[index].price : feedViewModel.videoSource!.listVideos[index].price}'),
                               ],
                             ),
                           ),
@@ -134,13 +143,21 @@ class ProductDetails {
                                       .videoSource!.listData[index].store
                                   : feedViewModel3
                                       .videoSource!.listData[index].store
-                              : feedViewModel
-                                  .videoSource!.listVideos[index].store;
+                              : filterVideo
+                                  ? feedViewModel4
+                                      .videoSource!.listVideos[index].store
+                                  : feedViewModel
+                                      .videoSource!.listVideos[index].store;
                           launchURL(context, url);
                           await firebasefun.viewedUrl(likedVideo
                               ? feedViewModel2.videoSource!.listVideos[index]
-                              : feedViewModel.videoSource!.listVideos[index].id
-                                  .trim());
+                              : filterVideo
+                                  ? feedViewModel4
+                                      .videoSource!.listVideos[index].id
+                                      .trim()
+                                  : feedViewModel
+                                      .videoSource!.listVideos[index].id
+                                      .trim());
                         },
                         child: const Text('Visit Store')),
                   )),
@@ -151,7 +168,11 @@ class ProductDetails {
                         ? likedVideo
                             ? feedViewModel2.videoSource!.listData[index].seller
                             : feedViewModel3.videoSource!.listData[index].seller
-                        : feedViewModel.videoSource!.listVideos[index].seller),
+                        : filterVideo
+                            ? feedViewModel4
+                                .videoSource!.listVideos[index].seller
+                            : feedViewModel
+                                .videoSource!.listVideos[index].seller),
                     builder: (context, snapsot) {
                       if (snapsot.connectionState == ConnectionState.waiting) {
                         return const Text('Loading');
@@ -165,6 +186,8 @@ class ProductDetails {
         ? likedVideo
             ? feedViewModel2.playVideo(index)
             : feedViewModel3.playDrawer(false, false)
-        : feedViewModel.playVideo(index));
+        : filterVideo
+            ? feedViewModel4.playVideo(index)
+            : feedViewModel.playVideo(index));
   }
 }

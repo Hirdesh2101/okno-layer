@@ -164,13 +164,18 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text('No of users viewed product:'),
+                                const SizedBox(
+                                  height: 50,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'No of users viewed product:',
+                                    ),
+                                  ),
                                 ),
                                 const Divider(),
                                 const SizedBox(
-                                  height: 15,
+                                  height: 10,
                                 ),
                                 Text(
                                   '$viewedproduct',
@@ -189,13 +194,18 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text('No of users viewed url:'),
+                                  const SizedBox(
+                                    height: 50,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'No of users viewed url:',
+                                      ),
+                                    ),
                                   ),
                                   const Divider(),
                                   const SizedBox(
-                                    height: 15,
+                                    height: 10,
                                   ),
                                   Text(
                                     '$viewedurl',
@@ -215,13 +225,18 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text('No of users reporting video:'),
+                                  const SizedBox(
+                                    height: 50,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'No of users reporting video:',
+                                      ),
+                                    ),
                                   ),
                                   const Divider(),
                                   const SizedBox(
-                                    height: 15,
+                                    height: 10,
                                   ),
                                   Text(
                                     '$reported',
@@ -241,13 +256,18 @@ class _BrandSpecificationsState extends State<BrandSpecifications> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text('Total Views:'),
+                                  const SizedBox(
+                                    height: 50,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Total Views:',
+                                      ),
+                                    ),
                                   ),
                                   const Divider(),
                                   const SizedBox(
-                                    height: 15,
+                                    height: 10,
                                   ),
                                   Text(
                                     '$viewedvideo',

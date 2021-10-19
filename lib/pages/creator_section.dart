@@ -6,6 +6,7 @@ import 'package:oknoapp/pages/brand/brands_page.dart';
 import 'package:oknoapp/pages/encashed_page.dart';
 import './webview.dart';
 import 'video_page.dart';
+import '../services/service_locator.dart';
 import 'package:oknoapp/pages/tab_viewprofile.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -18,6 +19,13 @@ class CreatorPage extends StatefulWidget {
 }
 
 class _CreatorPageState extends State<CreatorPage> {
+  @override
+  void initState() {
+    WidgetsFlutterBinding.ensureInitialized();
+    setupMyVideos();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!.uid;

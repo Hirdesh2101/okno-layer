@@ -9,6 +9,7 @@ import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
 import '../models/video.dart';
 import 'package:stacked/stacked.dart';
+import '../providers/filter_provider.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import '../providers/likedvideoprovider.dart';
 
@@ -28,7 +29,51 @@ class _ScrollFeedState extends State<ScrollFeed> {
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final feedViewModel2 = GetIt.instance<LikeProvider>();
   final feedViewModel3 = GetIt.instance<MyVideosProvider>();
+  final feedViewModel4 = GetIt.instance<FilterViewModel>();
   final SideBarFirebase firebaseServices = SideBarFirebase();
+  bool filterPage = false;
+  bool filterVideoView = false;
+  bool filterRunning = false;
+  List<String> countList = [
+    "Ethenics",
+    "Western",
+    "Festive",
+    "Casuals",
+  ];
+  List<String> selectedCountList = [];
+  void filterOpened(bool value) {
+    setState(() {
+      filterPage = value;
+    });
+  }
+
+  Future<void> submitFun(list) async {
+    setState(() {
+      selectedCountList = List.from(list);
+      if (selectedCountList.isEmpty) {
+        filterVideoView = false;
+      } else {
+        filterVideoView = true;
+      }
+    });
+    if (selectedCountList.isNotEmpty) {
+      await feedViewModel4.initial(list);
+    } else {
+      await feedViewModel.initial();
+    }
+    if (!filterRunning) {
+      await feedViewModel.disposingall();
+    }
+    setState(() {
+      if (selectedCountList.isNotEmpty) {
+        filterRunning = true;
+      } else {
+        filterRunning = false;
+      }
+    });
+    //await feedViewModel4.playDrawer();
+  }
+
   void init() {
     if (!widget.likedPage && !widget.myVideopage) {
       feedViewModel.initial();
@@ -62,7 +107,9 @@ class _ScrollFeedState extends State<ScrollFeed> {
       keepPage: true,
       initialPage: widget.likedPage || widget.myVideopage
           ? widget.startIndex
-          : feedViewModel.currentscreen,
+          : filterVideoView
+              ? feedViewModel4.currentscreen
+              : feedViewModel.currentscreen,
       viewportFraction: 1,
     );
     return Stack(
@@ -73,42 +120,50 @@ class _ScrollFeedState extends State<ScrollFeed> {
                 ? widget.likedPage
                     ? feedViewModel2
                     : feedViewModel3
-                : feedViewModel,
+                : filterVideoView
+                    ? feedViewModel4
+                    : feedViewModel,
             builder: (context, model, child) {
               return !feedViewModel.isBusy &&
                       !feedViewModel2.isBusy &&
-                      !feedViewModel3.isBusy
+                      !feedViewModel3.isBusy &&
+                      !feedViewModel4.isBusy
                   ? !widget.likedPage &&
                           !widget.myVideopage &&
                           feedViewModel.videoSource!.listVideos.isEmpty
-                      ? RefreshIndicator(
-                          onRefresh: () {
-                            feedViewModel.videoSource!.delete();
-                            return feedViewModel.videoSource!
-                                .load(0)
-                                .then((val) {
-                              init();
-                              setState(() {});
-                            });
-                          },
-                          child: SingleChildScrollView(
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height,
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Text('You Are All Caught Up'),
-                                    SizedBox(
-                                      height: 5,
+                      ? filterVideoView
+                          ? const Center(
+                              child: Text('No Videos For this Filter'),
+                            )
+                          : RefreshIndicator(
+                              onRefresh: () {
+                                feedViewModel.videoSource!.delete();
+                                return feedViewModel.videoSource!
+                                    .load(0)
+                                    .then((val) {
+                                  init();
+                                  setState(() {});
+                                });
+                              },
+                              child: SingleChildScrollView(
+                                child: SizedBox(
+                                  height: MediaQuery.of(context).size.height,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Text('You Are All Caught Up'),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text('Pull To Refresh')
+                                      ],
                                     ),
-                                    Text('Pull To Refresh')
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        )
+                            )
                       : PageView.builder(
                           //key: const PageStorageKey('page_key'),
                           physics: const BouncingScrollPhysics(),
@@ -117,14 +172,18 @@ class _ScrollFeedState extends State<ScrollFeed> {
                               ? widget.likedPage
                                   ? feedViewModel2.length()
                                   : feedViewModel3.videoSource!.listData.length
-                              : feedViewModel.length(),
+                              : filterVideoView
+                                  ? feedViewModel4.length()
+                                  : feedViewModel.length(),
                           onPageChanged: (index) {
                             widget.likedPage || widget.myVideopage
                                 ? widget.likedPage
                                     ? feedViewModel2.onpageChanged(index)
                                     : feedViewModel3.onpageChanged(
                                         index, false, false)
-                                : feedViewModel.onpageChanged(index);
+                                : filterVideoView
+                                    ? feedViewModel4.onpageChanged(index)
+                                    : feedViewModel.onpageChanged(index);
                           },
                           scrollDirection: Axis.vertical,
                           itemBuilder: (context, index) {
@@ -135,14 +194,30 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                           .videoSource!.listData[index])
                                       : videoCard3(feedViewModel3
                                           .videoSource!.listData[index])
-                                  : videoCard(
-                                      feedViewModel
-                                          .videoSource!.listVideos[index],
-                                      feedViewModel
-                                          .videoSource!.listVideos[index].id),
+                                  : filterVideoView
+                                      ? videoCard(
+                                          feedViewModel4
+                                              .videoSource!.listVideos[index],
+                                          feedViewModel4.videoSource!
+                                              .listVideos[index].id)
+                                      : videoCard(
+                                          feedViewModel
+                                              .videoSource!.listVideos[index],
+                                          feedViewModel.videoSource!
+                                              .listVideos[index].id),
                               !widget.myVideopage
-                                  ? ActionToolBar(index, widget.likedPage,
-                                      widget.myVideopage, context)
+                                  ? ActionToolBar(
+                                      index,
+                                      widget.likedPage,
+                                      widget.myVideopage,
+                                      filterVideoView,
+                                      context,
+                                      countList,
+                                      selectedCountList,
+                                      submitFun,
+                                      filterOpened,
+                                      filterVideoView,
+                                    )
                                   : (widget.myVideopage &&
                                           !feedViewModel3.videoSource!
                                               .listData[index].approved)
@@ -159,8 +234,18 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                               )
                                             ],
                                           ))
-                                      : ActionToolBar(index, widget.likedPage,
-                                          widget.myVideopage, context),
+                                      : ActionToolBar(
+                                          index,
+                                          widget.likedPage,
+                                          widget.myVideopage,
+                                          filterVideoView,
+                                          context,
+                                          countList,
+                                          selectedCountList,
+                                          submitFun,
+                                          filterOpened,
+                                          filterVideoView,
+                                        ),
                               feedViewModel.creatingLink!
                                   ? const Center(
                                       child: CircularProgressIndicator())
@@ -186,14 +271,26 @@ class _ScrollFeedState extends State<ScrollFeed> {
               var visiblePercentage = info.visibleFraction * 100;
               if (visiblePercentage < 50) {
                 if (video.controller!.value.isPlaying) {
-                  feedViewModel.pauseDrawer();
+                  if (filterVideoView) {
+                    feedViewModel4.pauseDrawer();
+                  } else {
+                    feedViewModel.pauseDrawer();
+                  }
                 }
               } else {
                 if (!video.controller!.value.isPlaying) {
-                  if (Scaffold.of(context).isDrawerOpen) {
-                    feedViewModel.pauseDrawer();
+                  if (Scaffold.of(context).isDrawerOpen || filterPage) {
+                    if (filterVideoView) {
+                      feedViewModel4.pauseDrawer();
+                    } else {
+                      feedViewModel.pauseDrawer();
+                    }
                   } else {
-                    feedViewModel.playDrawer();
+                    if (filterVideoView) {
+                      feedViewModel4.playDrawer();
+                    } else {
+                      feedViewModel.playDrawer();
+                    }
                   }
                 }
               }

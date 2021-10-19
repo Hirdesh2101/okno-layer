@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:oknoapp/pages/brand/brand_details.dart';
+import '../../services/service_locator.dart';
 
 class BrandPage extends StatefulWidget {
   static const routeName = '/brandspage';
@@ -16,6 +17,14 @@ class BrandPage extends StatefulWidget {
 class _BrandPageState extends State<BrandPage> {
   final TextEditingController _textEditingController = TextEditingController();
   var _switchval = false;
+
+  @override
+  void initState() {
+    WidgetsFlutterBinding.ensureInitialized();
+    setupBrand();
+    super.initState();
+  }
+
   @override
   void dispose() {
     _textEditingController.dispose();
@@ -66,11 +75,15 @@ class _BrandPageState extends State<BrandPage> {
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
+                                      const Center(
+                                        child: Text(
+                                            'By Default Last 30 Days values is visible'),
+                                      ),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceEvenly,
                                         children: [
-                                          const Text("View all records: "),
+                                          const Text("View all time records: "),
                                           CupertinoSwitch(
                                             // title: const Text('View All'),
                                             value: _switchval,

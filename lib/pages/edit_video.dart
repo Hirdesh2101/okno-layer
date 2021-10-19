@@ -11,6 +11,7 @@ import 'package:dio/dio.dart';
 //import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import './audio_sheet.dart';
+import '../services/service_locator.dart';
 import 'package:video_player/video_player.dart';
 
 class EditVideo extends StatefulWidget {
@@ -25,6 +26,8 @@ class EditVideo extends StatefulWidget {
 class _EditVideoState extends State<EditVideo> {
   @override
   void initState() {
+    WidgetsFlutterBinding.ensureInitialized();
+    setupAudio();
     super.initState();
   }
 

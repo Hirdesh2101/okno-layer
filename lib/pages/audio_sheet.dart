@@ -101,29 +101,39 @@ class _MyItemState extends State<MyItem> {
               });
             }
           },
-          child: ListTile(
-            leading: audiolist[index].thumbnail != ''
-                ? CircleAvatar(
-                    backgroundImage: NetworkImage(audiolist[index].thumbnail),
-                  )
-                : const Icon(Icons.music_note_outlined),
-            title: Text(audiolist[index].songname),
-            subtitle: Text(audiolist[index].artistname),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                audiolist[index].playingstatus == 0
-                    ? const Icon(Icons.play_arrow)
-                    : const Icon(Icons.pause),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _trySubmit(index);
-                  },
-                )
-              ],
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: audiolist[index].thumbnail != ''
+                    ? CircleAvatar(
+                        backgroundImage:
+                            NetworkImage(audiolist[index].thumbnail),
+                      )
+                    : const Icon(Icons.music_note_outlined),
+                title: Text(audiolist[index].songname),
+                subtitle: Text(audiolist[index].artistname),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    audiolist[index].playingstatus == 0
+                        ? const Icon(Icons.play_arrow)
+                        : const Icon(Icons.pause),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _trySubmit(index);
+                      },
+                    )
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 3, 0, 3),
+                child: Divider(),
+              ),
+            ],
           ),
         );
       },

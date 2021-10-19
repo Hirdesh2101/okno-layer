@@ -13,21 +13,48 @@ import '../providers/likedvideoprovider.dart';
 import 'package:ionicons/ionicons.dart';
 import '../providers/myvideosprovider.dart';
 import 'package:share_plus/share_plus.dart';
+import '../providers/filter_provider.dart';
+import 'package:filter_list/filter_list.dart';
 
 class ActionToolBar extends StatelessWidget {
   final int index;
   final bool likedPage;
   final bool mypage;
+  final bool filterScreen;
+  final List<String> countList;
+  final List<String> selectedCountList;
+  final bool filterApplied;
+  final Function(List<String>? selectedCountList) appliedFunction;
+  final Function(bool status) filterOpened;
   final BuildContext context;
-  ActionToolBar(this.index, this.likedPage, this.mypage, this.context,
+  ActionToolBar(
+      this.index,
+      this.likedPage,
+      this.mypage,
+      this.filterScreen,
+      this.context,
+      this.countList,
+      this.selectedCountList,
+      this.appliedFunction,
+      this.filterOpened,
+      this.filterApplied,
       {Key? key})
       : super(key: key);
 
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final feedViewMode2 = GetIt.instance<LikeProvider>();
   final feedViewMode3 = GetIt.instance<MyVideosProvider>();
+  final feedViewMode4 = GetIt.instance<FilterViewModel>();
   final SideBarFirebase firebaseServices = SideBarFirebase();
   final DynamicLinkService dynamicLinkService = DynamicLinkService();
+  //List<String>? selectedCountList = [];
+  Future<void> submitFunct(List<String>? selectedCountList) async {
+    await appliedFunction(selectedCountList);
+  }
+
+  void statusCheck(bool value) {
+    filterOpened(value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +74,16 @@ class ActionToolBar extends StatelessWidget {
                 ? likedPage
                     ? feedViewMode2.pauseDrawer()
                     : feedViewMode3.pauseDrawer(false, false)
-                : feedViewModel.pauseDrawer();
-            ProductDetails().sheet(context, index, likedPage, mypage);
+                : filterScreen
+                    ? feedViewMode4.pauseDrawer()
+                    : feedViewModel.pauseDrawer();
+            ProductDetails()
+                .sheet(context, index, likedPage, mypage, filterScreen);
             await firebaseServices.viewedProduct(likedPage
                 ? feedViewMode2.videoSource!.listVideos[index]
-                : feedViewModel.videoSource!.listVideos[index].id.trim());
+                : filterScreen
+                    ? feedViewMode4.videoSource!.listVideos[index].id.trim()
+                    : feedViewModel.videoSource!.listVideos[index].id.trim());
           },
         ),
       ),
@@ -75,8 +107,11 @@ class ActionToolBar extends StatelessWidget {
               );
             }
             final documents = snapshot.data!.docs.where((element) {
-              return element.id ==
-                  feedViewModel.videoSource!.listVideos[index].id.trim();
+              return filterScreen
+                  ? element.id ==
+                      feedViewMode4.videoSource!.listVideos[index].id.trim()
+                  : element.id ==
+                      feedViewModel.videoSource!.listVideos[index].id.trim();
             });
             List<dynamic> list = documents.first['Likes'] ?? [];
 
@@ -84,7 +119,11 @@ class ActionToolBar extends StatelessWidget {
               firebaseServices.add(
                   likedPage
                       ? feedViewMode2.videoSource!.listVideos[index]
-                      : feedViewModel.videoSource!.listVideos[index].id.trim(),
+                      : filterScreen
+                          ? feedViewMode4.videoSource!.listVideos[index].id
+                              .trim()
+                          : feedViewModel.videoSource!.listVideos[index].id
+                              .trim(),
                   list.contains(firebaseServices.user) ? true : false);
               return !init;
             }
@@ -109,15 +148,23 @@ class ActionToolBar extends StatelessWidget {
           }),
       IconButton(
           onPressed: () {
-            feedViewModel.pauseDrawer();
+            filterScreen
+                ? feedViewMode4.pauseDrawer()
+                : feedViewModel.pauseDrawer();
             Navigator.of(context)
                 .push(MaterialPageRoute(
-                    builder: (context) => Comments(feedViewModel
-                        .videoSource!.listVideos[index].id
-                        .trim())))
+                    builder: (context) => Comments(filterScreen
+                        ? feedViewMode4.videoSource!.listVideos[index].id.trim()
+                        : feedViewModel.videoSource!.listVideos[index].id
+                            .trim())))
                 .then((value) {
-              feedViewModel.seekZero();
-              feedViewModel.playDrawer();
+              if (filterScreen) {
+                feedViewMode4.seekZero();
+                feedViewMode4.playDrawer();
+              } else {
+                feedViewModel.seekZero();
+                feedViewModel.playDrawer();
+              }
               // });
             });
           },
@@ -131,16 +178,29 @@ class ActionToolBar extends StatelessWidget {
       ),
       IconButton(
           onPressed: () async {
-            feedViewModel.pauseDrawer();
-            feedViewModel.startCircularProgess();
-            Uri uri = await dynamicLinkService
-                .createDynamicLink(
-                    feedViewModel.videoSource!.listVideos[index].id.trim())
-                .whenComplete(() {
-              feedViewModel.endCircularProgess();
-            });
-            await Share.share('Look at this video!${uri.toString()}',
-                subject: 'Look at this video!');
+            if (filterScreen) {
+              feedViewMode4.pauseDrawer();
+              feedViewMode4.startCircularProgess();
+              Uri uri = await dynamicLinkService
+                  .createDynamicLink(
+                      feedViewMode4.videoSource!.listVideos[index].id.trim())
+                  .whenComplete(() {
+                feedViewMode4.endCircularProgess();
+              });
+              await Share.share('Look at this video!${uri.toString()}',
+                  subject: 'Look at this video!');
+            } else {
+              feedViewModel.pauseDrawer();
+              feedViewModel.startCircularProgess();
+              Uri uri = await dynamicLinkService
+                  .createDynamicLink(
+                      feedViewModel.videoSource!.listVideos[index].id.trim())
+                  .whenComplete(() {
+                feedViewModel.endCircularProgess();
+              });
+              await Share.share('Look at this video!${uri.toString()}',
+                  subject: 'Look at this video!');
+            }
           },
           icon: Icon(
             Ionicons.paper_plane_outline,
@@ -152,7 +212,11 @@ class ActionToolBar extends StatelessWidget {
       ),
       IconButton(
           onPressed: () {
-            feedViewModel.pauseDrawer();
+            if (filterScreen) {
+              feedViewMode4.pauseDrawer();
+            } else {
+              feedViewModel.pauseDrawer();
+            }
             showModalBottomSheet(
                 context: context,
                 barrierColor: Colors.black.withOpacity(0.3),
@@ -172,10 +236,56 @@ class ActionToolBar extends StatelessWidget {
                             height: MediaQuery.of(context).size.height * 0.01,
                             width: MediaQuery.of(context).size.width * 0.10,
                             decoration: const BoxDecoration(
-                                //   color: Colors.grey,
+                                color: Colors.grey,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(20))),
                           ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          leading: Icon(
+                            Ionicons.filter_outline,
+                            color: filterApplied
+                                ? Colors.green
+                                : Theme.of(context).iconTheme.color,
+                          ),
+                          title: const Text('Apply Filters'),
+                          onTap: () async {
+                            statusCheck(true);
+                            await FilterListDialog.display<String>(context,
+                                listData: countList,
+                                selectedListData: selectedCountList,
+                                height: 480,
+                                headlineText: "Select Filters",
+                                searchFieldHintText: "Search Here",
+                                choiceChipLabel: (item) {
+                              return item;
+                            }, validateSelectedItem: (list, val) {
+                              return list!.contains(val);
+                            }, onItemSearch: (list, text) {
+                              if (list!.any((element) => element
+                                  .toLowerCase()
+                                  .contains(text.toLowerCase()))) {
+                                return list
+                                    .where((element) => element
+                                        .toLowerCase()
+                                        .contains(text.toLowerCase()))
+                                    .toList();
+                              } else {
+                                return [];
+                              }
+                            }, onApplyButtonClick: (list) async {
+                              if (list != null) {
+                                await submitFunct(list);
+                              }
+                              Navigator.pop(context);
+                            }).whenComplete(() {
+                              statusCheck(false);
+                              Navigator.pop(context);
+                            });
+                          },
                         ),
                       ),
                       Padding(
@@ -186,9 +296,13 @@ class ActionToolBar extends StatelessWidget {
                             title: const Text('Save Video'),
                             onTap: () {
                               firebaseServices
-                                  .saveVideo(feedViewModel
-                                      .videoSource!.listVideos[index].id
-                                      .trim())
+                                  .saveVideo(filterScreen
+                                      ? feedViewMode4
+                                          .videoSource!.listVideos[index].id
+                                          .trim()
+                                      : feedViewModel
+                                          .videoSource!.listVideos[index].id
+                                          .trim())
                                   .whenComplete(() {
                                 Fluttertoast.showToast(
                                     msg: "Saved",
@@ -208,9 +322,13 @@ class ActionToolBar extends StatelessWidget {
                                   gravity: ToastGravity.BOTTOM,
                                   fontSize: 16.0);
                               firebaseServices
-                                  .reportVideo(feedViewModel
-                                      .videoSource!.listVideos[index].id
-                                      .trim())
+                                  .reportVideo(filterScreen
+                                      ? feedViewMode4
+                                          .videoSource!.listVideos[index].id
+                                          .trim()
+                                      : feedViewModel
+                                          .videoSource!.listVideos[index].id
+                                          .trim())
                                   .whenComplete(() {
                                 Fluttertoast.showToast(
                                     msg: "Reported Successfully",
@@ -221,14 +339,14 @@ class ActionToolBar extends StatelessWidget {
                             },
                           ),
                         ]),
-                      )
+                      ),
                     ],
                   );
                 }).whenComplete(() => feedViewModel.playDrawer());
           },
           icon: Icon(
             Ionicons.ellipsis_vertical_outline,
-            color: Colors.white,
+            color: filterApplied ? Colors.green : Colors.white,
             size: MediaQuery.of(context).size.width * 0.085,
           )),
     ]);

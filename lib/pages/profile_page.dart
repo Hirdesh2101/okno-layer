@@ -6,6 +6,7 @@ import 'package:oknoapp/pages/change_theme.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/tab_viewprofile.dart';
 import 'package:oknoapp/pages/webview.dart';
+import '../services/service_locator.dart';
 import 'video_page.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -22,13 +23,14 @@ class _ProfileScreenState extends State<ProfileScreen>
   int selectedIndex = 0;
   @override
   void initState() {
-    super.initState();
-
+    WidgetsFlutterBinding.ensureInitialized();
+    setupMyVideos();
     tabController = TabController(
       initialIndex: selectedIndex,
       length: 2,
       vsync: this,
     );
+    super.initState();
   }
 
   @override

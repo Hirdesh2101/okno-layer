@@ -75,6 +75,7 @@ dev_dependencies:
   flutter_video_info: ^1.2.0
   audioplayers: ^0.20.1
   dio: ^4.0.0
+  filter_list: ^1.0.0
   #super_easy_permissions: ^0.1.1
   #permission_handler: ^8.2.5
   awesome_dialog: ^2.1.1

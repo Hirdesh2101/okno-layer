@@ -201,6 +201,7 @@ class _EditProfileState extends State<EditProfile> {
                                             backgroundImage:
                                                 AssetImage("assets/female.jpg"))
                                     : CircleAvatar(
+                                        backgroundColor: Colors.grey.shade300,
                                         radius: 90,
                                         backgroundImage: NetworkImage(
                                           data['Image'],
