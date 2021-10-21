@@ -38,8 +38,10 @@ class MyVideosAPI {
           .doc(element)
           .get()
           .then((snapshot) {
-        video = MyVideos.fromJson(snapshot.data()!);
-        videoList.add(video);
+        if (snapshot.data()!['deleted'] == false) {
+          video = MyVideos.fromJson(snapshot.data()!);
+          videoList.add(video);
+        }
       });
     }
     return videoList;
@@ -54,9 +56,11 @@ class MyVideosAPI {
           .doc(element)
           .get()
           .then((snapshot) {
-        video = MyVideos.fromJson(snapshot.data()!);
-        if (video.approved) {
-          videoList.add(video);
+        if (snapshot.data()!['deleted'] == false) {
+          video = MyVideos.fromJson(snapshot.data()!);
+          if (video.approved) {
+            videoList.add(video);
+          }
         }
       });
     }
@@ -72,9 +76,11 @@ class MyVideosAPI {
           .doc(element)
           .get()
           .then((snapshot) {
-        video = MyVideos.fromJson(snapshot.data()!);
-        if (!video.approved) {
-          videoList.add(video);
+        if (snapshot.data()!['deleted'] == false) {
+          video = MyVideos.fromJson(snapshot.data()!);
+          if (!video.approved) {
+            videoList.add(video);
+          }
         }
       });
     }

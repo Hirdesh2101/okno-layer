@@ -34,6 +34,7 @@ class VideoFilterAPI {
   Future<List<Video>> _getVideoList(List tags) async {
     var data = await _firebase
         .where('Approved', isEqualTo: true)
+        .where('deleted', isEqualTo: false)
         .where('tags', arrayContainsAny: tags)
         .limit(10)
         .get();
@@ -52,6 +53,7 @@ class VideoFilterAPI {
     var data = await _firebase
         .startAfterDocument(lastData)
         .where('Approved', isEqualTo: true)
+        .where('deleted', isEqualTo: false)
         .where('tags', arrayContainsAny: tags)
         .limit(10)
         .get();

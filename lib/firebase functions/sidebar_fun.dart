@@ -259,12 +259,14 @@ class SideBarFirebase {
 
   Future<void> encashedSub(var phoneNumber) async {
     double balance = 0.0;
+    double enchashed = 0.0;
     await FirebaseFirestore.instance
         .collection('UsersData')
         .doc(user)
         .get()
         .then((value) {
       balance = (value.data()!['Balance']).toDouble();
+      enchashed = (value.data()!['Encashed']).toDouble();
     });
     await FirebaseFirestore.instance.collection('Requests').doc().set({
       'Amount': balance,
@@ -272,7 +274,10 @@ class SideBarFirebase {
       'paytmNo': phoneNumber,
       'id': user,
     });
-
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .update({'Encashed': balance + enchashed});
     await FirebaseFirestore.instance
         .collection('UsersData')
         .doc(user)

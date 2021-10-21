@@ -125,7 +125,7 @@ class FeedViewModel extends BaseViewModel {
     if (videoSource!.listVideos.length > index && index >= 0) {
       /// Create new controller
       await videoSource!.listVideos[index].loadController();
-      // notifyListeners();
+      notifyListeners();
       //log('🚀🚀🚀 INITIALIZED $index');
     }
   }

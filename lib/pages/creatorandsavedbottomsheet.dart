@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get_it/get_it.dart';
-import '../providers/feedviewprovider.dart';
+import '../providers/savedvideoprovider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cache_service.dart';
-import '../providers/likedvideoprovider.dart';
 import '../providers/myvideosprovider.dart';
-import '../providers/filter_provider.dart';
 import '../services/launch_url.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../firebase functions/sidebar_fun.dart';
 
-class ProductDetails {
-  final feedViewModel = GetIt.instance<FeedViewModel>();
-  final feedViewModel2 = GetIt.instance<LikeProvider>();
-  final feedViewModel3 = GetIt.instance<MyVideosProvider>();
-  final feedViewModel4 = GetIt.instance<FilterViewModel>();
+class CreatorAndSavedProductDetails {
+  final feedViewModel = GetIt.instance<MySavedVideosProvider>();
+  final feedViewModel2 = GetIt.instance<MyVideosProvider>();
   SideBarFirebase firebasefun = SideBarFirebase();
 
   Future<String> getname(String id) async {
@@ -28,8 +24,8 @@ class ProductDetails {
     });
   }
 
-  void sheet(context, int index, bool likedVideo, bool myVideo,
-      bool filterVideo) async {
+  void sheet(context, int index, bool isApproved, bool isNonApproved,
+      bool isSavedVideo) async {
     showModalBottomSheet(
         context: context,
         //barrierColor: Colors.black.withOpacity(0.3),
@@ -87,17 +83,14 @@ class ProductDetails {
                                         //color: Colors.grey,
                                         ),
                                     cacheManager: CustomCacheManager.instance2,
-                                    imageUrl: likedVideo || myVideo
-                                        ? likedVideo
+                                    imageUrl: isApproved || isNonApproved
+                                        ? isApproved
                                             ? feedViewModel2.videoSource!
-                                                .listData[index].product1
-                                            : feedViewModel3.videoSource!
-                                                .listData[index].product1
-                                        : filterVideo
-                                            ? feedViewModel4.videoSource!
-                                                .listVideos[index].product1
-                                            : feedViewModel.videoSource!
-                                                .listVideos[index].product1,
+                                                .approvedData[index].product1
+                                            : feedViewModel2.videoSource!
+                                                .nonapprovedData[index].product1
+                                        : feedViewModel.videoSource!
+                                            .listData[index].product1,
                                     height: MediaQuery.of(context).size.height *
                                         0.2,
                                     width: MediaQuery.of(context).size.height *
@@ -105,22 +98,19 @@ class ProductDetails {
                                     fit: BoxFit.contain,
                                   ),
                                 ),
-                                Text(likedVideo || myVideo
-                                    ? likedVideo
-                                        ? feedViewModel2
-                                            .videoSource!.listData[index].p1name
-                                        : feedViewModel3
-                                            .videoSource!.listData[index].p1name
-                                    : filterVideo
-                                        ? feedViewModel4.videoSource!
-                                            .listVideos[index].p1name
-                                        : feedViewModel.videoSource!
-                                            .listVideos[index].p1name),
+                                Text(isApproved || isNonApproved
+                                    ? isApproved
+                                        ? feedViewModel2.videoSource!
+                                            .approvedData[index].p1name
+                                        : feedViewModel2.videoSource!
+                                            .nonapprovedData[index].p1name
+                                    : feedViewModel
+                                        .videoSource!.listData[index].p1name),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Text(
-                                    'Price - ₹${likedVideo || myVideo ? likedVideo ? feedViewModel2.videoSource!.listData[index].price : feedViewModel3.videoSource!.listData[index].price : filterVideo ? feedViewModel4.videoSource!.listVideos[index].price : feedViewModel.videoSource!.listVideos[index].price}'),
+                                    'Price - ₹${isApproved || isNonApproved ? isApproved ? feedViewModel2.videoSource!.approvedData[index].price : feedViewModel2.videoSource!.nonapprovedData[index].price : feedViewModel.videoSource!.listData[index].price}'),
                               ],
                             ),
                           ),
@@ -137,42 +127,33 @@ class ProductDetails {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                         onPressed: () async {
-                          final url = likedVideo || myVideo
-                              ? likedVideo
+                          final url = isApproved || isNonApproved
+                              ? isApproved
                                   ? feedViewModel2
-                                      .videoSource!.listData[index].store
-                                  : feedViewModel3
-                                      .videoSource!.listData[index].store
-                              : filterVideo
-                                  ? feedViewModel4
-                                      .videoSource!.listVideos[index].store
-                                  : feedViewModel
-                                      .videoSource!.listVideos[index].store;
+                                      .videoSource!.approvedData[index].store
+                                  : feedViewModel2
+                                      .videoSource!.nonapprovedData[index].store
+                              : feedViewModel
+                                  .videoSource!.listData[index].store;
                           launchURL(context, url);
-                          await firebasefun.viewedUrl(likedVideo
-                              ? feedViewModel2.videoSource!.listData[index].id
-                              : filterVideo
-                                  ? feedViewModel4
-                                      .videoSource!.listVideos[index].id
-                                      .trim()
-                                  : feedViewModel
-                                      .videoSource!.listVideos[index].id
-                                      .trim());
+                          if (isSavedVideo) {
+                            await firebasefun.viewedUrl(feedViewModel
+                                .videoSource!.listData[index].id
+                                .trim());
+                          }
                         },
                         child: const Text('Visit Store')),
                   )),
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                 child: FutureBuilder(
-                    future: getname(likedVideo || myVideo
-                        ? likedVideo
-                            ? feedViewModel2.videoSource!.listData[index].seller
-                            : feedViewModel3.videoSource!.listData[index].seller
-                        : filterVideo
-                            ? feedViewModel4
-                                .videoSource!.listVideos[index].seller
-                            : feedViewModel
-                                .videoSource!.listVideos[index].seller),
+                    future: getname(isApproved || isNonApproved
+                        ? isApproved
+                            ? feedViewModel2
+                                .videoSource!.approvedData[index].seller
+                            : feedViewModel2
+                                .videoSource!.nonapprovedData[index].seller
+                        : feedViewModel.videoSource!.listData[index].seller),
                     builder: (context, snapsot) {
                       if (snapsot.connectionState == ConnectionState.waiting) {
                         return const Text('Loading');
@@ -182,12 +163,10 @@ class ProductDetails {
               ),
             ],
           );
-        }).whenComplete(() => likedVideo || myVideo
-        ? likedVideo
-            ? feedViewModel2.playVideo(index)
-            : feedViewModel3.playDrawer(false, false)
-        : filterVideo
-            ? feedViewModel4.playVideo(index)
-            : feedViewModel.playVideo(index));
+        }).whenComplete(() => isApproved || isNonApproved
+        ? isApproved
+            ? feedViewModel2.playDrawer(true, false)
+            : feedViewModel2.playDrawer(false, true)
+        : feedViewModel.playVideo(index));
   }
 }

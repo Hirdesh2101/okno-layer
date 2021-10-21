@@ -6,12 +6,8 @@ class LikedVideosAPI {
   List<String> listVideos = <String>[];
   List<LikeVideo> listData = <LikeVideo>[];
 
-  LikedVideosAPI() {
-    load();
-  }
-
-  void load() {
-    getLiked().listen((listofstring) async {
+  Future<void> load() async {
+    await getLiked().then((listofstring) async {
       listVideos = listofstring;
       listData = await getData();
     });
@@ -19,8 +15,8 @@ class LikedVideosAPI {
 
   final user = FirebaseAuth.instance.currentUser!.uid;
   final _firestore = FirebaseFirestore.instance;
-  Stream<List<String>> getLiked() {
-    return _firestore.collection("UsersData").doc(user).snapshots().map((list) {
+  Future<List<String>> getLiked() {
+    return _firestore.collection("UsersData").doc(user).get().then((list) {
       return List.from(list.data()!['Likes']);
     });
   }
@@ -34,8 +30,10 @@ class LikedVideosAPI {
           .doc(element)
           .get()
           .then((snapshot) {
-        video = LikeVideo.fromJson(snapshot.data()!);
-        videoList.add(video);
+        if (snapshot.data()!['deleted'] == false) {
+          video = LikeVideo.fromJson(snapshot.data()!);
+          videoList.add(video);
+        }
       });
     }
     return videoList;

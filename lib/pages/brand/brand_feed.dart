@@ -5,6 +5,7 @@ import 'package:stacked/stacked.dart';
 import '../../models/brand_videos.dart';
 import '../../providers/brand_provider.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import './brand_bottomsheet.dart';
 
 class BrandFeed extends StatefulWidget {
   final int startIndex;
@@ -16,6 +17,7 @@ class BrandFeed extends StatefulWidget {
 
 class _BrandFeedState extends State<BrandFeed> {
   final feedViewModel = GetIt.instance<BrandVideoProvider>();
+  bool keyBoardOpen = false;
   void init() {
     feedViewModel.initial(widget.startIndex);
   }
@@ -24,6 +26,14 @@ class _BrandFeedState extends State<BrandFeed> {
   void initState() {
     init();
     super.initState();
+  }
+
+  void keyBoardOpened(bool value) {
+    if (mounted) {
+      setState(() {
+        keyBoardOpen = value;
+      });
+    }
   }
 
   @override
@@ -61,6 +71,26 @@ class _BrandFeedState extends State<BrandFeed> {
                         return Stack(children: [
                           videoCard(feedViewModel.videoSource!.listData[index],
                               feedViewModel.videoSource!.listData[index].id),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: OutlinedButton(
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.resolveWith<Color>(
+                                          (states) =>
+                                              Colors.black.withOpacity(0.5))),
+                              child: const Text(
+                                'View Product',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () async {
+                                feedViewModel.pauseDrawer();
+                                BrandProductDetails(keyBoardOpened)
+                                    .sheet(context, index);
+                              },
+                            ),
+                          ),
+
                           // ActionToolBar(index, false, false, context),
                         ]);
                       })
@@ -84,7 +114,7 @@ class _BrandFeedState extends State<BrandFeed> {
                 }
               } else {
                 if (!video.controller!.value.isPlaying) {
-                  if (Scaffold.of(context).isDrawerOpen) {
+                  if (Scaffold.of(context).isDrawerOpen || keyBoardOpen) {
                     feedViewModel.pauseDrawer();
                   } else {
                     feedViewModel.playDrawer();

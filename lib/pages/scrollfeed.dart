@@ -60,6 +60,8 @@ class _ScrollFeedState extends State<ScrollFeed> {
       await feedViewModel4.initial(list);
     } else {
       await feedViewModel.initial();
+      await feedViewModel4.disposingall();
+      feedViewModel.playDrawer();
     }
     if (!filterRunning) {
       await feedViewModel.disposingall();
@@ -71,7 +73,6 @@ class _ScrollFeedState extends State<ScrollFeed> {
         filterRunning = false;
       }
     });
-    //await feedViewModel4.playDrawer();
   }
 
   void init() {
@@ -105,11 +106,8 @@ class _ScrollFeedState extends State<ScrollFeed> {
   Widget feedVideos() {
     final PageController pageController = PageController(
       keepPage: true,
-      initialPage: widget.likedPage || widget.myVideopage
-          ? widget.startIndex
-          : filterVideoView
-              ? feedViewModel4.currentscreen
-              : feedViewModel.currentscreen,
+      initialPage:
+          widget.likedPage || widget.myVideopage ? widget.startIndex : 0,
       viewportFraction: 1,
     );
     return Stack(
@@ -165,7 +163,6 @@ class _ScrollFeedState extends State<ScrollFeed> {
                               ),
                             )
                       : PageView.builder(
-                          //key: const PageStorageKey('page_key'),
                           physics: const BouncingScrollPhysics(),
                           controller: pageController,
                           itemCount: widget.likedPage || widget.myVideopage
@@ -246,7 +243,8 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                           filterOpened,
                                           filterVideoView,
                                         ),
-                              feedViewModel.creatingLink!
+                              feedViewModel.creatingLink! ||
+                                      feedViewModel4.creatingLink!
                                   ? const Center(
                                       child: CircularProgressIndicator())
                                   : const SizedBox(

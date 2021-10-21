@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:filter_list/filter_list.dart';
 
 class UploadPage extends StatefulWidget {
   final File file;
@@ -23,36 +24,60 @@ class _UploadPageState extends State<UploadPage> {
   File? finalFile;
   //String? finalPath;
   File? thumbnailFile;
+  List<String> selectedCountList = [];
   VideoPlayerController? _controller;
   TextEditingController urlController = TextEditingController();
   void postImage() {
-    setState(() {
-      uploading = true;
-    });
-    uploadVideo(finalFile).then((String data) {
-      uploadImage(thumbnailFile).then((String data2) {
-        postToFireStore(
-          mediaUrl: data,
-          url: urlController.text,
-          thumbnail: data2,
-        ).then((value) {
-          finalFile!.delete();
-          thumbnailFile!.delete();
-        });
-      });
-    }).then((_) {
+    if (urlController.text.trim() == '' || selectedCountList.isEmpty) {
+      if (urlController.text.trim() == '') {
+        Fluttertoast.showToast(
+            msg: "Please Enter Url",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            // backgroundColor: Colors.red,
+            // textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Please Select Tags",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            // backgroundColor: Colors.red,
+            // textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } else {
       setState(() {
-        uploading = false;
+        uploading = true;
       });
-      Fluttertoast.showToast(
-          msg: 'Upload Successful',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey,
-          textColor: Colors.white);
-      Navigator.of(context).pop();
-    });
+      uploadVideo(finalFile).then((String data) {
+        uploadImage(thumbnailFile).then((String data2) {
+          postToFireStore(
+            mediaUrl: data,
+            url: urlController.text,
+            thumbnail: data2,
+            tags: selectedCountList,
+          ).then((value) {
+            finalFile!.delete();
+            thumbnailFile!.delete();
+          });
+        });
+      }).then((_) {
+        setState(() {
+          uploading = false;
+        });
+        Fluttertoast.showToast(
+            msg: 'Upload Successful',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white);
+        Navigator.of(context).pop();
+      });
+    }
   }
 
   Future<void> init() async {
@@ -86,6 +111,12 @@ class _UploadPageState extends State<UploadPage> {
     super.dispose();
   }
 
+  void _submitTags(List<String> tags) {
+    setState(() {
+      selectedCountList = tags;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,6 +145,8 @@ class _UploadPageState extends State<UploadPage> {
                   controller: _controller,
                   urlController: urlController,
                   loading: uploading,
+                  tagsList: selectedCountList,
+                  submitTags: _submitTags,
                 ),
                 const Divider(),
               ],
@@ -126,16 +159,24 @@ class _UploadPageState extends State<UploadPage> {
 }
 
 class PostForm extends StatelessWidget {
-  // ignore: prefer_typing_uninitialized_variables
   final VideoPlayerController? controller;
   final TextEditingController urlController;
+  final List<String> tagsList;
   final bool loading;
-  const PostForm({
+  final Function(List<String>) submitTags;
+  PostForm({
     Key? key,
     required this.controller,
     required this.urlController,
     required this.loading,
+    required this.tagsList,
+    required this.submitTags,
   }) : super(key: key);
+
+  _submitFunction(List<String> finalTags) {
+    submitTags(finalTags);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -147,9 +188,18 @@ class PostForm extends StatelessWidget {
           child: Column(
             children: [
               if (controller!.value.isInitialized)
-                AspectRatio(
-                  aspectRatio: controller!.value.aspectRatio,
-                  child: VideoPlayer(controller!),
+                GestureDetector(
+                  onTap: () {
+                    if (controller!.value.isPlaying) {
+                      controller?.pause();
+                    } else {
+                      controller?.play();
+                    }
+                  },
+                  child: AspectRatio(
+                    aspectRatio: controller!.value.aspectRatio,
+                    child: VideoPlayer(controller!),
+                  ),
                 ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -166,11 +216,61 @@ class PostForm extends StatelessWidget {
                   ),
                 ),
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        showReportDialog1(context);
+                      },
+                      child: const Text('Select Tags')),
+                ],
+              )
             ],
           ),
         ),
       ],
     );
+  }
+
+  final List<String> countList = [
+    "Ethenics",
+    "Western",
+    "Festive",
+    "Casuals",
+  ];
+
+  void showReportDialog1(BuildContext context) async {
+    await FilterListDialog.display<String>(context,
+        listData: countList,
+        selectedListData: tagsList,
+        searchFieldTextStyle: const TextStyle(color: Colors.black),
+        controlButtonTextStyle: const TextStyle(color: Colors.blue),
+        height: MediaQuery.of(context).size.height * 0.6,
+        controlContainerDecoration: const BoxDecoration(color: Colors.white),
+        headlineText: "Select Filters",
+        applyButtonTextStyle: const TextStyle(color: Colors.white),
+        selectedItemsText: 'Filters Selected',
+        searchFieldHintText: "Search Here", choiceChipLabel: (item) {
+      return item;
+    }, validateSelectedItem: (list, val) {
+      return list!.contains(val);
+    }, onItemSearch: (list, text) {
+      if (list!.any(
+          (element) => element.toLowerCase().contains(text.toLowerCase()))) {
+        return list
+            .where(
+                (element) => element.toLowerCase().contains(text.toLowerCase()))
+            .toList();
+      } else {
+        return [];
+      }
+    }, onApplyButtonClick: (list) {
+      if (list != null) {
+        _submitFunction(list);
+      }
+      Navigator.pop(context);
+    });
   }
 }
 
@@ -191,7 +291,7 @@ Future<String> uploadImage(var thumnailfile) async {
 }
 
 Future<void> postToFireStore(
-    {String? mediaUrl, String? url, String? thumbnail}) async {
+    {String? mediaUrl, String? url, String? thumbnail, List? tags}) async {
   var user = FirebaseAuth.instance.currentUser!.uid;
   var timestamp = DateTime.now().toString();
   var reference =
@@ -204,6 +304,7 @@ Future<void> postToFireStore(
     "id": timestamp,
     "url": mediaUrl,
     "price": "56",
+    "tags": tags,
     "timestamp": DateTime.now(),
     "p1name": "Hirdesh",
     "product1":

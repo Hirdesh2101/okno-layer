@@ -44,6 +44,22 @@ class MyVideosProvider extends BaseViewModel {
     currentscreen = index;
   }
 
+  void seekZero(bool approved) async {
+    if (approved) {
+      if (videoSource!.approvedData.isNotEmpty) {
+        await videoSource!.approvedData[currentscreen].controller
+            ?.seekTo(Duration.zero);
+        notifyListeners();
+      }
+    } else {
+      if (videoSource!.listData.isNotEmpty) {
+        await videoSource!.listData[currentscreen].controller
+            ?.seekTo(Duration.zero);
+        notifyListeners();
+      }
+    }
+  }
+
   Future<void> pauseDrawer(bool approved, bool nonapproved) async {
     if (approved || nonapproved) {
       if (approved) {

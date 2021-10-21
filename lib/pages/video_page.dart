@@ -279,7 +279,7 @@ class _VideoRecorderState extends State<VideoRecorder>
     var imageFile = await imagePicker.pickVideo(
       source: ImageSource.gallery,
     );
-    //await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 500));
     if (imageFile != null) {
       file = File(imageFile.path);
       Navigator.of(context)

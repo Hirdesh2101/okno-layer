@@ -34,8 +34,10 @@ class MySavedVideosAPI {
           .doc(element)
           .get()
           .then((snapshot) {
-        video = MySavedVideos.fromJson(snapshot.data()!);
-        videoList.add(video);
+        if (snapshot.data()!['deleted'] == false) {
+          video = MySavedVideos.fromJson(snapshot.data()!);
+          videoList.add(video);
+        }
       });
     }
     return videoList;

@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:oknoapp/pages/brand/brand_details.dart';
-import '../../services/service_locator.dart';
+//import '../../services/service_locator.dart';
 
 class BrandPage extends StatefulWidget {
   static const routeName = '/brandspage';
@@ -15,20 +15,18 @@ class BrandPage extends StatefulWidget {
 }
 
 class _BrandPageState extends State<BrandPage> {
-  final TextEditingController _textEditingController = TextEditingController();
   var _switchval = false;
+
+  // init() {
+  //   Future.delayed(Duration(seconds: 1), () {
+  //     setState(() {});
+  //   });
+  // }
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
-    setupBrand();
+    //init();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _textEditingController.dispose();
-    super.dispose();
   }
 
   @override

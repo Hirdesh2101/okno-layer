@@ -99,7 +99,7 @@ class _CreatorPageState extends State<CreatorPage> {
                               height: 5,
                             ),
                             Text(
-                                "Total Income ${data['Total Income'] ?? '0.0'}"),
+                                "Total Income ${data['Encashed'] + data['Balance'] ?? '0.0'}"),
                             const SizedBox(
                               height: 5,
                             ),
@@ -166,6 +166,7 @@ class _CreatorPageState extends State<CreatorPage> {
                                       //   color: Colors.white,
                                     ))),
                                 onPressed: () {
+                                  setupBrand();
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

@@ -7,6 +7,7 @@ import '../providers/savedvideoprovider.dart';
 import '../providers/myvideosprovider.dart';
 import '../models/my_saved.dart';
 import '../models/my_videos.dart';
+import './creatorandsavedtoolbar.dart';
 
 class CreatorAndSavedFeed extends StatefulWidget {
   final int startIndex;
@@ -104,7 +105,14 @@ class _CreatorAndSavedFeedState extends State<CreatorAndSavedFeed> {
                                       feedViewModel2
                                           .videoSource!.nonapprovedData[index],
                                       feedViewModel2.videoSource!
-                                          .nonapprovedData[index].id)
+                                          .nonapprovedData[index].id),
+                          CreatorandSavedActionToolBar(
+                              index,
+                              widget.isSavedVideo,
+                              widget.isApproved,
+                              widget.isNonApproved,
+                              context)
+                          //if(widget.isSavedVideo) ActionToolBar(index, false, false, context),
                           // ActionToolBar(index, false, false, context),
                         ]);
                       })

@@ -105,8 +105,11 @@ class VideosAPI {
   }
 
   Future<List<Video>> _getVideoList() async {
-    var data =
-        await _firebase.where('Approved', isEqualTo: true).limit(10).get();
+    var data = await _firebase
+        .where('Approved', isEqualTo: true)
+        .where('deleted', isEqualTo: false)
+        .limit(10)
+        .get();
     var videoList = <Video>[];
     QuerySnapshot<Map<String, dynamic>> videos;
 
@@ -138,6 +141,7 @@ class VideosAPI {
     var data = await _firebase
         .startAfterDocument(lastData)
         .where('Approved', isEqualTo: true)
+        .where('deleted', isEqualTo: false)
         //.where('id', whereNotIn: list)
         .limit(10)
         .get();

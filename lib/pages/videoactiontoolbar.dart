@@ -80,7 +80,7 @@ class ActionToolBar extends StatelessWidget {
             ProductDetails()
                 .sheet(context, index, likedPage, mypage, filterScreen);
             await firebaseServices.viewedProduct(likedPage
-                ? feedViewMode2.videoSource!.listVideos[index]
+                ? feedViewMode2.videoSource!.listData[index].id
                 : filterScreen
                     ? feedViewMode4.videoSource!.listVideos[index].id.trim()
                     : feedViewModel.videoSource!.listVideos[index].id.trim());
@@ -118,7 +118,7 @@ class ActionToolBar extends StatelessWidget {
             Future<bool> likeFunc(bool init) async {
               firebaseServices.add(
                   likedPage
-                      ? feedViewMode2.videoSource!.listVideos[index]
+                      ? feedViewMode2.videoSource!.listData[index].id
                       : filterScreen
                           ? feedViewMode4.videoSource!.listVideos[index].id
                               .trim()
@@ -244,53 +244,60 @@ class ActionToolBar extends StatelessWidget {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          leading: Icon(
-                            Ionicons.filter_outline,
-                            color: filterApplied
-                                ? Colors.green
-                                : Theme.of(context).iconTheme.color,
-                          ),
-                          title: const Text('Apply Filters'),
-                          onTap: () async {
-                            statusCheck(true);
-                            await FilterListDialog.display<String>(context,
-                                listData: countList,
-                                selectedListData: selectedCountList,
-                                height: 480,
-                                headlineText: "Select Filters",
-                                searchFieldHintText: "Search Here",
-                                choiceChipLabel: (item) {
-                              return item;
-                            }, validateSelectedItem: (list, val) {
-                              return list!.contains(val);
-                            }, onItemSearch: (list, text) {
-                              if (list!.any((element) => element
-                                  .toLowerCase()
-                                  .contains(text.toLowerCase()))) {
-                                return list
-                                    .where((element) => element
-                                        .toLowerCase()
-                                        .contains(text.toLowerCase()))
-                                    .toList();
-                              } else {
-                                return [];
-                              }
-                            }, onApplyButtonClick: (list) async {
-                              if (list != null) {
-                                await submitFunct(list);
-                              }
-                              Navigator.pop(context);
-                            }).whenComplete(() {
-                              statusCheck(false);
-                              Navigator.pop(context);
-                            });
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
                         child: Column(children: [
+                          ListTile(
+                            leading: Icon(
+                              Ionicons.filter_outline,
+                              color: filterApplied
+                                  ? Colors.green
+                                  : Theme.of(context).iconTheme.color,
+                            ),
+                            title: const Text('Apply Filters'),
+                            onTap: () async {
+                              statusCheck(true);
+                              await FilterListDialog.display<String>(context,
+                                  listData: countList,
+                                  selectedListData: selectedCountList,
+                                  searchFieldTextStyle:
+                                      const TextStyle(color: Colors.black),
+                                  controlButtonTextStyle:
+                                      const TextStyle(color: Colors.blue),
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.6,
+                                  controlContainerDecoration:
+                                      const BoxDecoration(color: Colors.white),
+                                  headlineText: "Select Filters",
+                                  searchFieldHintText: "Search Here",
+                                  applyButtonTextStyle:
+                                      const TextStyle(color: Colors.white),
+                                  selectedItemsText: 'Filters Selected',
+                                  choiceChipLabel: (item) {
+                                return item;
+                              }, validateSelectedItem: (list, val) {
+                                return list!.contains(val);
+                              }, onItemSearch: (list, text) {
+                                if (list!.any((element) => element
+                                    .toLowerCase()
+                                    .contains(text.toLowerCase()))) {
+                                  return list
+                                      .where((element) => element
+                                          .toLowerCase()
+                                          .contains(text.toLowerCase()))
+                                      .toList();
+                                } else {
+                                  return [];
+                                }
+                              }, onApplyButtonClick: (list) async {
+                                if (list != null) {
+                                  await submitFunct(list);
+                                }
+                                Navigator.pop(context);
+                              }).whenComplete(() {
+                                statusCheck(false);
+                                Navigator.pop(context);
+                              });
+                            },
+                          ),
                           ListTile(
                             leading: const Icon(Ionicons.bookmark_outline),
                             title: const Text('Save Video'),
@@ -342,10 +349,16 @@ class ActionToolBar extends StatelessWidget {
                       ),
                     ],
                   );
-                }).whenComplete(() => feedViewModel.playDrawer());
+                }).whenComplete(() {
+              filterApplied
+                  ? feedViewMode4.playDrawer()
+                  : feedViewModel.playDrawer();
+            });
           },
           icon: Icon(
-            Ionicons.ellipsis_vertical_outline,
+            filterApplied
+                ? Ionicons.checkbox_outline
+                : Ionicons.ellipsis_vertical_outline,
             color: filterApplied ? Colors.green : Colors.white,
             size: MediaQuery.of(context).size.width * 0.085,
           )),

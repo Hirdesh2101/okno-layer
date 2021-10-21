@@ -65,6 +65,14 @@ class MySavedVideosProvider extends BaseViewModel {
     }
   }
 
+  void seekZero() async {
+    if (videoSource!.listData.isNotEmpty) {
+      await videoSource!.listData[currentscreen].controller
+          ?.seekTo(Duration.zero);
+      notifyListeners();
+    }
+  }
+
   void playVideo(int index) async {
     if (videoSource!.listData.length > index) {
       videoSource!.listData[index].controller?.play();
