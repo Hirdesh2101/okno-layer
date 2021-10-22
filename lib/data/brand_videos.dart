@@ -6,19 +6,41 @@ class BrandVideosAPI {
   List<String> listBrand = <String>[];
   List<String> listVideos = <String>[];
   List<BrandVideos> listData = <BrandVideos>[];
+  int lastitemIndex = 0;
+  int flag = 0;
+  bool hasMore = true;
+  bool isRunning = false;
 
-  BrandVideosAPI() {
-    load();
-  }
-
-  void load() {
-    getBrand().then((listofstring) async {
-      listBrand = listofstring;
-      await getVideos().then((value) async {
-        listVideos = value;
-        listData = await getData();
-      });
-    });
+  Future<void> load() async {
+    if (flag == 0) {
+      if (!isRunning) {
+        isRunning = true;
+        if (listData.isEmpty) {
+          await getBrand().then((listofstring) async {
+            listBrand = listofstring;
+            await getVideos().then((value) async {
+              listVideos = value;
+              listData.addAll(await getData());
+            });
+          });
+          flag = 1;
+          isRunning = false;
+        }
+      }
+    } else {
+      if (!isRunning) {
+        isRunning = true;
+        listData.addAll(await getData());
+        isRunning = false;
+      }
+    }
+    // getBrand().then((listofstring) async {
+    //   listBrand = listofstring;
+    //   await getVideos().then((value) async {
+    //     listVideos = value;
+    //     listData = await getData();
+    //   });
+    // });
   }
 
   final user = FirebaseAuth.instance.currentUser!.uid;
@@ -47,16 +69,37 @@ class BrandVideosAPI {
   Future<List<BrandVideos>> getData() async {
     var videoList = <BrandVideos>[];
     BrandVideos video;
-    for (var element in listVideos) {
+    for (int i = lastitemIndex; i < lastitemIndex + 10; i++) {
+      if (i > listVideos.length - 1) {
+        hasMore = false;
+        break;
+      }
       await _firestore
           .collection("VideosData")
-          .doc(element)
+          .doc(listVideos[i])
           .get()
           .then((snapshot) {
-        video = BrandVideos.fromJson(snapshot.data()!);
-        videoList.add(video);
+        if (snapshot.data()!['deleted'] == false) {
+          video = BrandVideos.fromJson(snapshot.data()!);
+          videoList.add(video);
+        }
       });
     }
+    lastitemIndex += 10;
     return videoList;
+
+    // var videoList = <BrandVideos>[];
+    // BrandVideos video;
+    // for (var element in listVideos) {
+    //   await _firestore
+    //       .collection("VideosData")
+    //       .doc(element)
+    //       .get()
+    //       .then((snapshot) {
+    //     video = BrandVideos.fromJson(snapshot.data()!);
+    //     videoList.add(video);
+    //   });
+    // }
+    // return videoList;
   }
 }

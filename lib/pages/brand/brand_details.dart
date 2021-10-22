@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/brand/brand_detilstab.dart';
-import 'package:oknoapp/pages/brand/brand_videopage.dart';
-import 'package:oknoapp/providers/brand_provider.dart';
-import 'package:get_it/get_it.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../../services/cache_service.dart';
-import 'package:stacked/stacked.dart';
+import 'package:oknoapp/pages/brand/brand_videostab.dart';
 
 class BrandDetails extends StatefulWidget {
   final bool switchval;
@@ -38,7 +33,6 @@ class _BrandDetailsState extends State<BrandDetails>
 
   @override
   Widget build(BuildContext context) {
-    final feedViewModel = GetIt.instance<BrandVideoProvider>();
     return Column(
       children: [
         TabBar(
@@ -83,68 +77,7 @@ class _BrandDetailsState extends State<BrandDetails>
                 maintainState: true,
               ),
               Visibility(
-                child: feedViewModel.videoSource!.listVideos.isEmpty
-                    ? Center(
-                        child: Column(
-                          children: const [
-                            SizedBox(
-                              height: 50,
-                            ),
-                            Text('No Videos from your brand yet!!'),
-                          ],
-                        ),
-                      )
-                    : ViewModelBuilder.reactive(
-                        disposeViewModel: false,
-                        viewModelBuilder: () => feedViewModel,
-                        builder: (context, model, child) {
-                          return GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount:
-                                  feedViewModel.videoSource!.listVideos.length,
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 1.5,
-                                mainAxisSpacing: 1.5,
-                                childAspectRatio: 9 / 15,
-                              ),
-                              itemBuilder: (
-                                context,
-                                index,
-                              ) {
-                                return GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) {
-                                        return BrandScroll(index);
-                                      }));
-                                    },
-                                    child: Card(
-                                      elevation: 3,
-                                      child: SizedBox.expand(
-                                        child: FittedBox(
-                                          fit: BoxFit.fill,
-                                          child: CachedNetworkImage(
-                                            key: Key(feedViewModel.videoSource!
-                                                .listData[index].thumbnail),
-                                            placeholder: (context, url) =>
-                                                Container(
-                                                    // color: Colors.grey,
-                                                    ),
-                                            fit: BoxFit.fill,
-                                            cacheManager:
-                                                CustomCacheManager.instance2,
-                                            imageUrl: feedViewModel.videoSource!
-                                                .listData[index].thumbnail,
-                                          ),
-                                        ),
-                                      ),
-                                    ));
-                              });
-                        },
-                      ),
+                child: const BrandTab(),
                 maintainState: true,
                 visible: selectedIndex == 1,
               ),

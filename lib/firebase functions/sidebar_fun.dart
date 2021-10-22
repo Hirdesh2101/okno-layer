@@ -29,6 +29,24 @@ class SideBarFirebase {
     }
   }
 
+  Future<void> removeSaved(dynamic docu) async {
+    var obj2 = [docu];
+
+    await FirebaseFirestore.instance
+        .collection('UsersData')
+        .doc(user)
+        .update({'Saved': FieldValue.arrayRemove(obj2)});
+  }
+
+  Future<void> removeMyVideo(dynamic docu) async {
+    //var obj2 = [docu];
+
+    await FirebaseFirestore.instance
+        .collection('VideosData')
+        .doc(docu.trim())
+        .update({'deleted': true});
+  }
+
   Future<void> watchedVideo(dynamic docu) async {
     var obj = [docu];
     var obj2 = [user];

@@ -66,12 +66,12 @@ class CreatorandSavedActionToolBar extends StatelessWidget {
                 },
               ),
             ),
-      if (!isNonApproved)
-        Positioned(
-          right: 0,
-          bottom: 0,
-          child: sideButtons(),
-        )
+      // if (!isNonApproved)
+      //   Positioned(
+      //     right: 0,
+      //     bottom: 0,
+      //     child: sideButtons(),
+      //   )
     ]);
   }
 

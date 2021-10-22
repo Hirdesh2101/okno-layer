@@ -5,12 +5,29 @@ import '../models/like_videos.dart';
 class LikedVideosAPI {
   List<String> listVideos = <String>[];
   List<LikeVideo> listData = <LikeVideo>[];
+  int lastitemIndex = 0;
+  int flag = 0;
+  bool hasMore = true;
+  bool isRunning = false;
 
   Future<void> load() async {
-    await getLiked().then((listofstring) async {
-      listVideos = listofstring;
-      listData = await getData();
-    });
+    if (flag == 0) {
+      if (!isRunning) {
+        isRunning = true;
+        await getLiked().then((listofstring) async {
+          listVideos = listofstring;
+          listData.addAll(await getData());
+        });
+        flag = 1;
+        isRunning = false;
+      }
+    } else {
+      if (!isRunning) {
+        isRunning = true;
+        listData.addAll(await getData());
+        isRunning = false;
+      }
+    }
   }
 
   final user = FirebaseAuth.instance.currentUser!.uid;
@@ -24,10 +41,14 @@ class LikedVideosAPI {
   Future<List<LikeVideo>> getData() async {
     var videoList = <LikeVideo>[];
     LikeVideo video;
-    for (var element in listVideos) {
+    for (int i = lastitemIndex; i < lastitemIndex + 10; i++) {
+      if (i > listVideos.length - 1) {
+        hasMore = false;
+        break;
+      }
       await _firestore
           .collection("VideosData")
-          .doc(element)
+          .doc(listVideos[i])
           .get()
           .then((snapshot) {
         if (snapshot.data()!['deleted'] == false) {
@@ -36,6 +57,7 @@ class LikedVideosAPI {
         }
       });
     }
+    lastitemIndex += 10;
     return videoList;
   }
 }
