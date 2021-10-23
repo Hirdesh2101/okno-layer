@@ -61,7 +61,8 @@ class _BrandTabState extends State<BrandTab>
                   //shrinkWrap: true,
                   shrinkWrap: true,
                   physics: const BouncingScrollPhysics(),
-                  itemCount: feedViewModel2.videoSource!.hasMore
+                  itemCount: feedViewModel2.videoSource!.hasMore &&
+                          feedViewModel2.videoSource!.listData.length >= 10
                       ? videosData.length + 1
                       : videosData.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
