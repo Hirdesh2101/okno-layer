@@ -139,17 +139,28 @@ class _UploadPageState extends State<UploadPage> {
         ],
       ),
       body: (_controller != null && _controller!.value.isInitialized)
-          ? ListView(
-              children: <Widget>[
-                PostForm(
-                  controller: _controller,
-                  urlController: urlController,
-                  loading: uploading,
-                  tagsList: selectedCountList,
-                  submitTags: _submitTags,
-                ),
-                const Divider(),
-              ],
+          ? WillPopScope(
+              onWillPop: () async {
+                if (await finalFile!.exists()) {
+                  await finalFile!.delete();
+                }
+                if (await thumbnailFile!.exists()) {
+                  await thumbnailFile!.delete();
+                }
+                return true;
+              },
+              child: ListView(
+                children: <Widget>[
+                  PostForm(
+                    controller: _controller,
+                    urlController: urlController,
+                    loading: uploading,
+                    tagsList: selectedCountList,
+                    submitTags: _submitTags,
+                  ),
+                  const Divider(),
+                ],
+              ),
             )
           : const Center(
               child: CircularProgressIndicator(),

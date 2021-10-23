@@ -39,10 +39,12 @@ class _ApprovedVideoTabState extends State<ApprovedVideoTab>
 
   @override
   void initState() {
-    feedViewModel2.videoSource!.flagapproved = 0;
     feedViewModel2.videoSource!.hasMoreapproved = true;
-    feedViewModel2.videoSource!.lastitemIndexapproved = 0;
-    _loadMoreSavedVertical();
+    if (feedViewModel2.videoSource!.approvedData.isEmpty) {
+      _loadMoreSavedVertical();
+    } else {
+      videosData = feedViewModel2.videoSource!.approvedData;
+    }
     super.initState();
   }
 
@@ -51,7 +53,7 @@ class _ApprovedVideoTabState extends State<ApprovedVideoTab>
     super.build(context);
     return LazyLoadScrollView(
       onEndOfPage: () => _loadMoreSavedVertical(),
-      child: isLoading
+      child: isLoading && feedViewModel2.videoSource!.flagapproved == 0
           ? const Center(
               child: CircularProgressIndicator(),
             )
@@ -59,77 +61,100 @@ class _ApprovedVideoTabState extends State<ApprovedVideoTab>
               ? const Center(
                   child: Text('No Approved Videos'),
                 )
-              : GridView.builder(
-                  //key: Key(feedViewModel.videoSource!.listVideos.length.toString()),
-                  //shrinkWrap: true,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: videosData.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 1,
-                    mainAxisSpacing: 1,
-                    childAspectRatio: 9 / 15,
-                  ),
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                        key: UniqueKey(),
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return CreatorandSavedScroll(
-                                index, false, true, false);
-                          }));
-                        },
-                        child: Card(
-                          elevation: 3,
-                          child: Stack(
-                            children: [
-                              SizedBox.expand(
-                                child: FittedBox(
-                                  fit: BoxFit.fill,
-                                  child: CachedNetworkImage(
-                                    placeholder: (context, url) => Container(
-                                        // color: Colors.grey,
+              : CustomScrollView(
+                  slivers: <Widget>[
+                    SliverPadding(
+                      padding: const EdgeInsets.all(2),
+                      sliver: SliverGrid(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 1,
+                          mainAxisSpacing: 1,
+                          childAspectRatio: 9 / 15,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (index == videosData.length &&
+                                feedViewModel2.videoSource!.hasMoreapproved) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            return GestureDetector(
+                                key: UniqueKey(),
+                                onTap: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                    return CreatorandSavedScroll(
+                                        index, false, true, false);
+                                  }));
+                                },
+                                child: Card(
+                                  elevation: 3,
+                                  child: Stack(
+                                    children: [
+                                      SizedBox.expand(
+                                        child: FittedBox(
+                                          fit: BoxFit.fill,
+                                          child: CachedNetworkImage(
+                                            placeholder: (context, url) =>
+                                                Container(
+                                                    // color: Colors.grey,
+                                                    ),
+                                            fit: BoxFit.fitHeight,
+                                            cacheManager:
+                                                CustomCacheManager.instance2,
+                                            imageUrl: feedViewModel2
+                                                .videoSource!
+                                                .approvedData[index]
+                                                .thumbnail,
+                                          ),
                                         ),
-                                    fit: BoxFit.fitHeight,
-                                    cacheManager: CustomCacheManager.instance2,
-                                    imageUrl: feedViewModel2.videoSource!
-                                        .approvedData[index].thumbnail,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                right: 0,
-                                child: PopupMenuButton(
-                                  itemBuilder: (BuildContext context) {
-                                    return <PopupMenuEntry>[
-                                      const PopupMenuItem(
-                                        child: Text('Remove'),
-                                        value: 1,
                                       ),
-                                    ];
-                                  },
-                                  onSelected: (value) async {
-                                    if (value == 1) {
-                                      await firebaseServices
-                                          .removeMyVideo(feedViewModel2
-                                              .videoSource!
-                                              .approvedData[index]
-                                              .id)
-                                          .then((value) {
-                                        setState(() {
-                                          videosData.removeAt(index);
-                                        });
-                                      });
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ));
-                  }),
+                                      Positioned(
+                                        right: 0,
+                                        child: PopupMenuButton(
+                                          itemBuilder: (BuildContext context) {
+                                            return <PopupMenuEntry>[
+                                              const PopupMenuItem(
+                                                child: Text('Remove'),
+                                                value: 1,
+                                              ),
+                                            ];
+                                          },
+                                          onSelected: (value) async {
+                                            if (value == 1) {
+                                              await firebaseServices
+                                                  .removeMyVideo(feedViewModel2
+                                                      .videoSource!
+                                                      .approvedData[index]
+                                                      .id)
+                                                  .then((value) {
+                                                setState(() {
+                                                  videosData.removeAt(index);
+                                                });
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ));
+                          },
+                          childCount:
+                              feedViewModel2.videoSource!.hasMoreapproved &&
+                                      feedViewModel2.videoSource!.approvedData
+                                              .length >=
+                                          10
+                                  ? videosData.length + 1
+                                  : videosData.length,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
     );
   }
 

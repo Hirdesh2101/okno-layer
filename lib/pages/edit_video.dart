@@ -58,6 +58,7 @@ class _VideoEditorState extends State<VideoEditor> {
   bool _exported = false;
   var _page = 0;
   var showDismiss = false;
+  int flag = 0;
   var coloring = false;
   var addingAudio = false;
   final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
@@ -79,6 +80,8 @@ class _VideoEditorState extends State<VideoEditor> {
   void dispose() {
     _exportingProgress.dispose();
     _isExporting.dispose();
+    _isExporting2.dispose();
+    _exportingProgress2.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -167,9 +170,11 @@ class _VideoEditorState extends State<VideoEditor> {
     final Directory? appDirectory = await getExternalStorageDirectory();
     final String videoDirectory = '${appDirectory!.path}/audios';
     await Directory(videoDirectory).create(recursive: true);
-    final String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
+    const String currentTime = 'myAudio';
     final String filePath = '$videoDirectory/$currentTime.mp3';
-
+    // if (await File(filePath).exists()) {
+    //   await File(filePath).delete();
+    // }
     try {
       _isExporting2.value = true;
 
@@ -218,13 +223,18 @@ class _VideoEditorState extends State<VideoEditor> {
           setState(() {
             addingAudio = true;
           });
-          await _exportAudio(filePath).then((value) => null);
+          await _exportAudio(filePath).then((value) async {
+            if (await File(filePath).exists()) {
+              await File(filePath).delete();
+            }
+          });
         }
       }).then((value) {
         setState(() {
           showDismiss = true;
         });
       });
+      _exportingProgress2.value = 0.0;
       _isExporting2.value = false;
     } catch (e) {
       // print(e);
@@ -235,17 +245,23 @@ class _VideoEditorState extends State<VideoEditor> {
     final Directory? appDirectory = await getExternalStorageDirectory();
     final String videoDirectory = '${appDirectory!.path}/Videos';
     await Directory(videoDirectory).create(recursive: true);
-    final String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
+    const String currentTime = 'temp_video';
     final String filePath = '$videoDirectory/$currentTime.mp4';
+    if (await File(filePath).exists()) {
+      await File(filePath).delete();
+    }
     await _flutterFFmpeg
         .execute(
             '-i ${widget.file.path} -i $audio -c:v copy -map 0:v:0 -map 1:a:0 -shortest $filePath')
         .whenComplete(() async {
+      _controller.dispose();
       _controller = VideoEditorController.file(
         File(filePath),
       );
       await _controller.initialize().then((_) {
-        setState(() {});
+        setState(() {
+          flag = 1;
+        });
       });
     });
   }
@@ -284,6 +300,9 @@ class _VideoEditorState extends State<VideoEditor> {
     if (_page != 0) {
       await _flutterFFmpeg.execute(
           '-i ${file.path} -f lavfi -i "color=${_getColorBackground(_page)}:s=$size1" -filter_complex "blend=shortest=1:all_mode=overlay:all_opacity=0.2" -preset ultrafast -y $filePath');
+      if (await file.exists()) {
+        await file.delete();
+      }
     }
     _isExporting.value = false;
 
@@ -320,196 +339,209 @@ class _VideoEditorState extends State<VideoEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      //backgroundColor: Colors.black,
-      body: _controller.initialized
-          ? SafeArea(
-              child: Stack(children: [
-                Stack(children: [
-                  DefaultTabController(
-                      length: 2,
-                      child: Column(mainAxisSize: MainAxisSize.max, children: [
-                        Expanded(
-                            child: TabBarView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          children: [
-                            Stack(alignment: Alignment.topCenter, children: [
-                              // CropGridViewer(
-                              //   controller: _controller,
-                              //   showGrid: false,
-                              // ),
-                              AnimatedContainer(
-                                  duration: const Duration(seconds: 1),
-                                  curve: Curves.fastOutSlowIn,
-                                  child: SizedBox.expand(
-                                      child: FittedBox(
-                                          fit: BoxFit.cover,
-                                          child: SizedBox(
-                                            width: _controller
-                                                .video.value.size.width,
-                                            height: _controller
-                                                .video.value.size.height,
-                                            child:
-                                                VideoPlayer(_controller.video),
-                                          )))),
-                              // AnimatedBuilder(
-                              //   animation: _controller.video,
-                              //   builder: (_, __) => OpacityTransition(
-                              //     visible: !_controller.isPlaying,
-                              //     child: GestureDetector(
-                              //       onTap: _controller.video.play,
-                              //     ),
-                              //   ),
-                              // ),
-                              // if (!_controller.video.value.isPlaying)
-                              OpacityTransition(
-                                visible: !_controller.video.value.isPlaying,
-                                child: Center(
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.07,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.07,
-                                    child: const Icon(Icons.play_arrow),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      color: Colors.grey.withOpacity(0.5),
+    return WillPopScope(
+      onWillPop: () async {
+        if (flag == 1) {
+          await _controller.file.delete();
+        }
+        return true;
+      },
+      child: Scaffold(
+        //backgroundColor: Colors.black,
+        body: _controller.initialized
+            ? SafeArea(
+                child: Stack(children: [
+                  Stack(children: [
+                    DefaultTabController(
+                        length: 2,
+                        child:
+                            Column(mainAxisSize: MainAxisSize.max, children: [
+                          Expanded(
+                              child: TabBarView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                              Stack(alignment: Alignment.topCenter, children: [
+                                // CropGridViewer(
+                                //   controller: _controller,
+                                //   showGrid: false,
+                                // ),
+                                AnimatedContainer(
+                                    duration: const Duration(seconds: 1),
+                                    curve: Curves.fastOutSlowIn,
+                                    child: SizedBox.expand(
+                                        child: FittedBox(
+                                            fit: BoxFit.cover,
+                                            child: SizedBox(
+                                              width: _controller
+                                                  .video.value.size.width,
+                                              height: _controller
+                                                  .video.value.size.height,
+                                              child: VideoPlayer(
+                                                  _controller.video),
+                                            )))),
+                                // AnimatedBuilder(
+                                //   animation: _controller.video,
+                                //   builder: (_, __) => OpacityTransition(
+                                //     visible: !_controller.isPlaying,
+                                //     child: GestureDetector(
+                                //       onTap: _controller.video.play,
+                                //     ),
+                                //   ),
+                                // ),
+                                // if (!_controller.video.value.isPlaying)
+                                OpacityTransition(
+                                  visible: !_controller.video.value.isPlaying,
+                                  child: Center(
+                                    child: Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.07,
+                                      width:
+                                          MediaQuery.of(context).size.height *
+                                              0.07,
+                                      child: const Icon(Icons.play_arrow),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: Colors.grey.withOpacity(0.5),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              PageView.builder(
-                                itemCount: _pages.length,
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      if (_controller.video.value.isPlaying) {
-                                        _controller.video.pause();
-                                        setState(() {});
-                                      } else {
-                                        _controller.video.play();
-                                        setState(() {});
-                                      }
-                                    },
-                                    child: SizedBox.expand(
-                                      child: FittedBox(
-                                        fit: BoxFit.cover,
-                                        child: SizedBox(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          height: _controller
-                                              .video.value.size.height,
-                                          child: Container(
-                                            child: Center(
-                                              child: OpacityTransition(
-                                                visible: showFilterName,
-                                                child: Text(
-                                                  _getColorBackgroundName(
-                                                      index),
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.bold,
+                                PageView.builder(
+                                  itemCount: _pages.length,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        if (_controller.video.value.isPlaying) {
+                                          _controller.video.pause();
+                                          setState(() {});
+                                        } else {
+                                          _controller.video.play();
+                                          setState(() {});
+                                        }
+                                      },
+                                      child: SizedBox.expand(
+                                        child: FittedBox(
+                                          fit: BoxFit.cover,
+                                          child: SizedBox(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: _controller
+                                                .video.value.size.height,
+                                            child: Container(
+                                              child: Center(
+                                                child: OpacityTransition(
+                                                  visible: showFilterName,
+                                                  child: Text(
+                                                    _getColorBackgroundName(
+                                                        index),
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 25,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
+                                              decoration: BoxDecoration(
+                                                  color: _pages[index]),
                                             ),
-                                            decoration: BoxDecoration(
-                                                color: _pages[index]),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
-                                scrollDirection: Axis.horizontal,
-                                onPageChanged: (value) {
-                                  _page = value;
-                                  _filterNameFun();
-                                },
-                              ),
-                            ]),
-                            CoverViewer(controller: _controller)
-                          ],
-                        )),
-                        AnimatedContainer(
-                            height: _visible.toDouble(),
-                            duration: const Duration(seconds: 1),
-                            curve: Curves.fastOutSlowIn,
-                            child: Column(children: [
-                              TabBar(
-                                indicatorColor: Colors.white,
-                                tabs: [
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Padding(
-                                            padding: Margin.all(5),
-                                            child: Icon(Icons.content_cut)),
-                                        Text('Trim')
-                                      ]),
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Padding(
-                                            padding: Margin.all(5),
-                                            child: Icon(Icons.video_label)),
-                                        Text('Cover')
-                                      ]),
-                                ],
-                              ),
-                              Expanded(
-                                child: TabBarView(
-                                  children: [
-                                    Column(
+                                    );
+                                  },
+                                  scrollDirection: Axis.horizontal,
+                                  onPageChanged: (value) {
+                                    _page = value;
+                                    _filterNameFun();
+                                  },
+                                ),
+                              ]),
+                              CoverViewer(controller: _controller)
+                            ],
+                          )),
+                          AnimatedContainer(
+                              height: _visible.toDouble(),
+                              duration: const Duration(seconds: 1),
+                              curve: Curves.fastOutSlowIn,
+                              child: Column(children: [
+                                TabBar(
+                                  indicatorColor: Colors.white,
+                                  tabs: [
+                                    Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
-                                        children: _trimSlider()),
-                                    Column(
+                                        children: const [
+                                          Padding(
+                                              padding: Margin.all(5),
+                                              child: Icon(Icons.content_cut)),
+                                          Text('Trim')
+                                        ]),
+                                    Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
-                                        children: [_coverSelection()]),
+                                        children: const [
+                                          Padding(
+                                              padding: Margin.all(5),
+                                              child: Icon(Icons.video_label)),
+                                          Text('Cover')
+                                        ]),
                                   ],
                                 ),
-                              )
-                            ])),
-                        _customSnackBar(),
-                        ValueListenableBuilder(
-                          valueListenable: _isExporting,
-                          builder: (_, bool export, __) => OpacityTransition(
-                            visible: export,
-                            child: AlertDialog(
-                              // backgroundColor: Colors.white,
-                              title: ValueListenableBuilder(
-                                  valueListenable: _exportingProgress,
-                                  builder: (_, double value, __) {
-                                    return !coloring
-                                        ? Text(
-                                            value * 100 < 100
-                                                ? "Exporting video ${(value * 100).ceil()}%"
-                                                : "Finalizing Colors....",
-                                            // color: Colors.black,
-                                            // bold: true,
-                                          )
-                                        : const Text('Finalizing Colors...'
-                                            // color: Colors.black,
-                                            // bold: true,
-                                            );
-                                  }),
+                                Expanded(
+                                  child: TabBarView(
+                                    children: [
+                                      Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: _trimSlider()),
+                                      Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [_coverSelection()]),
+                                    ],
+                                  ),
+                                )
+                              ])),
+                          _customSnackBar(),
+                          ValueListenableBuilder(
+                            valueListenable: _isExporting,
+                            builder: (_, bool export, __) => OpacityTransition(
+                              visible: export,
+                              child: AlertDialog(
+                                // backgroundColor: Colors.white,
+                                title: ValueListenableBuilder(
+                                    valueListenable: _exportingProgress,
+                                    builder: (_, double value, __) {
+                                      return !coloring
+                                          ? Text(
+                                              value * 100 < 100
+                                                  ? "Exporting video ${(value * 100).ceil()}%"
+                                                  : "Finalizing Colors....",
+                                              // color: Colors.black,
+                                              // bold: true,
+                                            )
+                                          : const Text('Finalizing Colors...'
+                                              // color: Colors.black,
+                                              // bold: true,
+                                              );
+                                    }),
+                              ),
                             ),
-                          ),
-                        )
-                      ])),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: _topNavBar(),
-                  ),
-                ])
-              ]),
-            )
-          : const Center(child: CircularProgressIndicator()),
+                          )
+                        ])),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: _topNavBar(),
+                    ),
+                  ])
+                ]),
+              )
+            : const Center(child: CircularProgressIndicator()),
+      ),
     );
   }
 

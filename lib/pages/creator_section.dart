@@ -4,13 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:oknoapp/pages/brand/brands_page.dart';
 import 'package:oknoapp/pages/encashed_page.dart';
+import 'package:oknoapp/pages/tab_approvedvideo.dart';
+import 'package:oknoapp/pages/tabnonapproved.dart';
 import './webview.dart';
 import 'video_page.dart';
-import '../services/service_locator.dart';
-import 'package:oknoapp/pages/tab_viewprofile.dart';
-import 'package:get_it/get_it.dart';
-import '../providers/myvideosprovider.dart';
 import 'package:ionicons/ionicons.dart';
+import '../services/service_locator.dart';
+import 'package:tuple/tuple.dart';
 
 class CreatorPage extends StatefulWidget {
   static const routeName = '/creator_page';
@@ -20,48 +20,124 @@ class CreatorPage extends StatefulWidget {
   _CreatorPageState createState() => _CreatorPageState();
 }
 
-class _CreatorPageState extends State<CreatorPage> {
+class _CreatorPageState extends State<CreatorPage>
+    with SingleTickerProviderStateMixin {
+  final List<Tuple2> _pages = [
+    const Tuple2(ApprovedVideoTab(), Icon(Ionicons.apps_outline)),
+    const Tuple2(NonApprovedVideoTab(), Icon(Ionicons.hardware_chip_outline)),
+  ];
+  TabController? _tabController;
+
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
-    setupMyVideos();
+    _tabController = TabController(length: _pages.length, vsync: this);
+    _tabController!.addListener(() => setState(() {}));
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _tabController!.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: NestedScrollView(
+          // controller: _scrollController,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              const PortfolioSliverAppBar(),
+              SliverPersistentHeader(
+                  delegate: SliverPersistentHeaderDelegateImpl(
+                      tabBar: TabBar(
+                labelColor: Theme.of(context).iconTheme.color,
+                indicatorColor: Theme.of(context).iconTheme.color,
+                controller: _tabController,
+                tabs: _pages
+                    .map<Tab>((Tuple2 page) => Tab(
+                          icon: page.item2,
+                        ))
+                    .toList(),
+              )))
+            ];
+          },
+          body: TabBarView(
+            controller: _tabController,
+            children: _pages.map<Widget>((Tuple2 page) => page.item1).toList(),
+          )),
+    );
+  }
+}
+
+class SliverPersistentHeaderDelegateImpl
+    extends SliverPersistentHeaderDelegate {
+  final TabBar? tabBar;
+  final Color color;
+
+  const SliverPersistentHeaderDelegateImpl({
+    Color color = Colors.transparent,
+    @required this.tabBar,
+    // ignore: prefer_initializing_formals
+  }) : color = color;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: color,
+      child: tabBar,
+    );
+  }
+
+  @override
+  double get maxExtent => tabBar!.preferredSize.height;
+
+  @override
+  double get minExtent => tabBar!.preferredSize.height;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
+    return false;
+  }
+}
+
+class PortfolioSliverAppBar extends StatefulWidget {
+  const PortfolioSliverAppBar({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<PortfolioSliverAppBar> createState() => _PortfolioSliverAppBarState();
+}
+
+class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!.uid;
     final _firebase =
         FirebaseFirestore.instance.collection("UsersData").doc(user);
-    final feedViewModel2 = GetIt.instance<MyVideosProvider>();
-    return Scaffold(
-      appBar: AppBar(),
-      body: WillPopScope(
-        onWillPop: () async {
-          feedViewModel2.videoSource!.listVideos.clear();
-          feedViewModel2.videoSource!.listData.clear();
-          feedViewModel2.videoSource!.approvedData.clear();
-          feedViewModel2.videoSource!.nonapprovedData.clear();
-          feedViewModel2.videoSource!.isRunning = false;
-          feedViewModel2.videoSource!.isRunningapproved = false;
-          feedViewModel2.videoSource!.isRunningnonapproved = false;
-          // if (_key.currentState!.canPop()) {
-          //   _key.currentState!.pop();
-          //   return false;
-          // }
-          return true;
-        },
-        child: FutureBuilder(
+    return SliverAppBar(
+      iconTheme: Theme.of(context).iconTheme,
+      expandedHeight: 250,
+      pinned: true,
+      floating: true,
+      flexibleSpace: FlexibleSpaceBar(
+        background: FutureBuilder(
             future: _firebase.get(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator());
               }
               dynamic data = snapshot.data;
               return ListView(
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
                 children: [
+                  const SizedBox(
+                    height: 25,
+                  ),
                   Column(
                     children: [
                       const SizedBox(
@@ -169,32 +245,34 @@ class _CreatorPageState extends State<CreatorPage> {
                                     );
                                   },
                                 ),
-                                IconButton(
-                                  icon: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.1,
-                                      height:
-                                          MediaQuery.of(context).size.width *
-                                              0.1,
-                                      decoration: const BoxDecoration(
-                                          //  border: Border.all(color: Colors.white12)
-                                          ),
-                                      child: const Center(
-                                          child: Icon(
-                                        Ionicons.storefront,
-                                        size: 20,
-                                        //   color: Colors.white,
-                                      ))),
-                                  onPressed: () {
-                                    setupBrand();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const BrandPage()),
-                                    );
-                                  },
-                                )
+                                if (data['BrandEnabled'] == true)
+                                  IconButton(
+                                    icon: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.1,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.1,
+                                        decoration: const BoxDecoration(
+                                            //  border: Border.all(color: Colors.white12)
+                                            ),
+                                        child: const Center(
+                                            child: Icon(
+                                          Ionicons.storefront,
+                                          size: 20,
+                                          //   color: Colors.white,
+                                        ))),
+                                    onPressed: () {
+                                      setupBrand();
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const BrandPage()),
+                                      );
+                                    },
+                                  )
                               ],
                             ),
                         ],
@@ -232,8 +310,6 @@ class _CreatorPageState extends State<CreatorPage> {
                         ),
                     ],
                   ),
-                  if (data['Creator'] == true)
-                    const TabBarControllerWidget(true),
                 ],
               );
             }),

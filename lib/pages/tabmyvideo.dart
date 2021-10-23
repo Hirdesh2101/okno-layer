@@ -39,10 +39,12 @@ class _MyVideoTabState extends State<MyVideoTab>
 
   @override
   void initState() {
-    feedViewModel2.videoSource!.flag = 0;
     feedViewModel2.videoSource!.hasMore = true;
-    feedViewModel2.videoSource!.lastitemIndex = 0;
-    _loadMoreSavedVertical();
+    if (feedViewModel2.videoSource!.listData.isEmpty) {
+      _loadMoreSavedVertical();
+    } else {
+      videosData = feedViewModel2.videoSource!.listData;
+    }
     super.initState();
   }
 
@@ -51,7 +53,7 @@ class _MyVideoTabState extends State<MyVideoTab>
     super.build(context);
     return LazyLoadScrollView(
       onEndOfPage: () => _loadMoreSavedVertical(),
-      child: isLoading
+      child: isLoading && feedViewModel2.videoSource!.flag == 0
           ? const Center(
               child: CircularProgressIndicator(),
             )
@@ -59,49 +61,70 @@ class _MyVideoTabState extends State<MyVideoTab>
               ? const Center(
                   child: Text('No Videos Created'),
                 )
-              : GridView.builder(
-                  //key: Key(feedViewModel.videoSource!.listVideos.length.toString()),
-                  //shrinkWrap: true,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: videosData.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 1,
-                    mainAxisSpacing: 1,
-                    childAspectRatio: 9 / 15,
-                  ),
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                        key: UniqueKey(),
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return LikeScroll(index, true);
-                          }));
-                        },
-                        child: Card(
-                          elevation: 3,
-                          child: Stack(
-                            children: [
-                              SizedBox.expand(
-                                child: FittedBox(
-                                  fit: BoxFit.fill,
-                                  child: CachedNetworkImage(
-                                    placeholder: (context, url) => Container(
-                                        // color: Colors.grey,
+              : CustomScrollView(
+                  slivers: <Widget>[
+                    SliverPadding(
+                      padding: const EdgeInsets.all(2),
+                      sliver: SliverGrid(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 1,
+                          mainAxisSpacing: 1,
+                          childAspectRatio: 9 / 15,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            if (index == videosData.length &&
+                                feedViewModel2.videoSource!.hasMore) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            return GestureDetector(
+                                key: UniqueKey(),
+                                onTap: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                    return LikeScroll(index, true);
+                                  }));
+                                },
+                                child: Card(
+                                  elevation: 3,
+                                  child: Stack(
+                                    children: [
+                                      SizedBox.expand(
+                                        child: FittedBox(
+                                          fit: BoxFit.fill,
+                                          child: CachedNetworkImage(
+                                            placeholder: (context, url) =>
+                                                Container(
+                                                    // color: Colors.grey,
+                                                    ),
+                                            fit: BoxFit.fitHeight,
+                                            cacheManager:
+                                                CustomCacheManager.instance2,
+                                            imageUrl: feedViewModel2
+                                                .videoSource!
+                                                .listData[index]
+                                                .thumbnail,
+                                          ),
                                         ),
-                                    fit: BoxFit.fitHeight,
-                                    cacheManager: CustomCacheManager.instance2,
-                                    imageUrl: feedViewModel2
-                                        .videoSource!.listData[index].thumbnail,
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ));
-                  }),
+                                ));
+                          },
+                          childCount: feedViewModel2.videoSource!.hasMore &&
+                                  feedViewModel2.videoSource!.listData.length >=
+                                      10
+                              ? videosData.length + 1
+                              : videosData.length,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
     );
   }
 

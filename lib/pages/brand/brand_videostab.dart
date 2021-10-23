@@ -48,7 +48,7 @@ class _BrandTabState extends State<BrandTab>
     super.build(context);
     return LazyLoadScrollView(
       onEndOfPage: () => _loadMoreSavedVertical(),
-      child: isLoading
+      child: isLoading && feedViewModel2.videoSource!.flag == 0
           ? const Center(
               child: CircularProgressIndicator(),
             )
@@ -60,8 +60,10 @@ class _BrandTabState extends State<BrandTab>
                   //key: Key(feedViewModel.videoSource!.listVideos.length.toString()),
                   //shrinkWrap: true,
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: videosData.length,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: feedViewModel2.videoSource!.hasMore
+                      ? videosData.length + 1
+                      : videosData.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 1,
@@ -69,6 +71,12 @@ class _BrandTabState extends State<BrandTab>
                     childAspectRatio: 9 / 15,
                   ),
                   itemBuilder: (context, index) {
+                    if (index == videosData.length &&
+                        feedViewModel2.videoSource!.hasMore) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
                     return GestureDetector(
                         key: UniqueKey(),
                         onTap: () {

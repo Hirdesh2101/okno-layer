@@ -55,7 +55,7 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
       ),
       body: LazyLoadScrollView(
         onEndOfPage: () => _loadMoreVertical(),
-        child: isLoading
+        child: isLoading && feedViewModel.videoSource!.flag == 0
             ? const Center(child: CircularProgressIndicator())
             : videosData.isEmpty
                 ? const Center(
@@ -66,7 +66,9 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                     //shrinkWrap: true,
                     shrinkWrap: true,
                     //physics: const NeverScrollableScrollPhysics(),
-                    itemCount: videosData.length,
+                    itemCount: feedViewModel.videoSource!.hasMore
+                        ? videosData.length + 1
+                        : videosData.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
@@ -75,6 +77,12 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                       childAspectRatio: 9 / 15,
                     ),
                     itemBuilder: (context, index) {
+                      if (index == videosData.length &&
+                          feedViewModel.videoSource!.hasMore) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
                       return GestureDetector(
                           key: UniqueKey(),
                           onTap: () {

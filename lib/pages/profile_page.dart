@@ -4,12 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:oknoapp/pages/change_theme.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
-import 'package:oknoapp/pages/tab_viewprofile.dart';
+import 'package:oknoapp/pages/tab_saved.dart';
+import 'package:oknoapp/pages/tabmyvideo.dart';
 import 'package:oknoapp/pages/webview.dart';
-import '../services/service_locator.dart';
+import 'package:ionicons/ionicons.dart';
 import 'video_page.dart';
-import 'package:get_it/get_it.dart';
-import '../providers/savedvideoprovider.dart';
+import 'package:tuple/tuple.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = '/profile_page';
@@ -21,66 +21,178 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
-  TabController? tabController;
-  int selectedIndex = 0;
+  TabController? _tabController;
+  final List<Tuple2> _pages = [
+    const Tuple2(
+        MyVideoTab(),
+        Icon(
+          Ionicons.grid_outline,
+        )),
+    const Tuple2(
+        SavedTab(),
+        Icon(
+          Ionicons.bookmark_outline,
+        )),
+  ];
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
-    setupMyVideos();
-    tabController = TabController(
-      initialIndex: selectedIndex,
-      length: 2,
-      vsync: this,
-    );
+    _tabController = TabController(length: _pages.length, vsync: this);
+    _tabController!.addListener(() => setState(() {}));
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _tabController!.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // final user = FirebaseAuth.instance.currentUser!.uid;
+    // final _firebase =
+    //     FirebaseFirestore.instance.collection("UsersData").doc(user);
+    // final feedViewModel2 = GetIt.instance<MySavedVideosProvider>();
+    return
+        // appBar: AppBar(
+        //   actions: [
+        //     PopupMenuButton(itemBuilder: (BuildContext context) {
+        //       return <PopupMenuEntry>[
+        //         const PopupMenuItem(
+        //           child: Text('Settings'),
+        //           value: 1,
+        //         ),
+        //       ];
+        //     }, onSelected: (value) async {
+        //       if (value == 1) {
+        //         Navigator.of(context).push(
+        //             MaterialPageRoute(builder: (ctx) => const ThemeScreen()));
+        //       }
+        //     })
+        //   ],
+        // ),
+        Scaffold(
+      body: NestedScrollView(
+          // controller: _scrollController,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              const PortfolioSliverAppBar(),
+              SliverPersistentHeader(
+                  delegate: SliverPersistentHeaderDelegateImpl(
+                      tabBar: TabBar(
+                labelColor: Theme.of(context).iconTheme.color,
+                indicatorColor: Theme.of(context).iconTheme.color,
+                controller: _tabController,
+                tabs: _pages
+                    .map<Tab>((Tuple2 page) => Tab(
+                          icon: page.item2,
+                        ))
+                    .toList(),
+              )))
+            ];
+          },
+          body: TabBarView(
+            controller: _tabController,
+            children: _pages.map<Widget>((Tuple2 page) => page.item1).toList(),
+          )),
+    );
+  }
+}
+
+// WillPopScope(
+//   onWillPop: () async {
+//     feedViewModel2.videoSource!.listVideos.clear();
+//     feedViewModel2.videoSource!.listData.clear();
+//     feedViewModel2.videoSource!.isRunning = false;
+//     // if (_key.currentState!.canPop()) {
+//     //   _key.currentState!.pop();
+//     //   return false;
+//     // }
+//     return true;
+//   },
+
+class SliverPersistentHeaderDelegateImpl
+    extends SliverPersistentHeaderDelegate {
+  final TabBar? tabBar;
+  final Color color;
+
+  const SliverPersistentHeaderDelegateImpl({
+    Color color = Colors.transparent,
+    @required this.tabBar,
+    // ignore: prefer_initializing_formals
+  }) : color = color;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: color,
+      child: tabBar,
+    );
+  }
+
+  @override
+  double get maxExtent => tabBar!.preferredSize.height;
+
+  @override
+  double get minExtent => tabBar!.preferredSize.height;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
+    return false;
+  }
+}
+
+class PortfolioSliverAppBar extends StatefulWidget {
+  const PortfolioSliverAppBar({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<PortfolioSliverAppBar> createState() => _PortfolioSliverAppBarState();
+}
+
+class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!.uid;
     final _firebase =
         FirebaseFirestore.instance.collection("UsersData").doc(user);
-    final feedViewModel2 = GetIt.instance<MySavedVideosProvider>();
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          PopupMenuButton(itemBuilder: (BuildContext context) {
-            return <PopupMenuEntry>[
-              const PopupMenuItem(
-                child: Text('Settings'),
-                value: 1,
-              ),
-            ];
-          }, onSelected: (value) async {
-            if (value == 1) {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const ThemeScreen()));
-            }
-          })
-        ],
-      ),
-      body: WillPopScope(
-        onWillPop: () async {
-          feedViewModel2.videoSource!.listVideos.clear();
-          feedViewModel2.videoSource!.listData.clear();
-          feedViewModel2.videoSource!.isRunning = false;
-          // if (_key.currentState!.canPop()) {
-          //   _key.currentState!.pop();
-          //   return false;
-          // }
-          return true;
-        },
-        child: FutureBuilder(
+    return SliverAppBar(
+      iconTheme: Theme.of(context).iconTheme,
+      actions: [
+        PopupMenuButton(itemBuilder: (BuildContext context) {
+          return <PopupMenuEntry>[
+            const PopupMenuItem(
+              child: Text('Settings'),
+              value: 1,
+            ),
+          ];
+        }, onSelected: (value) async {
+          if (value == 1) {
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (ctx) => const ThemeScreen()));
+          }
+        })
+      ],
+      expandedHeight: 270,
+      pinned: true,
+      floating: true,
+      flexibleSpace: FlexibleSpaceBar(
+        background: FutureBuilder(
             future: _firebase.get(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator());
               }
               dynamic data = snapshot.data;
               return ListView(
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
                 children: [
+                  const SizedBox(
+                    height: 25,
+                  ),
                   Column(
                     children: [
                       const SizedBox(
@@ -220,8 +332,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                     ],
                   ),
-                  if (data['Creator'] == true)
-                    const TabBarControllerWidget(false),
                 ],
               );
             }),
