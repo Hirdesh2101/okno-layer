@@ -38,28 +38,30 @@ class VideosAPI {
   }
 
   Future<void> load(int flag) async {
-    if (flag == 0) {
-      userlist = await _viewedProduct();
-      _sorting.mergeSort(userlist!, 0, userlist!.length - 1);
-      listVideos = await _getVideoList();
+    if (listVideos.isEmpty) {
+      if (flag == 0) {
+        userlist = await _viewedProduct();
+        _sorting.mergeSort(userlist!, 0, userlist!.length - 1);
+        listVideos = await _getVideoList();
 
-      for (int i = 0; i < listVideos.length; i++) {
-        int temp =
-            _search.count2(userlist!, userlist!.length, listVideos[i].id);
-        if (temp != -1) {
-          listVideos.remove(listVideos[i]);
-          i--;
+        for (int i = 0; i < listVideos.length; i++) {
+          int temp =
+              _search.count2(userlist!, userlist!.length, listVideos[i].id);
+          if (temp != -1) {
+            listVideos.remove(listVideos[i]);
+            i--;
+          }
         }
+        if (listVideos.length <= 1) {
+          addVideos();
+        }
+        listVideos = shuffle1(listVideos);
+      } else {
+        var temp = await _viewedProduct();
+        var tem2 = await _getVideoList();
+        tem2.clear();
+        temp.clear();
       }
-      if (listVideos.length <= 1) {
-        addVideos();
-      }
-      listVideos = shuffle1(listVideos);
-    } else {
-      var temp = await _viewedProduct();
-      var tem2 = await _getVideoList();
-      tem2.clear();
-      temp.clear();
     }
   }
 

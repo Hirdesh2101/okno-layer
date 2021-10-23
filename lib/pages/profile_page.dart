@@ -296,16 +296,8 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                                           const VideoRecorder()),
                                 );
                               },
-                            )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      if (data['Creator'] == false)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                            ),
+                          if (data['Creator'] == false)
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(),
                               onPressed: () {
@@ -328,8 +320,11 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
                     ],
                   ),
                 ],
