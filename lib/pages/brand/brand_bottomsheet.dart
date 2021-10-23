@@ -5,7 +5,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../services/cache_service.dart';
 import '../../services/launch_url.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ionicons/ionicons.dart';
 import '../../providers/brand_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -129,101 +128,114 @@ class BrandProductDetails {
                           child: const Text('Visit Store')),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: IconButton(
-                        onPressed: () {
-                          keyBoard(true);
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text('Edit Store Link'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  //color: Colors.white24
-                                                  )),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: TextFormField(
-                                              controller:
-                                                  _textEditingController,
-                                              decoration: const InputDecoration(
-                                                labelText:
-                                                    'Please provide a proper url',
-                                                enabledBorder:
-                                                    UnderlineInputBorder(
-                                                        borderSide: BorderSide(
-                                                            color:
-                                                                Colors.grey)),
-                                                focusedBorder:
-                                                    UnderlineInputBorder(
-                                                        borderSide: BorderSide(
-                                                            color:
-                                                                Colors.grey)),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0, 0, 8, 8),
+                      child: ElevatedButton(
+                          onPressed: () async {
+                            keyBoard(true);
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('Edit Store Link'),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    //color: Colors.white24
+                                                    )),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: TextFormField(
+                                                controller:
+                                                    _textEditingController,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText:
+                                                      'Please provide a proper url',
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  color: Colors
+                                                                      .grey)),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  color: Colors
+                                                                      .grey)),
+                                                ),
                                               ),
+                                            )),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                keyBoard(false);
+                                              },
+                                              child: const Text('Cancel'),
                                             ),
-                                          )),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                              keyBoard(false);
-                                            },
-                                            child: const Text('Cancel'),
-                                          ),
-                                          TextButton(
-                                              child: const Text('Submit'),
-                                              onPressed: () async {
-                                                if (_textEditingController.text
-                                                    .trim()
-                                                    .isNotEmpty) {
-                                                  FirebaseFirestore.instance
-                                                      .collection('VideosData')
-                                                      .doc(feedViewModel
-                                                          .videoSource!
-                                                          .listData[index]
-                                                          .id)
-                                                      .update({
-                                                    'store':
-                                                        _textEditingController
-                                                            .text
-                                                            .trim()
-                                                            .toString()
-                                                  });
-                                                  Navigator.of(context).pop();
-                                                  keyBoard(false);
-                                                } else {
-                                                  Fluttertoast.showToast(
-                                                      msg: "Url can't be empty",
-                                                      toastLength:
-                                                          Toast.LENGTH_SHORT,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 1,
-                                                      // backgroundColor: Colors.red,
-                                                      // textColor: Colors.white,
-                                                      fontSize: 16.0);
-                                                }
-                                              }),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).whenComplete(() {
-                            Navigator.of(context).pop();
-                          });
-                        },
-                        icon: const Icon(Ionicons.create_outline)),
-                  )
+                                            TextButton(
+                                                child: const Text('Submit'),
+                                                onPressed: () async {
+                                                  if (_textEditingController
+                                                      .text
+                                                      .trim()
+                                                      .isNotEmpty) {
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            'VideosData')
+                                                        .doc(feedViewModel
+                                                            .videoSource!
+                                                            .listData[index]
+                                                            .id)
+                                                        .update({
+                                                      'store':
+                                                          _textEditingController
+                                                              .text
+                                                              .trim()
+                                                              .toString()
+                                                    });
+                                                    Navigator.of(context).pop();
+                                                    keyBoard(false);
+                                                  } else {
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Url can't be empty",
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        gravity:
+                                                            ToastGravity.BOTTOM,
+                                                        timeInSecForIosWeb: 1,
+                                                        // backgroundColor: Colors.red,
+                                                        // textColor: Colors.white,
+                                                        fontSize: 16.0);
+                                                  }
+                                                }),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).whenComplete(() {
+                              Navigator.of(context).pop();
+                            });
+                          },
+                          child: const Text('Edit Store Link')),
+                    ),
+                  ),
                 ],
               ),
               Padding(
