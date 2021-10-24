@@ -3,35 +3,49 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:get_it/get_it.dart';
 import 'package:oknoapp/pages/shared_video.dart';
 import '../providers/feedviewprovider.dart';
+import './dynamic_linkstream.dart';
 
 class DynamicLinkService {
   final feedViewModel = GetIt.instance<FeedViewModel>();
   Future<void> retrieveDynamicLink(BuildContext context) async {
-    try {
-      final PendingDynamicLinkData? data =
-          await FirebaseDynamicLinks.instance.getInitialLink();
-      final Uri? deepLink = data?.link;
-
-      if (deepLink != null) {
-        String? id;
-        if (deepLink.queryParameters.containsKey('id')) {
-          id = deepLink.queryParameters['id']!;
-        }
+    final PendingDynamicLinkData? data =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    _handleDeepLink(data!, context);
+    FirebaseDynamicLinks.instance.onLink(
+        onSuccess: (PendingDynamicLinkData? dynamicLink) async {
+      final Uri? deepLink = dynamicLink?.link;
+      String? id;
+      if (deepLink!.queryParameters.containsKey('id')) {
+        id = deepLink.queryParameters['id']!;
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => SharedVideo(id!)));
+      } else {
+        String? id;
+        if (deepLink.queryParameters.containsKey('filter')) {
+          id = deepLink.queryParameters['filter']!;
+          controller.add(id);
+        }
       }
-      FirebaseDynamicLinks.instance.onLink(
-          onSuccess: (PendingDynamicLinkData? dynamicLink) async {
-        final Uri? deepLink = dynamicLink?.link;
-        String? id;
-        if (deepLink!.queryParameters.containsKey('id')) {
-          id = deepLink.queryParameters['id']!;
-        }
+    });
+  }
+
+  _handleDeepLink(PendingDynamicLinkData data, BuildContext context) {
+    final Uri? deepLink = data.link;
+    if (deepLink != null) {
+      String? id;
+      if (deepLink.queryParameters.containsKey('id')) {
+        id = deepLink.queryParameters['id']!;
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => SharedVideo(id!)));
-      });
-    } catch (e) {
-      // print(e);
+      } else {
+        if (deepLink.queryParameters.containsKey('filter')) {
+          String? id;
+          if (deepLink.queryParameters.containsKey('filter')) {
+            id = deepLink.queryParameters['filter']!;
+            controller.add(id);
+          }
+        }
+      }
     }
   }
 

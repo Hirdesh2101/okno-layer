@@ -62,15 +62,13 @@ dev_dependencies:
   firebase_dynamic_links: ^2.0.9
   share_plus: ^2.1.4
   visibility_detector: ^0.2.0
-  #awesome_dialog: ^2.1.1
   shared_preferences: ^2.0.8
-  #flutter_ffmpeg: ^0.4.2
   video_editor: ^1.2.0
   helpers: ^1.1.4
   jiffy: ^4.1.0
   webview_flutter: ^2.1.1
   flutter_ffmpeg: ^0.4.2
-  #comment_box: ^0.0.16
+  firebase_in_app_messaging: ^0.5.0+11
   readmore: ^2.1.0
   flutter_video_info: ^1.2.0
   audioplayers: ^0.20.1

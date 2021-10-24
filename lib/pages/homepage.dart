@@ -12,7 +12,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../services/dynamic_link.dart';
 import 'package:ionicons/ionicons.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,13 +28,11 @@ class _HomePageState extends State<HomePage> {
   final feedViewModel = GetIt.instance<FeedViewModel>();
   final firebaseAuth = FirebaseAuth.instance;
   var user = FirebaseAuth.instance.currentUser!.uid;
-  final DynamicLinkService _dynamicLinkService = DynamicLinkService();
   // ignore: prefer_typing_uninitialized_variables
   var future;
 
   @override
   void initState() {
-    _dynamicLinkService.retrieveDynamicLink(context);
     future = feedViewModel.videoSource!.load(0);
     super.initState();
   }

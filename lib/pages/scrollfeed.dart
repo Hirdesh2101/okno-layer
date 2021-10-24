@@ -7,10 +7,13 @@ import '../providers/feedviewprovider.dart';
 import 'package:video_player/video_player.dart';
 import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
+import 'dart:async';
+import '../services/dynamic_linkstream.dart';
 import '../models/video.dart';
 import 'package:stacked/stacked.dart';
 import '../providers/filter_provider.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import '../services/dynamic_link.dart';
 import '../providers/likedvideoprovider.dart';
 
 class ScrollFeed extends StatefulWidget {
@@ -31,9 +34,12 @@ class _ScrollFeedState extends State<ScrollFeed> {
   final feedViewModel3 = GetIt.instance<MyVideosProvider>();
   final feedViewModel4 = GetIt.instance<FilterViewModel>();
   final SideBarFirebase firebaseServices = SideBarFirebase();
+  final DynamicLinkService _dynamicLinkService = DynamicLinkService();
   bool filterPage = false;
   bool filterVideoView = false;
   bool filterRunning = false;
+  String? dynamicId = '';
+  Stream stream = controller.stream;
   List<String> countList = [
     "Ethenics",
     "Western",
@@ -61,10 +67,12 @@ class _ScrollFeedState extends State<ScrollFeed> {
     } else {
       await feedViewModel.initial();
       await feedViewModel4.disposingall();
+      feedViewModel4.currentscreen = 0;
       feedViewModel.playDrawer();
     }
     if (!filterRunning) {
       await feedViewModel.disposingall();
+      feedViewModel.currentscreen = 0;
     }
     setState(() {
       if (selectedCountList.isNotEmpty) {
@@ -75,7 +83,12 @@ class _ScrollFeedState extends State<ScrollFeed> {
     });
   }
 
-  void init() {
+  void init() async {
+    stream.listen((event) {
+      if (event != '') {
+        submitFun(List.filled(1, event));
+      }
+    });
     if (!widget.likedPage && !widget.myVideopage) {
       feedViewModel.initial();
     }
@@ -85,12 +98,21 @@ class _ScrollFeedState extends State<ScrollFeed> {
     if (widget.myVideopage) {
       feedViewModel3.initial(widget.startIndex, false, false);
     }
+    feedViewModel.setBusy(true);
+    _dynamicLinkService.retrieveDynamicLink(context);
+    feedViewModel.setBusy(false);
   }
 
   @override
   void initState() {
     init();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.close();
+    super.dispose();
   }
 
   @override
