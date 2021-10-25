@@ -69,6 +69,7 @@ class _LoginscreenState extends State<Loginscreen> {
               'Encashed': 0.0,
               'WatchedVideo': [],
               'Saved': [],
+              'topic': 'viewer',
               'Image': googleUser.photoUrl,
               'BrandEnabled': false,
               'BrandAssociated': [],

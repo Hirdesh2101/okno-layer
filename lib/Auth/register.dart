@@ -49,6 +49,7 @@ class _RegisterState extends State<Register> {
         'Encashed': 0.0,
         'WatchedVideo': [],
         'Saved': [],
+        'topic': 'viewer',
         'Image': gender,
         'BrandEnabled': false,
         'BrandAssociated': [],
