@@ -9,13 +9,10 @@ import 'scrollfeed.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
-import '../services/launch_url.dart';
 import '../providers/feedviewprovider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -36,75 +33,8 @@ class _HomePageState extends State<HomePage> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   // ignore: prefer_typing_uninitialized_variables
   var future;
-  Future<void> _handleBckground(RemoteMessage remoteMessage) async {}
   init() async {
     //subscribe to topic on each app start-up
-    FirebaseMessaging.onBackgroundMessage(_handleBckground);
-    // return showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         title: Text(message.notification!.title!),
-    //         content: Text(message.notification!.body!),
-    //         actions: [
-    //           TextButton(onPressed: () {}, child: const Text('Cancel')),
-    //           TextButton(
-    //               onPressed: () {
-    //                 launch(message.data.entries.first.value);
-    //               },
-    //               child: const Text('Visit'))
-    //         ],
-    //       );
-    //     });
-    FirebaseMessaging.onMessage.listen((message) {
-      if (message.data.isNotEmpty) {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text(message.notification!.title!),
-                content: Text(message.notification!.body!),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('Cancel')),
-                  TextButton(
-                      onPressed: () async {
-                        await launchURL(
-                            context, message.data.entries.first.value);
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('Visit'))
-                ],
-              );
-            });
-      }
-    });
-    FirebaseMessaging.onMessageOpenedApp.length;
-
-    _firebaseMessaging.getInitialMessage().then((message) {
-      if (message != null) {
-        return showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text(message.notification!.title!),
-                content: Text(message.notification!.body!),
-                actions: [
-                  TextButton(onPressed: () {}, child: const Text('Cancel')),
-                  TextButton(
-                      onPressed: () {
-                        launch(message.data.entries.first.value);
-                      },
-                      child: const Text('Visit'))
-                ],
-              );
-            });
-      }
-    });
-
     FirebaseAnalytics().logEvent(name: 'login', parameters: null);
     FirebaseAnalytics().logEvent(name: 'main_feed', parameters: null);
     await FirebaseFirestore.instance

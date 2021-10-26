@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/firebase%20functions/sidebar_fun.dart';
 import 'package:oknoapp/models/like_videos.dart';
 import 'package:oknoapp/models/my_videos.dart';
 import 'package:oknoapp/providers/myvideosprovider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:video_player/video_player.dart';
 import './videoactiontoolbar.dart';
@@ -37,9 +39,11 @@ class _ScrollFeedState extends State<ScrollFeed> {
   final DynamicLinkService _dynamicLinkService = DynamicLinkService();
   bool filterPage = false;
   bool filterVideoView = false;
+  bool loadingNotification = false;
   bool filterRunning = false;
   String? dynamicId = '';
   Stream stream = controller.stream;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   List<String> countList = [
     "Ethenics",
     "Western",
@@ -52,6 +56,8 @@ class _ScrollFeedState extends State<ScrollFeed> {
       filterPage = value;
     });
   }
+
+  Future<void> _handleBckground(RemoteMessage remoteMessage) async {}
 
   Future<void> submitFun(list) async {
     setState(() {
@@ -101,6 +107,164 @@ class _ScrollFeedState extends State<ScrollFeed> {
     feedViewModel.setBusy(true);
     _dynamicLinkService.retrieveDynamicLink(context);
     feedViewModel.setBusy(false);
+    await FirebaseMessaging.instance.getToken();
+    FirebaseMessaging.onBackgroundMessage(_handleBckground);
+    // return showDialog(
+    //     context: context,
+    //     builder: (context) {
+    //       return AlertDialog(
+    //         title: Text(message.notification!.title!),
+    //         content: Text(message.notification!.body!),
+    //         actions: [
+    //           TextButton(onPressed: () {}, child: const Text('Cancel')),
+    //           TextButton(
+    //               onPressed: () {
+    //                 launch(message.data.entries.first.value);
+    //               },
+    //               child: const Text('Visit'))
+    //         ],
+    //       );
+    //     });
+    FirebaseMessaging.onMessage.listen((message) {
+      if (message.data.isNotEmpty) {
+        if (!widget.likedPage && !widget.myVideopage) {
+          feedViewModel.pauseDrawer();
+        }
+        if (widget.likedPage) {
+          feedViewModel2.pauseDrawer();
+        }
+        if (widget.myVideopage) {
+          feedViewModel3.pauseDrawer(false, false);
+        }
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text(message.notification!.title!),
+                content: Text(message.notification!.title!),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel')),
+                  TextButton(
+                      onPressed: () async {
+                        await submitFun(
+                            List.filled(1, message.data.entries.first.value));
+                        // await launchURL(
+                        //   context,
+                        // );
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Visit'))
+                ],
+              );
+            }).whenComplete(() {
+          if (!widget.likedPage && !widget.myVideopage) {
+            feedViewModel.playDrawer();
+          }
+          if (widget.likedPage) {
+            feedViewModel2.playDrawer();
+          }
+          if (widget.myVideopage) {
+            feedViewModel3.playDrawer(false, false);
+          }
+        });
+      }
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      if (message.data.isNotEmpty) {
+        if (!widget.likedPage && !widget.myVideopage) {
+          feedViewModel.pauseDrawer();
+        }
+        if (widget.likedPage) {
+          feedViewModel2.pauseDrawer();
+        }
+        if (widget.myVideopage) {
+          feedViewModel3.pauseDrawer(false, false);
+        }
+        showDialog(
+            context: context,
+            builder: (context) {
+              return StatefulBuilder(builder: (context, setState) {
+                return AlertDialog(
+                  title: Text(message.notification!.title!),
+                  content: Text(message.notification!.body!),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Cancel')),
+                    TextButton(
+                        onPressed: () async {
+                          await submitFun(
+                              List.filled(1, message.data.entries.first.value));
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Visit'))
+                  ],
+                );
+              });
+            }).whenComplete(() {
+          if (!widget.likedPage && !widget.myVideopage) {
+            feedViewModel.playDrawer();
+          }
+          if (widget.likedPage) {
+            feedViewModel2.playDrawer();
+          }
+          if (widget.myVideopage) {
+            feedViewModel3.playDrawer(false, false);
+          }
+        });
+      }
+    });
+    _firebaseMessaging.getInitialMessage().then((message) {
+      if (message != null) {
+        if (!widget.likedPage && !widget.myVideopage) {
+          feedViewModel.pauseDrawer();
+        }
+        if (widget.likedPage) {
+          feedViewModel2.pauseDrawer();
+        }
+        if (widget.myVideopage) {
+          feedViewModel3.pauseDrawer(false, false);
+        }
+        return showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text(message.notification!.title!),
+                content: Text(message.notification!.body!),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel')),
+                  TextButton(
+                      onPressed: () async {
+                        await submitFun(
+                            List.filled(1, message.data.entries.first.value));
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Visit'))
+                ],
+              );
+            }).whenComplete(() {
+          if (!widget.likedPage && !widget.myVideopage) {
+            feedViewModel.playDrawer();
+          }
+          if (widget.likedPage) {
+            feedViewModel2.playDrawer();
+          }
+          if (widget.myVideopage) {
+            feedViewModel3.playDrawer(false, false);
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -120,7 +284,13 @@ class _ScrollFeedState extends State<ScrollFeed> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Expanded(child: feedVideos()),
+        kIsWeb
+            ? Expanded(
+                child: Center(
+                    child:
+                        AspectRatio(aspectRatio: 9 / 16, child: feedVideos())),
+              )
+            : Expanded(child: feedVideos()),
       ],
     );
   }
@@ -317,6 +487,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
             },
             child: Stack(children: [
               GestureDetector(
+                behavior: HitTestBehavior.translucent,
                 onTap: () {
                   if (video.controller!.value.isPlaying) {
                     video.controller?.pause();

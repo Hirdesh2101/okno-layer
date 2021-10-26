@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:pedantic/pedantic.dart';
@@ -63,23 +64,30 @@ class Video {
   }
 
   Future<void> loadController() async {
-    _cacheManager ??= CustomCacheManager.instance;
-    final fileInfo = await _cacheManager?.getFileFromCache(url);
-    if (fileInfo == null) {
-      // print('[VideoControllerService]: No video in cache');
-
-      // print('[VideoControllerService]: Saving video to cache');
-      unawaited(_cacheManager!.downloadFile(url));
+    if (kIsWeb) {
       controller = VideoPlayerController.network(url);
       controller?.addListener(checkVideo);
       await controller?.initialize();
       controller?.setLooping(true);
     } else {
-      // print('[VideoControllerService]: Loading video from cache');
-      controller = VideoPlayerController.file(fileInfo.file);
-      controller?.addListener(checkVideo);
-      await controller?.initialize();
-      controller?.setLooping(true);
+      _cacheManager ??= CustomCacheManager.instance;
+      final fileInfo = await _cacheManager?.getFileFromCache(url);
+      if (fileInfo == null) {
+        // print('[VideoControllerService]: No video in cache');
+
+        // print('[VideoControllerService]: Saving video to cache');
+        unawaited(_cacheManager!.downloadFile(url));
+        controller = VideoPlayerController.network(url);
+        controller?.addListener(checkVideo);
+        await controller?.initialize();
+        controller?.setLooping(true);
+      } else {
+        // print('[VideoControllerService]: Loading video from cache');
+        controller = VideoPlayerController.file(fileInfo.file);
+        controller?.addListener(checkVideo);
+        await controller?.initialize();
+        controller?.setLooping(true);
+      }
     }
   }
 

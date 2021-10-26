@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
@@ -97,13 +98,13 @@ class ActionToolBar extends StatelessWidget {
   }
 
   sideButtons() {
-    return Column(children: [
+    return Column(mainAxisSize: MainAxisSize.min, children: [
       FutureBuilder<QuerySnapshot>(
           future: FirebaseFirestore.instance.collection('VideosData').get(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Container(
-                width: MediaQuery.of(context).size.width * 0.085,
+                width: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
               );
             }
             final documents = snapshot.data!.docs.where((element) {
@@ -128,23 +129,18 @@ class ActionToolBar extends StatelessWidget {
               return !init;
             }
 
-            return Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: SizedBox(
-                  child: LikeButton(
-                    size: MediaQuery.of(context).size.width * 0.1,
-                    likeBuilder: (bool isLiked) {
-                      return Icon(
-                        isLiked ? Icons.favorite : Icons.favorite_border,
-                        color: isLiked ? Colors.red : Colors.white,
-                        size: MediaQuery.of(context).size.width * 0.1,
-                      );
-                    },
-                    isLiked:
-                        list.contains(firebaseServices.user) ? true : false,
-                    onTap: likeFunc,
-                  ),
-                ));
+            return LikeButton(
+              size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
+              likeBuilder: (bool isLiked) {
+                return Icon(
+                  isLiked ? Icons.favorite : Icons.favorite_border,
+                  color: isLiked ? Colors.red : Colors.white,
+                  size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
+                );
+              },
+              isLiked: list.contains(firebaseServices.user) ? true : false,
+              onTap: likeFunc,
+            );
           }),
       IconButton(
           onPressed: () {
@@ -171,7 +167,7 @@ class ActionToolBar extends StatelessWidget {
           icon: Icon(
             Ionicons.chatbubble_outline,
             color: Colors.white,
-            size: MediaQuery.of(context).size.width * 0.085,
+            size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
           )),
       const SizedBox(
         height: 10,
@@ -205,7 +201,7 @@ class ActionToolBar extends StatelessWidget {
           icon: Icon(
             Ionicons.paper_plane_outline,
             color: Colors.white,
-            size: MediaQuery.of(context).size.width * 0.085,
+            size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
           )),
       const SizedBox(
         height: 10,
@@ -360,7 +356,7 @@ class ActionToolBar extends StatelessWidget {
                 ? Ionicons.checkbox_outline
                 : Ionicons.ellipsis_vertical_outline,
             color: filterApplied ? Colors.green : Colors.white,
-            size: MediaQuery.of(context).size.width * 0.085,
+            size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
           )),
     ]);
   }
