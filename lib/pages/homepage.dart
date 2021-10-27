@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/contact_page.dart';
 import 'package:oknoapp/pages/creator_section.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/pages/profile_page.dart';
 import 'package:oknoapp/providers/likedvideoprovider.dart';
+import 'package:oknoapp/services/web_placeholder.dart';
 import '../providers/myvideosprovider.dart';
 import 'scrollfeed.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -136,16 +138,25 @@ class _HomePageState extends State<HomePage> {
                                             backgroundImage:
                                                 AssetImage("assets/female.jpg"))
                                     : ClipOval(
-                                        child: CachedNetworkImage(
-                                          fit: BoxFit.cover,
-                                          imageUrl: data['Image'],
-                                          height: 90.0,
-                                          width: 90.0,
-                                          placeholder: (context, url) =>
-                                              const CircularProgressIndicator(),
-                                          errorWidget: (context, url, error) =>
-                                              const Icon(Icons.error),
-                                        ),
+                                        child: kIsWeb
+                                            ? FadeInImage.memoryNetwork(
+                                                placeholder: kTransparentImage,
+                                                image: data['Image'],
+                                                height: 90.0,
+                                                fit: BoxFit.cover,
+                                                width: 90.0,
+                                              )
+                                            : CachedNetworkImage(
+                                                fit: BoxFit.cover,
+                                                imageUrl: data['Image'],
+                                                height: 90.0,
+                                                width: 90.0,
+                                                placeholder: (context, url) =>
+                                                    const CircularProgressIndicator(),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        const Icon(Icons.error),
+                                              ),
                                       ),
                               ],
                             ),

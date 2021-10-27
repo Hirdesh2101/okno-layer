@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:oknoapp/services/web_placeholder.dart';
 import 'package:readmore/readmore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -119,17 +121,26 @@ class _CommentsState extends State<Comments> {
                                               backgroundImage: AssetImage(
                                                   "assets/female.jpg"))
                                       : ClipOval(
-                                          child: CachedNetworkImage(
-                                            fit: BoxFit.cover,
-                                            imageUrl: data['Image'],
-                                            height: 30,
-                                            width: 30,
-                                            placeholder: (context, url) =>
-                                                const CircularProgressIndicator(),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.error),
-                                          ),
+                                          child: kIsWeb
+                                              ? FadeInImage.memoryNetwork(
+                                                  placeholder:
+                                                      kTransparentImage,
+                                                  image: data['Image'],
+                                                  fit: BoxFit.cover,
+                                                  height: 30,
+                                                  width: 30,
+                                                )
+                                              : CachedNetworkImage(
+                                                  fit: BoxFit.cover,
+                                                  imageUrl: data['Image'],
+                                                  height: 30,
+                                                  width: 30,
+                                                  placeholder: (context, url) =>
+                                                      const CircularProgressIndicator(),
+                                                  errorWidget: (context, url,
+                                                          error) =>
+                                                      const Icon(Icons.error),
+                                                ),
                                         ),
                                   title: Text(
                                     '${data['Name']}',

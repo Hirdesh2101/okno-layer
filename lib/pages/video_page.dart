@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/edit_video.dart';
+import 'package:oknoapp/pages/upload_videopage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -282,12 +284,21 @@ class _VideoRecorderState extends State<VideoRecorder>
     await Future.delayed(const Duration(milliseconds: 500));
     if (imageFile != null) {
       file = File(imageFile.path);
-      Navigator.of(context)
-          .pushReplacement(
-              MaterialPageRoute(builder: (context) => EditVideo(file!)))
-          .then((value) {
-        Navigator.of(context).pop();
-      });
+      if (kIsWeb) {
+        Navigator.of(context)
+            .push(MaterialPageRoute(
+                builder: (context) => UploadPage(file!, file!.path)))
+            .then((value) {
+          Navigator.of(context).pop();
+        });
+      } else {
+        Navigator.of(context)
+            .pushReplacement(
+                MaterialPageRoute(builder: (context) => EditVideo(file!)))
+            .then((value) {
+          Navigator.of(context).pop();
+        });
+      }
     } else {
       Fluttertoast.showToast(
           msg: "No Video Selected",
@@ -339,11 +350,21 @@ class _VideoRecorderState extends State<VideoRecorder>
         await controller!.stopImageStream();
       }
       await controller!.dispose();
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => EditVideo(videoFile!)))
-          .then((value) {
-        Navigator.of(context).pop();
-      });
+      if (kIsWeb) {
+        Navigator.of(context)
+            .push(MaterialPageRoute(
+                builder: (context) => UploadPage(videoFile!, videoFile!.path)))
+            .then((value) {
+          Navigator.of(context).pop();
+        });
+      } else {
+        Navigator.of(context)
+            .push(
+                MaterialPageRoute(builder: (context) => EditVideo(videoFile!)))
+            .then((value) {
+          Navigator.of(context).pop();
+        });
+      }
     });
   }
 

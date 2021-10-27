@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class WebViewPage extends StatefulWidget {
   final String? title;
@@ -18,11 +20,12 @@ class WebViewPage extends StatefulWidget {
 class _WebViewPageState extends State<WebViewPage> {
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+    if (!kIsWeb) WebView.platform = SurfaceAndroidWebView();
   }
 
   @override
@@ -34,24 +37,26 @@ class _WebViewPageState extends State<WebViewPage> {
       appBar: AppBar(
         title: Text(widget.title!),
         actions: <Widget>[
-          NavigationControls(_controller.future),
+          if (!kIsWeb) NavigationControls(_controller.future),
         ],
       ),
       body: Stack(
         children: [
           Builder(builder: (BuildContext context) {
-            return WebView(
-              initialUrl: widget.url,
-              javascriptMode: JavascriptMode.unrestricted,
-              onWebViewCreated: (WebViewController webViewController) {
-                _controller.complete(webViewController);
-              },
-              onProgress: (int progress) {},
-              javascriptChannels: <JavascriptChannel>{
-                _toasterJavascriptChannel(context),
-              },
-              gestureNavigationEnabled: true,
-            );
+            return kIsWeb
+                ? const Text('terms and conditions')
+                : WebView(
+                    initialUrl: widget.url,
+                    javascriptMode: JavascriptMode.unrestricted,
+                    onWebViewCreated: (WebViewController webViewController) {
+                      _controller.complete(webViewController);
+                    },
+                    onProgress: (int progress) {},
+                    javascriptChannels: <JavascriptChannel>{
+                      _toasterJavascriptChannel(context),
+                    },
+                    gestureNavigationEnabled: true,
+                  );
           }),
           Align(
             alignment: Alignment.bottomCenter,
@@ -65,11 +70,13 @@ class _WebViewPageState extends State<WebViewPage> {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    _firebase.update({'Creator': true}).whenComplete(() {
+                  onPressed: () async {
+                    await _firebase.update({'Creator': true}).whenComplete(() {
                       setState(() {});
                     });
-
+                    await _firebase.update({'topic': "creator"});
+                    await _firebaseMessaging.unsubscribeFromTopic('viewer');
+                    await _firebaseMessaging.subscribeToTopic('creator');
                     Navigator.of(context).pop();
                   },
                   child: const Text('Accept'),

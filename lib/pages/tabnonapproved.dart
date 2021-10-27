@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
+import 'package:oknoapp/services/web_placeholder.dart';
 import '../firebase functions/sidebar_fun.dart';
 import '../models/my_videos.dart';
 import '../providers/myvideosprovider.dart';
@@ -98,19 +100,30 @@ class _NonApprovedVideoTabState extends State<NonApprovedVideoTab>
                                       SizedBox.expand(
                                         child: FittedBox(
                                           fit: BoxFit.fill,
-                                          child: CachedNetworkImage(
-                                            placeholder: (context, url) =>
-                                                Container(
-                                                    // color: Colors.grey,
-                                                    ),
-                                            fit: BoxFit.fitHeight,
-                                            cacheManager:
-                                                CustomCacheManager.instance2,
-                                            imageUrl: feedViewModel2
-                                                .videoSource!
-                                                .nonapprovedData[index]
-                                                .thumbnail,
-                                          ),
+                                          child: kIsWeb
+                                              ? FadeInImage.memoryNetwork(
+                                                  placeholder:
+                                                      kTransparentImage,
+                                                  image: feedViewModel2
+                                                      .videoSource!
+                                                      .nonapprovedData[index]
+                                                      .thumbnail,
+                                                  fit: BoxFit.fitHeight,
+                                                )
+                                              : CachedNetworkImage(
+                                                  placeholder: (context, url) =>
+                                                      Container(
+                                                          // color: Colors.grey,
+                                                          ),
+                                                  fit: BoxFit.fitHeight,
+                                                  cacheManager:
+                                                      CustomCacheManager
+                                                          .instance2,
+                                                  imageUrl: feedViewModel2
+                                                      .videoSource!
+                                                      .nonapprovedData[index]
+                                                      .thumbnail,
+                                                ),
                                         ),
                                       ),
                                       Positioned(

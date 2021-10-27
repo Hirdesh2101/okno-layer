@@ -92,19 +92,22 @@ class ActionToolBar extends StatelessWidget {
         Positioned(
           right: 0,
           bottom: 0,
-          child: sideButtons(),
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: sideButtons(),
+          ),
         )
     ]);
   }
 
-  sideButtons() {
+  Widget sideButtons() {
     return Column(mainAxisSize: MainAxisSize.min, children: [
       FutureBuilder<QuerySnapshot>(
           future: FirebaseFirestore.instance.collection('VideosData').get(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Container(
-                width: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
+                width: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.1,
               );
             }
             final documents = snapshot.data!.docs.where((element) {
@@ -130,18 +133,21 @@ class ActionToolBar extends StatelessWidget {
             }
 
             return LikeButton(
-              size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
+              size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.1,
               likeBuilder: (bool isLiked) {
                 return Icon(
                   isLiked ? Icons.favorite : Icons.favorite_border,
                   color: isLiked ? Colors.red : Colors.white,
-                  size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
+                  size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.1,
                 );
               },
               isLiked: list.contains(firebaseServices.user) ? true : false,
               onTap: likeFunc,
             );
           }),
+      const SizedBox(
+        height: 10,
+      ),
       IconButton(
           onPressed: () {
             filterScreen

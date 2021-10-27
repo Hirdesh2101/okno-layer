@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:oknoapp/models/like_videos.dart';
 import 'package:oknoapp/pages/liked_scroll.dart';
+import 'package:oknoapp/services/web_placeholder.dart';
 import '../providers/likedvideoprovider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cache_service.dart';
@@ -98,16 +100,24 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                                 SizedBox.expand(
                                   child: FittedBox(
                                     fit: BoxFit.fill,
-                                    child: CachedNetworkImage(
-                                      placeholder: (context, url) => Container(
-                                          // color: Colors.grey,
+                                    child: kIsWeb
+                                        ? FadeInImage.memoryNetwork(
+                                            placeholder: kTransparentImage,
+                                            image: feedViewModel.videoSource!
+                                                .listData[index].product1,
+                                            fit: BoxFit.fitHeight,
+                                          )
+                                        : CachedNetworkImage(
+                                            placeholder: (context, url) =>
+                                                Container(
+                                                    // color: Colors.grey,
+                                                    ),
+                                            fit: BoxFit.fitHeight,
+                                            cacheManager:
+                                                CustomCacheManager.instance2,
+                                            imageUrl: feedViewModel.videoSource!
+                                                .listData[index].product1,
                                           ),
-                                      fit: BoxFit.fitHeight,
-                                      cacheManager:
-                                          CustomCacheManager.instance2,
-                                      imageUrl: feedViewModel.videoSource!
-                                          .listData[index].product1,
-                                    ),
                                   ),
                                 ),
                                 Positioned(

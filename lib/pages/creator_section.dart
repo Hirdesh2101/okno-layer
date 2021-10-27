@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +7,7 @@ import 'package:oknoapp/pages/brand/brands_page.dart';
 import 'package:oknoapp/pages/encashed_page.dart';
 import 'package:oknoapp/pages/tab_approvedvideo.dart';
 import 'package:oknoapp/pages/tabnonapproved.dart';
+import 'package:oknoapp/services/web_placeholder.dart';
 import './webview.dart';
 import 'video_page.dart';
 import 'package:ionicons/ionicons.dart';
@@ -161,16 +163,25 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                                         backgroundImage:
                                             AssetImage("assets/female.jpg"))
                                 : ClipOval(
-                                    child: CachedNetworkImage(
-                                      fit: BoxFit.cover,
-                                      imageUrl: data['Image'],
-                                      height: 100.0,
-                                      width: 100.0,
-                                      placeholder: (context, url) =>
-                                          const CircularProgressIndicator(),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                    ),
+                                    child: kIsWeb
+                                        ? FadeInImage.memoryNetwork(
+                                            placeholder: kTransparentImage,
+                                            image: data['Image'],
+                                            fit: BoxFit.cover,
+                                            height: 100.0,
+                                            width: 100.0,
+                                          )
+                                        : CachedNetworkImage(
+                                            fit: BoxFit.cover,
+                                            imageUrl: data['Image'],
+                                            height: 100.0,
+                                            width: 100.0,
+                                            placeholder: (context, url) =>
+                                                const CircularProgressIndicator(),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Icon(Icons.error),
+                                          ),
                                   ),
                           ),
                           const SizedBox(

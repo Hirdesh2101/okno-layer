@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:oknoapp/services/web_placeholder.dart';
 import '../../services/cache_service.dart';
 import '../../services/launch_url.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -81,19 +83,40 @@ class BrandProductDetails {
                                 Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(9, 18, 9, 18),
-                                  child: CachedNetworkImage(
-                                    placeholder: (context, url) => Container(
-                                        //color: Colors.grey,
+                                  child: kIsWeb
+                                      ? FadeInImage.memoryNetwork(
+                                          placeholder: kTransparentImage,
+                                          image: feedViewModel.videoSource!
+                                              .listData[index].product1,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.2,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.2,
+                                          fit: BoxFit.contain,
+                                        )
+                                      : CachedNetworkImage(
+                                          placeholder: (context, url) =>
+                                              Container(
+                                                  //color: Colors.grey,
+                                                  ),
+                                          cacheManager:
+                                              CustomCacheManager.instance2,
+                                          imageUrl: feedViewModel.videoSource!
+                                              .listData[index].product1,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.2,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.2,
+                                          fit: BoxFit.contain,
                                         ),
-                                    cacheManager: CustomCacheManager.instance2,
-                                    imageUrl: feedViewModel
-                                        .videoSource!.listData[index].product1,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.2,
-                                    width: MediaQuery.of(context).size.height *
-                                        0.2,
-                                    fit: BoxFit.contain,
-                                  ),
                                 ),
                                 Text(feedViewModel
                                     .videoSource!.listData[index].p1name),

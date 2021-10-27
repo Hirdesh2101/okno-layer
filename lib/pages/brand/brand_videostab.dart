@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get_it/get_it.dart';
 import 'package:oknoapp/pages/brand/brand_videopage.dart';
+import 'package:oknoapp/services/web_placeholder.dart';
 import '../../services/cache_service.dart';
 import '../../models/brand_videos.dart';
 import '../../providers/brand_provider.dart';
@@ -93,15 +95,24 @@ class _BrandTabState extends State<BrandTab>
                               SizedBox.expand(
                                 child: FittedBox(
                                   fit: BoxFit.fill,
-                                  child: CachedNetworkImage(
-                                    placeholder: (context, url) => Container(
-                                        // color: Colors.grey,
+                                  child: kIsWeb
+                                      ? FadeInImage.memoryNetwork(
+                                          placeholder: kTransparentImage,
+                                          image: feedViewModel2.videoSource!
+                                              .listData[index].thumbnail,
+                                          fit: BoxFit.fitHeight,
+                                        )
+                                      : CachedNetworkImage(
+                                          placeholder: (context, url) =>
+                                              Container(
+                                                  // color: Colors.grey,
+                                                  ),
+                                          fit: BoxFit.fitHeight,
+                                          cacheManager:
+                                              CustomCacheManager.instance2,
+                                          imageUrl: feedViewModel2.videoSource!
+                                              .listData[index].thumbnail,
                                         ),
-                                    fit: BoxFit.fitHeight,
-                                    cacheManager: CustomCacheManager.instance2,
-                                    imageUrl: feedViewModel2
-                                        .videoSource!.listData[index].thumbnail,
-                                  ),
                                 ),
                               ),
                             ],

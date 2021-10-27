@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
+import 'package:oknoapp/services/web_placeholder.dart';
 import '../models/my_saved.dart';
 import '../firebase functions/sidebar_fun.dart';
 import '../providers/savedvideoprovider.dart';
@@ -97,19 +99,30 @@ class _SavedTabState extends State<SavedTab>
                                       SizedBox.expand(
                                         child: FittedBox(
                                           fit: BoxFit.fill,
-                                          child: CachedNetworkImage(
-                                            placeholder: (context, url) =>
-                                                Container(
-                                                    // color: Colors.grey,
-                                                    ),
-                                            fit: BoxFit.fitHeight,
-                                            cacheManager:
-                                                CustomCacheManager.instance2,
-                                            imageUrl: feedViewModel2
-                                                .videoSource!
-                                                .listData[index]
-                                                .product1,
-                                          ),
+                                          child: kIsWeb
+                                              ? FadeInImage.memoryNetwork(
+                                                  placeholder:
+                                                      kTransparentImage,
+                                                  image: feedViewModel2
+                                                      .videoSource!
+                                                      .listData[index]
+                                                      .product1,
+                                                  fit: BoxFit.fitHeight,
+                                                )
+                                              : CachedNetworkImage(
+                                                  placeholder: (context, url) =>
+                                                      Container(
+                                                          // color: Colors.grey,
+                                                          ),
+                                                  fit: BoxFit.fitHeight,
+                                                  cacheManager:
+                                                      CustomCacheManager
+                                                          .instance2,
+                                                  imageUrl: feedViewModel2
+                                                      .videoSource!
+                                                      .listData[index]
+                                                      .product1,
+                                                ),
                                         ),
                                       ),
                                       Positioned(
