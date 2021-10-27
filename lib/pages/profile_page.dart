@@ -7,7 +7,6 @@ import 'package:oknoapp/pages/change_theme.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/tab_saved.dart';
 import 'package:oknoapp/pages/tabmyvideo.dart';
-import 'package:oknoapp/pages/webview.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:oknoapp/services/web_placeholder.dart';
 import 'video_page.dart';
@@ -282,22 +281,12 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                           ),
                           if (data['Creator'] == true)
                             IconButton(
-                              icon: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.1,
-                                  height:
-                                      MediaQuery.of(context).size.width * 0.1,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          //color: Colors.white12
-
-                                          )),
-                                  child: const Center(
-                                      child: Icon(
-                                    Icons.add_a_photo_outlined,
-                                    size: 20,
-                                    //color: Colors.white,
-                                  ))),
+                              icon: Center(
+                                  child: Icon(
+                                Icons.add_a_photo_outlined,
+                                size: MediaQuery.of(context).size.width * 0.075,
+                                //color: Colors.white,
+                              )),
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -311,14 +300,18 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(),
                               onPressed: () {
-                                Navigator.of(context)
-                                    .push(MaterialPageRoute(builder: (cotext) {
-                                  return const WebViewPage(
-                                      title: 'Terms and Conditions',
-                                      url: 'https://www.oknoapp.com/');
-                                })).whenComplete(() {
+                                _firebase
+                                    .update({'Creator': true}).whenComplete(() {
                                   setState(() {});
                                 });
+                                // Navigator.of(context)
+                                //     .push(MaterialPageRoute(builder: (cotext) {
+                                //   return const WebViewPage(
+                                //       title: 'Terms and Conditions',
+                                //       url: 'https://www.oknoapp.com/');
+                                // })).whenComplete(() {
+                                //   setState(() {});
+                                // });
                               },
                               child: const Center(
                                 child: Text(

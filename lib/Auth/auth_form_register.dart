@@ -27,6 +27,7 @@ class _AuthFormState extends State<AuthForm> {
   var _userEmail = '';
   var _userName = '';
   var _userPassword = '';
+  var _checked = false;
   int _showing = 0;
   var _age = '';
 
@@ -36,6 +37,16 @@ class _AuthFormState extends State<AuthForm> {
     if (_showing == 0) {
       Fluttertoast.showToast(
           msg: "Please Select Age",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          // backgroundColor: Colors.red,
+          // textColor: Colors.white,
+          fontSize: 16.0);
+    }
+    if (_checked == false) {
+      Fluttertoast.showToast(
+          msg: "Please accept terms and conditions.",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
@@ -54,7 +65,7 @@ class _AuthFormState extends State<AuthForm> {
           fontSize: 16.0);
     }
 
-    if (isValid && _gender != '' && _showing != 0) {
+    if (isValid && _gender != '' && _showing != 0 && _checked) {
       _formKey.currentState!.save();
       switch (_showing) {
         case 1:
@@ -252,6 +263,43 @@ class _AuthFormState extends State<AuthForm> {
                           onChanged: _handelRadioValueChange,
                         ),
                         const Text('Female'),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Checkbox(
+                            value: _checked,
+                            onChanged: (newValue) {
+                              setState(() {
+                                _checked = newValue!;
+                              });
+                            }),
+                        TextButton(
+                            onPressed: () {
+                              showLicensePage(
+                                  context: context,
+                                  applicationName: 'Okno',
+                                  applicationIcon: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.asset(
+                                      'assets/OknoIcon.png',
+                                      width: MediaQuery.of(context).size.width *
+                                          0.2,
+                                      height:
+                                          MediaQuery.of(context).size.width *
+                                              0.2,
+                                    ),
+                                  ),
+                                  applicationVersion: '1.2.0',
+                                  applicationLegalese:
+                                      'Your Relationship With Us \n Welcome to TikTok (the “Platform”), which is provided by TikTok Inc. in the United States (collectively such entities will be referred to as “TikTok”, “we” or “us”).\nYou are reading the terms of service (the “Terms”), which govern the relationship and serve as an agreement between you and us and set forth the terms and conditions by which you may access and use the Platform and our related websites, services, applications, products and content (collectively, the “Services”). Access to certain Services or features of the Services (such as, by way of example and not limitation, the ability to submit or share User Content (defined below)) may be subject to age restrictions and not available to all users of the Services. Our Services are provided for private, non-commercial use. For purposes of these Terms, “you” and “your” means you as the user of the Services.\nThe Terms form a legally binding agreement between you and us. Please take the time to read them carefully. If you are under age 18, you may only use the Services with the consent of your parent or legal guardian. Please be sure your parent or legal guardian has reviewed and discussed these Terms with you.\nARBITRATION NOTICE FOR USERS IN THE UNITED STATES: THESE TERMS CONTAIN AN ARBITRATION CLAUSE AND A WAIVER OF RIGHTS TO BRING A CLASS ACTION AGAINST US. EXCEPT FOR CERTAIN TYPES OF DISPUTES MENTIONED IN THAT ARBITRATION CLAUSE, YOU AND TIKTOK AGREE THAT DISPUTES BETWEEN US WILL BE RESOLVED BY MANDATORY BINDING ARBITRATION, AND YOU AND TIKTOK WAIVE ANY RIGHT TO PARTICIPATE IN A CLASS-ACTION LAWSUIT OR CLASS-WIDE ARBITRATION.');
+                            },
+                            child: Text(
+                              'Please accept the terms and conditions.',
+                              style: TextStyle(
+                                  color: Theme.of(context).iconTheme.color),
+                            ))
                       ],
                     ),
                     const SizedBox(height: 12),

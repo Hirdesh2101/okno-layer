@@ -8,7 +8,6 @@ import 'package:oknoapp/pages/encashed_page.dart';
 import 'package:oknoapp/pages/tab_approvedvideo.dart';
 import 'package:oknoapp/pages/tabnonapproved.dart';
 import 'package:oknoapp/services/web_placeholder.dart';
-import './webview.dart';
 import 'video_page.dart';
 import 'package:ionicons/ionicons.dart';
 import '../services/service_locator.dart';
@@ -241,10 +240,12 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                                       decoration: const BoxDecoration(
                                           //  border: Border.all(color: Colors.white12)
                                           ),
-                                      child: const Center(
+                                      child: Center(
                                           child: Icon(
                                         Icons.add_a_photo_outlined,
-                                        size: 20,
+                                        size:
+                                            MediaQuery.of(context).size.width *
+                                                0.075,
                                         //   color: Colors.white,
                                       ))),
                                   onPressed: () {
@@ -268,10 +269,13 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                                         decoration: const BoxDecoration(
                                             //  border: Border.all(color: Colors.white12)
                                             ),
-                                        child: const Center(
+                                        child: Center(
                                             child: Icon(
                                           Ionicons.storefront,
-                                          size: 20,
+                                          size: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.075,
                                           //   color: Colors.white,
                                         ))),
                                     onPressed: () {
@@ -298,14 +302,18 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(),
                               onPressed: () {
-                                Navigator.of(context)
-                                    .push(MaterialPageRoute(builder: (cotext) {
-                                  return const WebViewPage(
-                                      title: 'Terms and Conditions',
-                                      url: 'https://www.oknoapp.com/');
-                                })).whenComplete(() {
+                                _firebase
+                                    .update({'Creator': true}).whenComplete(() {
                                   setState(() {});
                                 });
+                                // Navigator.of(context)
+                                //     .push(MaterialPageRoute(builder: (cotext) {
+                                //   return const WebViewPage(
+                                //       title: 'Terms and Conditions',
+                                //       url: 'https://www.oknoapp.com/');
+                                // })).whenComplete(() {
+                                //   setState(() {});
+                                // });
                               },
                               child: const Center(
                                 child: Text(
