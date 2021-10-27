@@ -6,7 +6,6 @@ import 'package:oknoapp/pages/change_theme.dart';
 import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/tab_saved.dart';
 import 'package:oknoapp/pages/tabmyvideo.dart';
-import 'package:oknoapp/pages/webview.dart';
 import 'package:ionicons/ionicons.dart';
 import 'video_page.dart';
 import 'package:tuple/tuple.dart';
