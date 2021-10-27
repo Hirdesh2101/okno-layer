@@ -128,23 +128,18 @@ class ActionToolBar extends StatelessWidget {
               return !init;
             }
 
-            return Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: SizedBox(
-                  child: LikeButton(
-                    size: MediaQuery.of(context).size.width * 0.1,
-                    likeBuilder: (bool isLiked) {
-                      return Icon(
-                        isLiked ? Icons.favorite : Icons.favorite_border,
-                        color: isLiked ? Colors.red : Colors.white,
-                        size: MediaQuery.of(context).size.width * 0.1,
-                      );
-                    },
-                    isLiked:
-                        list.contains(firebaseServices.user) ? true : false,
-                    onTap: likeFunc,
-                  ),
-                ));
+            return LikeButton(
+              size: MediaQuery.of(context).size.width * 0.1,
+              likeBuilder: (bool isLiked) {
+                return Icon(
+                  isLiked ? Icons.favorite : Icons.favorite_border,
+                  color: isLiked ? Colors.red : Colors.white,
+                  size: MediaQuery.of(context).size.width * 0.1,
+                );
+              },
+              isLiked: list.contains(firebaseServices.user) ? true : false,
+              onTap: likeFunc,
+            );
           }),
       IconButton(
           onPressed: () {
