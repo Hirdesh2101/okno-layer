@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:pedantic/pedantic.dart';
@@ -50,17 +51,23 @@ class LikeVideo {
   }
 
   Future<void> loadController() async {
-    _cacheManager ??= CustomCacheManager.instance;
-    final fileInfo = await _cacheManager?.getFileFromCache(url);
-    if (fileInfo == null) {
-      unawaited(_cacheManager!.downloadFile(url));
+    if (kIsWeb) {
       controller = VideoPlayerController.network(url);
       await controller?.initialize();
       controller?.setLooping(true);
     } else {
-      controller = VideoPlayerController.file(fileInfo.file);
-      await controller?.initialize();
-      controller?.setLooping(true);
+      _cacheManager ??= CustomCacheManager.instance;
+      final fileInfo = await _cacheManager?.getFileFromCache(url);
+      if (fileInfo == null) {
+        unawaited(_cacheManager!.downloadFile(url));
+        controller = VideoPlayerController.network(url);
+        await controller?.initialize();
+        controller?.setLooping(true);
+      } else {
+        controller = VideoPlayerController.file(fileInfo.file);
+        await controller?.initialize();
+        controller?.setLooping(true);
+      }
     }
   }
 

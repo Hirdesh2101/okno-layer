@@ -8,6 +8,7 @@ import 'package:oknoapp/pages/edit_profile.dart';
 import 'package:oknoapp/pages/tab_saved.dart';
 import 'package:oknoapp/pages/tabmyvideo.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:oknoapp/services/web_placeholder.dart';
 import 'video_page.dart';
 import 'package:tuple/tuple.dart';
@@ -159,6 +160,7 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
     final user = FirebaseAuth.instance.currentUser!.uid;
     final _firebase =
         FirebaseFirestore.instance.collection("UsersData").doc(user);
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
     return SliverAppBar(
       iconTheme: Theme.of(context).iconTheme,
       actions: [
@@ -279,7 +281,7 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                           const SizedBox(
                             width: 5,
                           ),
-                          if (data['Creator'] == true)
+                          if (data['Creator'] == true && !kIsWeb)
                             IconButton(
                               icon: Center(
                                   child: Icon(
@@ -299,11 +301,16 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                           if (data['Creator'] == false)
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(),
-                              onPressed: () {
-                                _firebase
+                              onPressed: () async {
+                                await _firebase
                                     .update({'Creator': true}).whenComplete(() {
                                   setState(() {});
                                 });
+                                await _firebase.update({'topic': "creator"});
+                                await _firebaseMessaging
+                                    .unsubscribeFromTopic('viewer');
+                                await _firebaseMessaging
+                                    .subscribeToTopic('creator');
                                 // Navigator.of(context)
                                 //     .push(MaterialPageRoute(builder: (cotext) {
                                 //   return const WebViewPage(

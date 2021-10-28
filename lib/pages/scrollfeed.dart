@@ -90,11 +90,13 @@ class _ScrollFeedState extends State<ScrollFeed> {
   }
 
   void init() async {
-    stream.listen((event) {
-      if (event != '') {
-        submitFun(List.filled(1, event));
-      }
-    });
+    if (!widget.likedPage && !widget.myVideopage) {
+      stream.listen((event) {
+        if (event != '') {
+          submitFun(List.filled(1, event));
+        }
+      });
+    }
     if (!widget.likedPage && !widget.myVideopage) {
       feedViewModel.initial();
     }
@@ -104,234 +106,239 @@ class _ScrollFeedState extends State<ScrollFeed> {
     if (widget.myVideopage) {
       feedViewModel3.initial(widget.startIndex, false, false);
     }
-    feedViewModel.setBusy(true);
-    _dynamicLinkService.retrieveDynamicLink(context);
-    feedViewModel.setBusy(false);
-    await FirebaseMessaging.instance.getToken();
-    FirebaseMessaging.onBackgroundMessage(_handleBckground);
-    // return showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         title: Text(message.notification!.title!),
-    //         content: Text(message.notification!.body!),
-    //         actions: [
-    //           TextButton(onPressed: () {}, child: const Text('Cancel')),
-    //           TextButton(
-    //               onPressed: () {
-    //                 launch(message.data.entries.first.value);
-    //               },
-    //               child: const Text('Visit'))
-    //         ],
-    //       );
-    //     });
-    FirebaseMessaging.onMessage.listen((message) {
-      if (message.data.isNotEmpty) {
-        showDialog(
-            context: context,
-            builder: (context) {
-              if (!widget.likedPage && !widget.myVideopage) {
-                feedViewModel.pauseDrawer();
-              }
-              if (widget.likedPage) {
-                feedViewModel2.pauseDrawer();
-              }
-              if (widget.myVideopage) {
-                feedViewModel3.pauseDrawer(false, false);
-              }
-              return Dialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0)),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (message.data.entries.last.key == 'image')
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image.network(message.data.entries.last.value),
+    if (!widget.likedPage && !widget.myVideopage) {
+      feedViewModel.setBusy(true);
+      _dynamicLinkService.retrieveDynamicLink(context);
+      feedViewModel.setBusy(false);
+      await FirebaseMessaging.instance.getToken();
+      FirebaseMessaging.onBackgroundMessage(_handleBckground);
+      // return showDialog(
+      //     context: context,
+      //     builder: (context) {
+      //       return AlertDialog(
+      //         title: Text(message.notification!.title!),
+      //         content: Text(message.notification!.body!),
+      //         actions: [
+      //           TextButton(onPressed: () {}, child: const Text('Cancel')),
+      //           TextButton(
+      //               onPressed: () {
+      //                 launch(message.data.entries.first.value);
+      //               },
+      //               child: const Text('Visit'))
+      //         ],
+      //       );
+      //     });
+      FirebaseMessaging.onMessage.listen((message) {
+        if (message.data.isNotEmpty) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                if (!widget.likedPage && !widget.myVideopage) {
+                  feedViewModel.pauseDrawer();
+                }
+                if (widget.likedPage) {
+                  feedViewModel2.pauseDrawer();
+                }
+                if (widget.myVideopage) {
+                  feedViewModel3.pauseDrawer(false, false);
+                }
+                return Dialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (message.data.entries.last.key == 'image')
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child:
+                                Image.network(message.data.entries.last.value),
+                          ),
+                        Text(
+                          message.notification!.title!,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                      Text(
-                        message.notification!.title!,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8.0, 4, 8, 8),
-                        child: Text(message.notification!.body!),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Cancel')),
-                          TextButton(
-                              onPressed: () async {
-                                await submitFun(List.filled(
-                                    1, message.data.entries.first.value));
-                                // await launchURL(
-                                //   context,
-                                // );
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Visit'))
-                        ],
-                      )
-                    ],
-                  ));
-            }).whenComplete(() {
-          if (!widget.likedPage && !widget.myVideopage) {
-            feedViewModel.playDrawer();
-          }
-          if (widget.likedPage) {
-            feedViewModel2.playDrawer();
-          }
-          if (widget.myVideopage) {
-            feedViewModel3.playDrawer(false, false);
-          }
-        });
-      }
-    });
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      if (message.data.isNotEmpty) {
-        showDialog(
-            context: context,
-            builder: (context) {
-              if (!widget.likedPage && !widget.myVideopage) {
-                feedViewModel.pauseDrawer();
-              }
-              if (widget.likedPage) {
-                feedViewModel2.pauseDrawer();
-              }
-              if (widget.myVideopage) {
-                feedViewModel3.pauseDrawer(false, false);
-              }
-              return Dialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0)),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (message.data.entries.last.key == 'image')
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image.network(message.data.entries.last.value),
+                          padding: const EdgeInsets.fromLTRB(8.0, 4, 8, 8),
+                          child: Text(message.notification!.body!),
                         ),
-                      Text(
-                        message.notification!.title!,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8.0, 4, 8, 8),
-                        child: Text(message.notification!.body!),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Cancel')),
-                          TextButton(
-                              onPressed: () async {
-                                await submitFun(List.filled(
-                                    1, message.data.entries.first.value));
-                                // await launchURL(
-                                //   context,
-                                // );
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Visit'))
-                        ],
-                      )
-                    ],
-                  ));
-            }).whenComplete(() {
-          if (!widget.likedPage && !widget.myVideopage) {
-            feedViewModel.playDrawer();
-          }
-          if (widget.likedPage) {
-            feedViewModel2.playDrawer();
-          }
-          if (widget.myVideopage) {
-            feedViewModel3.playDrawer(false, false);
-          }
-        });
-      }
-    });
-    _firebaseMessaging.getInitialMessage().then((message) {
-      if (message != null) {
-        return showDialog(
-            context: context,
-            builder: (context) {
-              if (!widget.likedPage && !widget.myVideopage) {
-                feedViewModel.pauseDrawer();
-              }
-              if (widget.likedPage) {
-                feedViewModel2.pauseDrawer();
-              }
-              if (widget.myVideopage) {
-                feedViewModel3.pauseDrawer(false, false);
-              }
-              return Dialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0)),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (message.data.entries.last.key == 'image')
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Cancel')),
+                            TextButton(
+                                onPressed: () async {
+                                  await submitFun(List.filled(
+                                      1, message.data.entries.first.value));
+                                  // await launchURL(
+                                  //   context,
+                                  // );
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Visit'))
+                          ],
+                        )
+                      ],
+                    ));
+              }).whenComplete(() {
+            if (!widget.likedPage && !widget.myVideopage) {
+              feedViewModel.playDrawer();
+            }
+            if (widget.likedPage) {
+              feedViewModel2.playDrawer();
+            }
+            if (widget.myVideopage) {
+              feedViewModel3.playDrawer(false, false);
+            }
+          });
+        }
+      });
+      FirebaseMessaging.onMessageOpenedApp.listen((message) {
+        if (message.data.isNotEmpty) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                if (!widget.likedPage && !widget.myVideopage) {
+                  feedViewModel.pauseDrawer();
+                }
+                if (widget.likedPage) {
+                  feedViewModel2.pauseDrawer();
+                }
+                if (widget.myVideopage) {
+                  feedViewModel3.pauseDrawer(false, false);
+                }
+                return Dialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (message.data.entries.last.key == 'image')
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child:
+                                Image.network(message.data.entries.last.value),
+                          ),
+                        Text(
+                          message.notification!.title!,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image.network(message.data.entries.last.value),
+                          padding: const EdgeInsets.fromLTRB(8.0, 4, 8, 8),
+                          child: Text(message.notification!.body!),
                         ),
-                      Text(
-                        message.notification!.title!,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8.0, 4, 8, 8),
-                        child: Text(message.notification!.body!),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Cancel')),
-                          TextButton(
-                              onPressed: () async {
-                                await submitFun(List.filled(
-                                    1, message.data.entries.first.value));
-                                // await launchURL(
-                                //   context,
-                                // );
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Visit'))
-                        ],
-                      )
-                    ],
-                  ));
-            }).whenComplete(() {
-          if (!widget.likedPage && !widget.myVideopage) {
-            feedViewModel.playDrawer();
-          }
-          if (widget.likedPage) {
-            feedViewModel2.playDrawer();
-          }
-          if (widget.myVideopage) {
-            feedViewModel3.playDrawer(false, false);
-          }
-        });
-      }
-    });
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Cancel')),
+                            TextButton(
+                                onPressed: () async {
+                                  await submitFun(List.filled(
+                                      1, message.data.entries.first.value));
+                                  // await launchURL(
+                                  //   context,
+                                  // );
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Visit'))
+                          ],
+                        )
+                      ],
+                    ));
+              }).whenComplete(() {
+            if (!widget.likedPage && !widget.myVideopage) {
+              feedViewModel.playDrawer();
+            }
+            if (widget.likedPage) {
+              feedViewModel2.playDrawer();
+            }
+            if (widget.myVideopage) {
+              feedViewModel3.playDrawer(false, false);
+            }
+          });
+        }
+      });
+      _firebaseMessaging.getInitialMessage().then((message) {
+        if (message != null) {
+          return showDialog(
+              context: context,
+              builder: (context) {
+                if (!widget.likedPage && !widget.myVideopage) {
+                  feedViewModel.pauseDrawer();
+                }
+                if (widget.likedPage) {
+                  feedViewModel2.pauseDrawer();
+                }
+                if (widget.myVideopage) {
+                  feedViewModel3.pauseDrawer(false, false);
+                }
+                return Dialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (message.data.entries.last.key == 'image')
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child:
+                                Image.network(message.data.entries.last.value),
+                          ),
+                        Text(
+                          message.notification!.title!,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(8.0, 4, 8, 8),
+                          child: Text(message.notification!.body!),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Cancel')),
+                            TextButton(
+                                onPressed: () async {
+                                  await submitFun(List.filled(
+                                      1, message.data.entries.first.value));
+                                  // await launchURL(
+                                  //   context,
+                                  // );
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Visit'))
+                          ],
+                        )
+                      ],
+                    ));
+              }).whenComplete(() {
+            if (!widget.likedPage && !widget.myVideopage) {
+              feedViewModel.playDrawer();
+            }
+            if (widget.likedPage) {
+              feedViewModel2.playDrawer();
+            }
+            if (widget.myVideopage) {
+              feedViewModel3.playDrawer(false, false);
+            }
+          });
+        }
+      });
+    }
   }
 
   @override
