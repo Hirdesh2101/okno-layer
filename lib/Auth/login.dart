@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:oknoapp/Auth/sign_in_details.dart';
 //import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 import 'auth_form_login.dart';
@@ -39,53 +40,11 @@ class _LoginscreenState extends State<Loginscreen> {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-        await _auth.signInWithCredential(credential);
-        try {
-          final user = FirebaseAuth.instance.currentUser;
-          var check = false;
-          await FirebaseFirestore.instance
-              .collection('UsersData')
-              .doc(user!.uid)
-              .get()
-              .then((value) {
-            if (value.exists) {
-              check = true;
-            }
-          });
-          if (!check) {
-            await FirebaseFirestore.instance
-                .collection('UsersData')
-                .doc(user.uid)
-                .set({
-              'Name': googleUser.displayName,
-              'Gender': "",
-              'Email': googleUser.email,
-              'Age': "",
-              'Creator': false,
-              'Likes': [],
-              'MyVideos': [],
-              'Total Income': 0.0,
-              'Balance': 0.0,
-              'Encashed': 0.0,
-              'WatchedVideo': [],
-              'Saved': [],
-              'topic': 'viewer',
-              'Image': googleUser.photoUrl,
-              'BrandEnabled': false,
-              'BrandAssociated': [],
-            });
-          }
-        } catch (err) {
-          var message = 'Try Again Later';
-          ScaffoldMessenger.of(ctx).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: Theme.of(ctx).errorColor,
-            ),
-          );
-          setState(() {
-            _isLoading = false;
-          });
+        final UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
+        if (userCredential.additionalUserInfo!.isNewUser) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => GoogleDetails(googleUser)));
         }
       } catch (err) {
         var message = 'An error occurred, please check your credentials!';

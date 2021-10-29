@@ -561,7 +561,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
             },
             child: Stack(children: [
               GestureDetector(
-                //behavior: HitTestBehavior.opaque,
+                behavior: HitTestBehavior.opaque,
                 onTap: () {
                   if (video.controller!.value.isPlaying) {
                     video.controller?.pause();

@@ -93,7 +93,7 @@ class ActionToolBar extends StatelessWidget {
           right: 0,
           bottom: 0,
           child: Padding(
-            padding: const EdgeInsets.all(5.0),
+            padding: const EdgeInsets.all(15.0),
             child: sideButtons(),
           ),
         )
@@ -106,8 +106,13 @@ class ActionToolBar extends StatelessWidget {
           future: FirebaseFirestore.instance.collection('VideosData').get(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(
-                width: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.1,
+              return IconButton(
+                icon: Icon(
+                  Icons.favorite_border,
+                  color: Colors.white,
+                  size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.1,
+                ),
+                onPressed: () {},
               );
             }
             final documents = snapshot.data!.docs.where((element) {
@@ -133,12 +138,13 @@ class ActionToolBar extends StatelessWidget {
             }
 
             return LikeButton(
-              size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.1,
+              padding: const EdgeInsets.all(0),
+              size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.1,
               likeBuilder: (bool isLiked) {
                 return Icon(
                   isLiked ? Icons.favorite : Icons.favorite_border,
                   color: isLiked ? Colors.red : Colors.white,
-                  size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.1,
+                  size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.1,
                 );
               },
               isLiked: list.contains(firebaseServices.user) ? true : false,
@@ -173,7 +179,7 @@ class ActionToolBar extends StatelessWidget {
           icon: Icon(
             Ionicons.chatbubble_outline,
             color: Colors.white,
-            size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
+            size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.085,
           )),
       const SizedBox(
         height: 10,
@@ -207,7 +213,7 @@ class ActionToolBar extends StatelessWidget {
           icon: Icon(
             Ionicons.paper_plane_outline,
             color: Colors.white,
-            size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
+            size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.085,
           )),
       const SizedBox(
         height: 10,
@@ -362,7 +368,7 @@ class ActionToolBar extends StatelessWidget {
                 ? Ionicons.checkbox_outline
                 : Ionicons.ellipsis_vertical_outline,
             color: filterApplied ? Colors.green : Colors.white,
-            size: kIsWeb ? 70 : MediaQuery.of(context).size.width * 0.085,
+            size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.085,
           )),
     ]);
   }
