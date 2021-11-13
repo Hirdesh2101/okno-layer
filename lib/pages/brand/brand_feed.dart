@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oknoapp/pages/brand/brandtoolbar.dart';
 import 'package:video_player/video_player.dart';
 import 'package:get_it/get_it.dart';
 import 'package:stacked/stacked.dart';
@@ -90,7 +91,9 @@ class _BrandFeedState extends State<BrandFeed> {
                               },
                             ),
                           ),
-
+                          Align(
+                              alignment: Alignment.bottomRight,
+                              child: BrandActionToolBar(index, context)),
                           // ActionToolBar(index, false, false, context),
                         ]);
                       })

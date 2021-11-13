@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/contact_page.dart';
 import 'package:oknoapp/pages/creator_section.dart';
+import 'package:oknoapp/pages/legalpage.dart';
 import 'package:oknoapp/pages/mylikedvideos.dart';
 import 'package:oknoapp/pages/profile_page.dart';
 import 'package:oknoapp/providers/likedvideoprovider.dart';
@@ -211,6 +212,15 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.of(context).push(
                       MaterialPageRoute(builder: (ctx) => const ContactPage()));
+                  feedViewModel.pauseDrawer();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Ionicons.flag_outline),
+                title: const Text('Legal'),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const LegalPage()));
                   feedViewModel.pauseDrawer();
                 },
               ),

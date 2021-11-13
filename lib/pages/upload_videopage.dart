@@ -324,6 +324,7 @@ Future<void> postToFireStore(
     "seller": "Myself",
     "store": url,
     "value": '',
+    "deleted": false,
     "userupload": true,
     "storeupload": false,
     "uploadedby": user,

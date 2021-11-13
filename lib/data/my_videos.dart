@@ -124,6 +124,25 @@ class MyVideosAPI {
       });
     }
     lastitemIndex += 10;
+    if (videoList.length < 9 && hasMore) {
+      for (int i = lastitemIndex; i < lastitemIndex + 10; i++) {
+        if (i > listVideos.length - 1) {
+          hasMore = false;
+          break;
+        }
+        await _firestore
+            .collection("VideosData")
+            .doc(listVideos[i])
+            .get()
+            .then((snapshot) {
+          if (snapshot.data()!['deleted'] == false) {
+            video = MyVideos.fromJson(snapshot.data()!);
+            videoList.add(video);
+          }
+        });
+      }
+      lastitemIndex += 10;
+    }
     return videoList;
   }
 
@@ -149,6 +168,28 @@ class MyVideosAPI {
       });
     }
     lastitemIndexapproved += 10;
+    if (videoList.length < 9 && hasMoreapproved) {
+      for (int i = lastitemIndexapproved; i < lastitemIndexapproved + 10; i++) {
+        if (i > listVideos.length - 1) {
+          hasMoreapproved = false;
+          break;
+        }
+        await _firestore
+            .collection("VideosData")
+            .doc(listVideos[i])
+            .get()
+            .then((snapshot) {
+          if (snapshot.data()!['deleted'] == false) {
+            video = MyVideos.fromJson(snapshot.data()!);
+            if (video.approved) {
+              videoList.add(video);
+            }
+          }
+        });
+      }
+
+      lastitemIndexapproved += 10;
+    }
     return videoList;
   }
 
@@ -176,6 +217,30 @@ class MyVideosAPI {
       });
     }
     lastitemIndexnonapproved += 10;
+    if (videoList.length < 9 && hasMorenonapproved) {
+      for (int i = lastitemIndexnonapproved;
+          i < lastitemIndexnonapproved + 10;
+          i++) {
+        if (i > listVideos.length - 1) {
+          hasMorenonapproved = false;
+          break;
+        }
+        await _firestore
+            .collection("VideosData")
+            .doc(listVideos[i])
+            .get()
+            .then((snapshot) {
+          if (snapshot.data()!['deleted'] == false) {
+            video = MyVideos.fromJson(snapshot.data()!);
+            if (!video.approved) {
+              videoList.add(video);
+            }
+          }
+        });
+      }
+
+      lastitemIndexnonapproved += 10;
+    }
     return videoList;
   }
 }

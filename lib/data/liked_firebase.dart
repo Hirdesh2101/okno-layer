@@ -58,6 +58,25 @@ class LikedVideosAPI {
       });
     }
     lastitemIndex += 10;
+    if (videoList.length < 9 && hasMore) {
+      for (int i = lastitemIndex; i < lastitemIndex + 10; i++) {
+        if (i > listVideos.length - 1) {
+          hasMore = false;
+          break;
+        }
+        await _firestore
+            .collection("VideosData")
+            .doc(listVideos[i])
+            .get()
+            .then((snapshot) {
+          if (snapshot.data()!['deleted'] == false) {
+            video = LikeVideo.fromJson(snapshot.data()!);
+            videoList.add(video);
+          }
+        });
+      }
+      lastitemIndex += 10;
+    }
     return videoList;
   }
 }

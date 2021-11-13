@@ -92,6 +92,15 @@ class SideBarFirebase {
     });
   }
 
+  Future<void> brandreportVideo(dynamic docu) async {
+    await FirebaseFirestore.instance.collection('Requests').doc(docu).set({
+      'video': docu,
+      'timestamp': DateTime.now(),
+      'user': user,
+      'report': true,
+    });
+  }
+
   Future<void> saveVideo(dynamic docu) async {
     var obj2 = [docu];
     FirebaseFirestore.instance
