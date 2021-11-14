@@ -17,8 +17,7 @@ import 'package:share_plus/share_plus.dart';
 import '../providers/filter_provider.dart';
 import 'package:filter_list/filter_list.dart';
 
-// ignore: must_be_immutable
-class ActionToolBar extends StatelessWidget {
+class ActionToolBar extends StatefulWidget {
   final int index;
   final bool likedPage;
   final bool mypage;
@@ -29,7 +28,7 @@ class ActionToolBar extends StatelessWidget {
   final Function(List<String>? selectedCountList) appliedFunction;
   final Function(bool status) filterOpened;
   final BuildContext context;
-  ActionToolBar(
+  const ActionToolBar(
       this.index,
       this.likedPage,
       this.mypage,
@@ -43,22 +42,33 @@ class ActionToolBar extends StatelessWidget {
       {Key? key})
       : super(key: key);
 
+  @override
+  State<ActionToolBar> createState() => _ActionToolBarState();
+}
+
+class _ActionToolBarState extends State<ActionToolBar> {
   final feedViewModel = GetIt.instance<FeedViewModel>();
+
   final feedViewMode2 = GetIt.instance<LikeProvider>();
+
   final feedViewMode3 = GetIt.instance<MyVideosProvider>();
+
   final feedViewMode4 = GetIt.instance<FilterViewModel>();
+
   final SideBarFirebase firebaseServices = SideBarFirebase();
+
   final DynamicLinkService dynamicLinkService = DynamicLinkService();
-  //List<String>? selectedCountList = [];
+
   Future<void> submitFunct(List<String>? selectedCountList) async {
-    await appliedFunction(selectedCountList);
+    await widget.appliedFunction(selectedCountList);
   }
 
   void statusCheck(bool value) {
-    filterOpened(value);
+    widget.filterOpened(value);
   }
 
   bool _status = true;
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -73,334 +83,397 @@ class ActionToolBar extends StatelessWidget {
             style: TextStyle(color: Colors.white),
           ),
           onPressed: () async {
-            likedPage || mypage
-                ? likedPage
+            widget.likedPage || widget.mypage
+                ? widget.likedPage
                     ? feedViewMode2.pauseDrawer()
                     : feedViewMode3.pauseDrawer(false, false)
-                : filterScreen
+                : widget.filterScreen
                     ? feedViewMode4.pauseDrawer()
                     : feedViewModel.pauseDrawer();
-            ProductDetails()
-                .sheet(context, index, likedPage, mypage, filterScreen);
-            await firebaseServices.viewedProduct(likedPage
-                ? feedViewMode2.videoSource!.listData[index].id
-                : filterScreen
-                    ? feedViewMode4.videoSource!.listVideos[index].id.trim()
-                    : feedViewModel.videoSource!.listVideos[index].id.trim());
+            ProductDetails().sheet(context, widget.index, widget.likedPage,
+                widget.mypage, widget.filterScreen);
+            await firebaseServices.viewedProduct(widget.likedPage
+                ? feedViewMode2.videoSource!.listData[widget.index].id
+                : widget.filterScreen
+                    ? feedViewMode4.videoSource!.listVideos[widget.index].id
+                        .trim()
+                    : feedViewModel.videoSource!.listVideos[widget.index].id
+                        .trim());
           },
         ),
       ),
-      if (!likedPage && !mypage)
+      if (!widget.likedPage && !widget.mypage)
         Positioned(
           right: 0,
           bottom: 0,
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: sideButtons(),
-          ),
+          child: sideButtons(),
         )
     ]);
   }
 
   Widget sideButtons() {
-    return Column(mainAxisSize: MainAxisSize.min, children: [
-      if (kIsWeb)
-        IconButton(
-            onPressed: () {
-              if (_status) {
-                if (filterScreen) {
-                  feedViewMode4.pauseDrawer();
-                } else {
-                  feedViewModel.pauseDrawer();
-                }
-                _status = !_status;
-              } else {
-                if (filterScreen) {
-                  feedViewMode4.playDrawer();
-                } else {
-                  feedViewModel.playDrawer();
-                }
-                _status = !_status;
-              }
-            },
-            icon: const Icon(
-              Ionicons.play_outline,
-              color: Colors.white,
-              size: 40,
-            )),
-      if (kIsWeb)
-        const SizedBox(
-          height: 10,
-        ),
-      FutureBuilder<QuerySnapshot>(
-          future: FirebaseFirestore.instance.collection('VideosData').get(),
-          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return IconButton(
-                icon: Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                  size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.1,
-                ),
-                onPressed: () {},
-              );
-            }
-            final documents = snapshot.data!.docs.where((element) {
-              return filterScreen
-                  ? element.id ==
-                      feedViewMode4.videoSource!.listVideos[index].id.trim()
-                  : element.id ==
-                      feedViewModel.videoSource!.listVideos[index].id.trim();
-            });
-            List<dynamic> list = documents.first['Likes'] ?? [];
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (kIsWeb)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: StatefulBuilder(builder: (context, setState) {
+                return IconButton(
+                    onPressed: () {
+                      if (_status) {
+                        if (widget.filterScreen) {
+                          feedViewMode4.pauseDrawer();
+                        } else {
+                          feedViewModel.pauseDrawer();
+                        }
+                        setState(() {
+                          _status = !_status;
+                        });
+                      } else {
+                        if (widget.filterScreen) {
+                          feedViewMode4.playDrawer();
+                        } else {
+                          feedViewModel.playDrawer();
+                        }
+                        setState(() {
+                          _status = !_status;
+                        });
+                      }
+                    },
+                    icon: Icon(
+                      _status ? Ionicons.pause_outline : Ionicons.play_outline,
+                      color: Colors.white,
+                      size: MediaQuery.of(context).size.width * 0.1,
+                    ));
+              }),
+            ),
+          // if (kIsWeb)
+          //   const SizedBox(
+          //     height: 10,
+          //   ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FutureBuilder<QuerySnapshot>(
+                future:
+                    FirebaseFirestore.instance.collection('VideosData').get(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return IconButton(
+                      icon: Icon(
+                        Icons.favorite_border,
+                        color: Colors.white,
+                        size: kIsWeb
+                            ? MediaQuery.of(context).size.width * 0.1
+                            : MediaQuery.of(context).size.width * 0.1,
+                      ),
+                      onPressed: () {},
+                    );
+                  }
+                  final documents = snapshot.data!.docs.where((element) {
+                    return widget.filterScreen
+                        ? element.id ==
+                            feedViewMode4
+                                .videoSource!.listVideos[widget.index].id
+                                .trim()
+                        : element.id ==
+                            feedViewModel
+                                .videoSource!.listVideos[widget.index].id
+                                .trim();
+                  });
+                  List<dynamic> list = documents.first['Likes'] ?? [];
 
-            Future<bool> likeFunc(bool init) async {
-              firebaseServices.add(
-                  likedPage
-                      ? feedViewMode2.videoSource!.listData[index].id
-                      : filterScreen
-                          ? feedViewMode4.videoSource!.listVideos[index].id
-                              .trim()
-                          : feedViewModel.videoSource!.listVideos[index].id
-                              .trim(),
-                  list.contains(firebaseServices.user) ? true : false);
-              return !init;
-            }
+                  Future<bool> likeFunc(bool init) async {
+                    firebaseServices.add(
+                        widget.likedPage
+                            ? feedViewMode2
+                                .videoSource!.listData[widget.index].id
+                            : widget.filterScreen
+                                ? feedViewMode4
+                                    .videoSource!.listVideos[widget.index].id
+                                    .trim()
+                                : feedViewModel
+                                    .videoSource!.listVideos[widget.index].id
+                                    .trim(),
+                        list.contains(firebaseServices.user) ? true : false);
+                    return !init;
+                  }
 
-            return LikeButton(
-              padding: const EdgeInsets.all(0),
-              size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.1,
-              likeBuilder: (bool isLiked) {
-                return Icon(
-                  isLiked ? Icons.favorite : Icons.favorite_border,
-                  color: isLiked ? Colors.red : Colors.white,
-                  size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.1,
-                );
-              },
-              isLiked: list.contains(firebaseServices.user) ? true : false,
-              onTap: likeFunc,
-            );
-          }),
-      const SizedBox(
-        height: 10,
-      ),
-      IconButton(
-          onPressed: () {
-            filterScreen
-                ? feedViewMode4.pauseDrawer()
-                : feedViewModel.pauseDrawer();
-            Navigator.of(context)
-                .push(MaterialPageRoute(
-                    builder: (context) => Comments(filterScreen
-                        ? feedViewMode4.videoSource!.listVideos[index].id.trim()
-                        : feedViewModel.videoSource!.listVideos[index].id
-                            .trim())))
-                .then((value) {
-              if (filterScreen) {
-                feedViewMode4.seekZero();
-                feedViewMode4.playDrawer();
-              } else {
-                feedViewModel.seekZero();
-                feedViewModel.playDrawer();
-              }
-              // });
-            });
-          },
-          icon: Icon(
-            Ionicons.chatbubble_outline,
-            color: Colors.white,
-            size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.085,
-          )),
-      const SizedBox(
-        height: 10,
-      ),
-      if (!kIsWeb)
-        IconButton(
-            onPressed: () async {
-              if (filterScreen) {
-                feedViewMode4.pauseDrawer();
-                feedViewMode4.startCircularProgess();
-                Uri uri = await dynamicLinkService
-                    .createDynamicLink(
-                        feedViewMode4.videoSource!.listVideos[index].id.trim())
-                    .whenComplete(() {
-                  feedViewMode4.endCircularProgess();
-                });
-                await Share.share('Look at this video!${uri.toString()}',
-                    subject: 'Look at this video!');
-              } else {
-                feedViewModel.pauseDrawer();
-                feedViewModel.startCircularProgess();
-                Uri uri = await dynamicLinkService
-                    .createDynamicLink(
-                        feedViewModel.videoSource!.listVideos[index].id.trim())
-                    .whenComplete(() {
-                  feedViewModel.endCircularProgess();
-                });
-                await Share.share('Look at this video!${uri.toString()}',
-                    subject: 'Look at this video!');
-              }
-            },
-            icon: Icon(
-              Ionicons.paper_plane_outline,
-              color: Colors.white,
-              size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.085,
-            )),
-      const SizedBox(
-        height: 10,
-      ),
-      IconButton(
-          onPressed: () {
-            if (filterScreen) {
-              feedViewMode4.pauseDrawer();
-            } else {
-              feedViewModel.pauseDrawer();
-            }
-            showModalBottomSheet(
-                context: context,
-                barrierColor: Colors.black.withOpacity(0.3),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                ),
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                elevation: 10,
-                builder: (context) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0.0, 8, 0, 0),
-                          child: Container(
-                            height: MediaQuery.of(context).size.height * 0.01,
-                            width: MediaQuery.of(context).size.width * 0.10,
-                            decoration: const BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                          ),
+                  return LikeButton(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    circleSize: MediaQuery.of(context).size.width * 0.1,
+                    bubblesSize: MediaQuery.of(context).size.width * 0.1,
+                    countPostion: CountPostion.bottom,
+                    padding: const EdgeInsets.all(0.0),
+                    size: kIsWeb
+                        ? MediaQuery.of(context).size.width * 0.1
+                        : MediaQuery.of(context).size.width * 0.1,
+                    likeBuilder: (bool isLiked) {
+                      return Center(
+                          child: IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          isLiked ? Icons.favorite : Icons.favorite_border,
+                          color: isLiked ? Colors.red : Colors.white,
+                          size: kIsWeb
+                              ? MediaQuery.of(context).size.width * 0.1
+                              : MediaQuery.of(context).size.width * 0.1,
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(children: [
-                          ListTile(
-                            leading: Icon(
-                              Ionicons.filter_outline,
-                              color: filterApplied
-                                  ? Colors.green
-                                  : Theme.of(context).iconTheme.color,
-                            ),
-                            title: const Text('Apply Filters'),
-                            onTap: () async {
-                              statusCheck(true);
-                              await FilterListDialog.display<String>(context,
-                                  listData: countList,
-                                  selectedListData: selectedCountList,
-                                  searchFieldTextStyle:
-                                      const TextStyle(color: Colors.black),
-                                  controlButtonTextStyle:
-                                      const TextStyle(color: Colors.blue),
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.6,
-                                  controlContainerDecoration:
-                                      const BoxDecoration(color: Colors.white),
-                                  headlineText: "Select Filters",
-                                  searchFieldHintText: "Search Here",
-                                  applyButtonTextStyle:
-                                      const TextStyle(color: Colors.white),
-                                  selectedItemsText: 'Filters Selected',
-                                  choiceChipLabel: (item) {
-                                return item;
-                              }, validateSelectedItem: (list, val) {
-                                return list!.contains(val);
-                              }, onItemSearch: (list, text) {
-                                if (list!.any((element) => element
-                                    .toLowerCase()
-                                    .contains(text.toLowerCase()))) {
-                                  return list
-                                      .where((element) => element
-                                          .toLowerCase()
-                                          .contains(text.toLowerCase()))
-                                      .toList();
-                                } else {
-                                  return [];
-                                }
-                              }, onApplyButtonClick: (list) async {
-                                if (list != null) {
-                                  await submitFunct(list);
-                                }
-                                Navigator.pop(context);
-                              }).whenComplete(() {
-                                statusCheck(false);
-                                Navigator.pop(context);
-                              });
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Ionicons.bookmark_outline),
-                            title: const Text('Save Video'),
-                            onTap: () {
-                              firebaseServices
-                                  .saveVideo(filterScreen
-                                      ? feedViewMode4
-                                          .videoSource!.listVideos[index].id
-                                          .trim()
-                                      : feedViewModel
-                                          .videoSource!.listVideos[index].id
-                                          .trim())
-                                  .whenComplete(() {
-                                Fluttertoast.showToast(
-                                    msg: "Saved",
-                                    toastLength: Toast.LENGTH_LONG,
-                                    gravity: ToastGravity.BOTTOM,
-                                    fontSize: 16.0);
-                              });
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Ionicons.alert_circle_outline),
-                            title: const Text('Report Video'),
-                            onTap: () {
-                              Fluttertoast.showToast(
-                                  msg: "Please Wait",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  fontSize: 16.0);
-                              firebaseServices
-                                  .reportVideo(filterScreen
-                                      ? feedViewMode4
-                                          .videoSource!.listVideos[index].id
-                                          .trim()
-                                      : feedViewModel
-                                          .videoSource!.listVideos[index].id
-                                          .trim())
-                                  .whenComplete(() {
-                                Fluttertoast.showToast(
-                                    msg: "Reported Successfully",
-                                    toastLength: Toast.LENGTH_LONG,
-                                    gravity: ToastGravity.BOTTOM,
-                                    fontSize: 16.0);
-                              });
-                            },
-                          ),
-                        ]),
-                      ),
-                    ],
+                      ));
+                    },
+                    isLiked:
+                        list.contains(firebaseServices.user) ? true : false,
+                    onTap: likeFunc,
                   );
-                }).whenComplete(() {
-              filterApplied
-                  ? feedViewMode4.playDrawer()
-                  : feedViewModel.playDrawer();
-            });
-          },
-          icon: Icon(
-            filterApplied
-                ? Ionicons.checkbox_outline
-                : Ionicons.ellipsis_vertical_outline,
-            color: filterApplied ? Colors.green : Colors.white,
-            size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.085,
-          )),
-    ]);
+                }),
+          ),
+          // const SizedBox(
+          //   height: 10,
+          // ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+                onPressed: () {
+                  widget.filterScreen
+                      ? feedViewMode4.pauseDrawer()
+                      : feedViewModel.pauseDrawer();
+                  Navigator.of(widget.context)
+                      .push(MaterialPageRoute(
+                          builder: (context) => Comments(widget.filterScreen
+                              ? feedViewMode4
+                                  .videoSource!.listVideos[widget.index].id
+                                  .trim()
+                              : feedViewModel
+                                  .videoSource!.listVideos[widget.index].id
+                                  .trim())))
+                      .then((value) {
+                    if (widget.filterScreen) {
+                      feedViewMode4.seekZero();
+                      feedViewMode4.playDrawer();
+                    } else {
+                      feedViewModel.seekZero();
+                      feedViewModel.playDrawer();
+                    }
+                    // });
+                  });
+                },
+                icon: Icon(
+                  Ionicons.chatbubble_outline,
+                  color: Colors.white,
+                  size: kIsWeb
+                      ? MediaQuery.of(context).size.width * 0.085
+                      : MediaQuery.of(widget.context).size.width * 0.085,
+                )),
+          ),
+          // const SizedBox(
+          //   height: 10,
+          // ),
+          if (!kIsWeb)
+            IconButton(
+                onPressed: () async {
+                  if (widget.filterScreen) {
+                    feedViewMode4.pauseDrawer();
+                    feedViewMode4.startCircularProgess();
+                    Uri uri = await dynamicLinkService
+                        .createDynamicLink(feedViewMode4
+                            .videoSource!.listVideos[widget.index].id
+                            .trim())
+                        .whenComplete(() {
+                      feedViewMode4.endCircularProgess();
+                    });
+                    await Share.share('Look at this video!${uri.toString()}',
+                        subject: 'Look at this video!');
+                  } else {
+                    feedViewModel.pauseDrawer();
+                    feedViewModel.startCircularProgess();
+                    Uri uri = await dynamicLinkService
+                        .createDynamicLink(feedViewModel
+                            .videoSource!.listVideos[widget.index].id
+                            .trim())
+                        .whenComplete(() {
+                      feedViewModel.endCircularProgess();
+                    });
+                    await Share.share('Look at this video!${uri.toString()}',
+                        subject: 'Look at this video!');
+                  }
+                },
+                icon: Icon(
+                  Ionicons.paper_plane_outline,
+                  color: Colors.white,
+                  size: kIsWeb
+                      ? MediaQuery.of(context).size.width * 0.085
+                      : MediaQuery.of(widget.context).size.width * 0.085,
+                )),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+                onPressed: () {
+                  if (widget.filterScreen) {
+                    feedViewMode4.pauseDrawer();
+                  } else {
+                    feedViewModel.pauseDrawer();
+                  }
+                  showModalBottomSheet(
+                      context: widget.context,
+                      barrierColor: Colors.black.withOpacity(0.3),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(10)),
+                      ),
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      elevation: 10,
+                      builder: (context) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Center(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0.0, 8, 0, 0),
+                                child: Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.10,
+                                  decoration: const BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20))),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(children: [
+                                ListTile(
+                                  leading: Icon(
+                                    Ionicons.filter_outline,
+                                    color: widget.filterApplied
+                                        ? Colors.green
+                                        : Theme.of(context).iconTheme.color,
+                                  ),
+                                  title: const Text('Apply Filters'),
+                                  onTap: () async {
+                                    statusCheck(true);
+                                    await FilterListDialog.display<String>(
+                                        context,
+                                        listData: widget.countList,
+                                        selectedListData:
+                                            widget.selectedCountList,
+                                        searchFieldTextStyle: const TextStyle(
+                                            color: Colors.black),
+                                        controlButtonTextStyle:
+                                            const TextStyle(color: Colors.blue),
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.6,
+                                        controlContainerDecoration:
+                                            const BoxDecoration(
+                                                color: Colors.white),
+                                        headlineText: "Select Filters",
+                                        searchFieldHintText: "Search Here",
+                                        applyButtonTextStyle: const TextStyle(
+                                            color: Colors.white),
+                                        selectedItemsText: 'Filters Selected',
+                                        choiceChipLabel: (item) {
+                                      return item;
+                                    }, validateSelectedItem: (list, val) {
+                                      return list!.contains(val);
+                                    }, onItemSearch: (list, text) {
+                                      if (list!.any((element) => element
+                                          .toLowerCase()
+                                          .contains(text.toLowerCase()))) {
+                                        return list
+                                            .where((element) => element
+                                                .toLowerCase()
+                                                .contains(text.toLowerCase()))
+                                            .toList();
+                                      } else {
+                                        return [];
+                                      }
+                                    }, onApplyButtonClick: (list) async {
+                                      if (list != null) {
+                                        await submitFunct(list);
+                                      }
+                                      Navigator.pop(context);
+                                    }).whenComplete(() {
+                                      statusCheck(false);
+                                      Navigator.pop(context);
+                                    });
+                                  },
+                                ),
+                                ListTile(
+                                  leading:
+                                      const Icon(Ionicons.bookmark_outline),
+                                  title: const Text('Save Video'),
+                                  onTap: () {
+                                    firebaseServices
+                                        .saveVideo(widget.filterScreen
+                                            ? feedViewMode4.videoSource!
+                                                .listVideos[widget.index].id
+                                                .trim()
+                                            : feedViewModel.videoSource!
+                                                .listVideos[widget.index].id
+                                                .trim())
+                                        .whenComplete(() {
+                                      Fluttertoast.showToast(
+                                          msg: "Saved",
+                                          toastLength: Toast.LENGTH_LONG,
+                                          gravity: ToastGravity.BOTTOM,
+                                          fontSize: 16.0);
+                                    });
+                                  },
+                                ),
+                                ListTile(
+                                  leading:
+                                      const Icon(Ionicons.alert_circle_outline),
+                                  title: const Text('Report Video'),
+                                  onTap: () {
+                                    Fluttertoast.showToast(
+                                        msg: "Please Wait",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        fontSize: 16.0);
+                                    firebaseServices
+                                        .reportVideo(widget.filterScreen
+                                            ? feedViewMode4.videoSource!
+                                                .listVideos[widget.index].id
+                                                .trim()
+                                            : feedViewModel.videoSource!
+                                                .listVideos[widget.index].id
+                                                .trim())
+                                        .whenComplete(() {
+                                      Fluttertoast.showToast(
+                                          msg: "Reported Successfully",
+                                          toastLength: Toast.LENGTH_LONG,
+                                          gravity: ToastGravity.BOTTOM,
+                                          fontSize: 16.0);
+                                    });
+                                  },
+                                ),
+                              ]),
+                            ),
+                          ],
+                        );
+                      }).whenComplete(() {
+                    widget.filterApplied
+                        ? feedViewMode4.playDrawer()
+                        : feedViewModel.playDrawer();
+                  });
+                },
+                icon: Icon(
+                  widget.filterApplied
+                      ? Ionicons.checkbox_outline
+                      : Ionicons.ellipsis_vertical_outline,
+                  color: widget.filterApplied ? Colors.green : Colors.white,
+                  size: kIsWeb
+                      ? MediaQuery.of(context).size.width * 0.1
+                      : MediaQuery.of(widget.context).size.width * 0.1,
+                )),
+          ),
+        ]);
   }
 }
