@@ -17,6 +17,7 @@ import 'package:share_plus/share_plus.dart';
 import '../providers/filter_provider.dart';
 import 'package:filter_list/filter_list.dart';
 
+// ignore: must_be_immutable
 class ActionToolBar extends StatelessWidget {
   final int index;
   final bool likedPage;
@@ -57,6 +58,7 @@ class ActionToolBar extends StatelessWidget {
     filterOpened(value);
   }
 
+  bool _status = true;
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -102,6 +104,34 @@ class ActionToolBar extends StatelessWidget {
 
   Widget sideButtons() {
     return Column(mainAxisSize: MainAxisSize.min, children: [
+      if (kIsWeb)
+        IconButton(
+            onPressed: () {
+              if (_status) {
+                if (filterScreen) {
+                  feedViewMode4.pauseDrawer();
+                } else {
+                  feedViewModel.pauseDrawer();
+                }
+                _status = !_status;
+              } else {
+                if (filterScreen) {
+                  feedViewMode4.playDrawer();
+                } else {
+                  feedViewModel.playDrawer();
+                }
+                _status = !_status;
+              }
+            },
+            icon: const Icon(
+              Ionicons.play_outline,
+              color: Colors.white,
+              size: 40,
+            )),
+      if (kIsWeb)
+        const SizedBox(
+          height: 10,
+        ),
       FutureBuilder<QuerySnapshot>(
           future: FirebaseFirestore.instance.collection('VideosData').get(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -184,37 +214,38 @@ class ActionToolBar extends StatelessWidget {
       const SizedBox(
         height: 10,
       ),
-      IconButton(
-          onPressed: () async {
-            if (filterScreen) {
-              feedViewMode4.pauseDrawer();
-              feedViewMode4.startCircularProgess();
-              Uri uri = await dynamicLinkService
-                  .createDynamicLink(
-                      feedViewMode4.videoSource!.listVideos[index].id.trim())
-                  .whenComplete(() {
-                feedViewMode4.endCircularProgess();
-              });
-              await Share.share('Look at this video!${uri.toString()}',
-                  subject: 'Look at this video!');
-            } else {
-              feedViewModel.pauseDrawer();
-              feedViewModel.startCircularProgess();
-              Uri uri = await dynamicLinkService
-                  .createDynamicLink(
-                      feedViewModel.videoSource!.listVideos[index].id.trim())
-                  .whenComplete(() {
-                feedViewModel.endCircularProgess();
-              });
-              await Share.share('Look at this video!${uri.toString()}',
-                  subject: 'Look at this video!');
-            }
-          },
-          icon: Icon(
-            Ionicons.paper_plane_outline,
-            color: Colors.white,
-            size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.085,
-          )),
+      if (!kIsWeb)
+        IconButton(
+            onPressed: () async {
+              if (filterScreen) {
+                feedViewMode4.pauseDrawer();
+                feedViewMode4.startCircularProgess();
+                Uri uri = await dynamicLinkService
+                    .createDynamicLink(
+                        feedViewMode4.videoSource!.listVideos[index].id.trim())
+                    .whenComplete(() {
+                  feedViewMode4.endCircularProgess();
+                });
+                await Share.share('Look at this video!${uri.toString()}',
+                    subject: 'Look at this video!');
+              } else {
+                feedViewModel.pauseDrawer();
+                feedViewModel.startCircularProgess();
+                Uri uri = await dynamicLinkService
+                    .createDynamicLink(
+                        feedViewModel.videoSource!.listVideos[index].id.trim())
+                    .whenComplete(() {
+                  feedViewModel.endCircularProgess();
+                });
+                await Share.share('Look at this video!${uri.toString()}',
+                    subject: 'Look at this video!');
+              }
+            },
+            icon: Icon(
+              Ionicons.paper_plane_outline,
+              color: Colors.white,
+              size: kIsWeb ? 40 : MediaQuery.of(context).size.width * 0.085,
+            )),
       const SizedBox(
         height: 10,
       ),

@@ -164,19 +164,20 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
     return SliverAppBar(
       iconTheme: Theme.of(context).iconTheme,
       actions: [
-        PopupMenuButton(itemBuilder: (BuildContext context) {
-          return <PopupMenuEntry>[
-            const PopupMenuItem(
-              child: Text('Settings'),
-              value: 1,
-            ),
-          ];
-        }, onSelected: (value) async {
-          if (value == 1) {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (ctx) => const ThemeScreen()));
-          }
-        })
+        if (!kIsWeb)
+          PopupMenuButton(itemBuilder: (BuildContext context) {
+            return <PopupMenuEntry>[
+              const PopupMenuItem(
+                child: Text('Settings'),
+                value: 1,
+              ),
+            ];
+          }, onSelected: (value) async {
+            if (value == 1) {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const ThemeScreen()));
+            }
+          })
       ],
       expandedHeight: 270,
       pinned: true,
