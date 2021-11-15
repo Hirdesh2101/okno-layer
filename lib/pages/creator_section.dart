@@ -229,36 +229,39 @@ class _PortfolioSliverAppBarState extends State<PortfolioSliverAppBar> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (data['Creator'] == true && !kIsWeb)
+                          if (data['Creator'] == true)
                             Row(
                               children: [
-                                IconButton(
-                                  icon: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.1,
-                                      height:
-                                          MediaQuery.of(context).size.width *
-                                              0.1,
-                                      decoration: const BoxDecoration(
-                                          //  border: Border.all(color: Colors.white12)
-                                          ),
-                                      child: Center(
-                                          child: Icon(
-                                        Icons.add_a_photo_outlined,
-                                        size:
+                                if (!kIsWeb)
+                                  IconButton(
+                                    icon: Container(
+                                        width:
                                             MediaQuery.of(context).size.width *
-                                                0.075,
-                                        //   color: Colors.white,
-                                      ))),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const VideoRecorder()),
-                                    );
-                                  },
-                                ),
+                                                0.1,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.1,
+                                        decoration: const BoxDecoration(
+                                            //  border: Border.all(color: Colors.white12)
+                                            ),
+                                        child: Center(
+                                            child: Icon(
+                                          Icons.add_a_photo_outlined,
+                                          size: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.075,
+                                          //   color: Colors.white,
+                                        ))),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const VideoRecorder()),
+                                      );
+                                    },
+                                  ),
                                 if (data['BrandEnabled'] == true)
                                   IconButton(
                                     icon: Container(

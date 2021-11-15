@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/Auth/login.dart';
 import 'package:oknoapp/Auth/register.dart';
@@ -57,15 +58,17 @@ class _MyAppState extends State<MyApp> {
     }, child: Consumer<ThemeModel>(
         builder: (context, ThemeModel themeNotifier, child) {
       return MaterialApp(
-          title: 'OkNoApp',
+          title: 'OkNo',
           theme: themeNotifier.isDark ? darkTheme : lightTheme,
           debugShowCheckedModeBanner: false,
           home: StreamBuilder(
               stream: FirebaseAuth.instance.authStateChanges(),
               builder: (ctx, userSnapshot) {
-                if (userSnapshot.connectionState == ConnectionState.waiting ||
-                    !_isTimerDone) {
-                  return const SplashScreen();
+                if (!kIsWeb) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting ||
+                      !_isTimerDone) {
+                    return const SplashScreen();
+                  }
                 }
                 if (userSnapshot.hasData) {
                   WidgetsFlutterBinding.ensureInitialized();

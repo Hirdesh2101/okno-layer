@@ -358,11 +358,12 @@ class _ScrollFeedState extends State<ScrollFeed> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        kIsWeb
+        kIsWeb &&
+                (defaultTargetPlatform == TargetPlatform.windows ||
+                    defaultTargetPlatform == TargetPlatform.macOS ||
+                    defaultTargetPlatform == TargetPlatform.linux)
             ? Expanded(
-                child: Center(
-                    child:
-                        AspectRatio(aspectRatio: 9 / 16, child: feedVideos())),
+                child: AspectRatio(aspectRatio: 9 / 16, child: feedVideos()),
               )
             : Expanded(child: feedVideos()),
       ],
@@ -410,6 +411,8 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                 });
                               },
                               child: SingleChildScrollView(
+                                physics: const BouncingScrollPhysics(
+                                    parent: AlwaysScrollableScrollPhysics()),
                                 child: SizedBox(
                                   height: MediaQuery.of(context).size.height,
                                   child: Center(
