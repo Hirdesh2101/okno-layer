@@ -145,7 +145,8 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     icon: Icon(
                       _status ? Ionicons.pause_outline : Ionicons.play_outline,
                       color: Colors.white,
-                      // size: MediaQuery.of(context).size.width * 0.1,
+                      size: 40,
+                      // size: MediaQuery.of(context).size.height * 0.070,
                     ));
               }),
             ),
@@ -158,10 +159,17 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     return IconButton(
                       icon: const Icon(
                         Icons.favorite_border,
+                        size: 40,
                         color: Colors.white,
-                        // size: kIsWeb
-                        //     ? MediaQuery.of(context).size.width * 0.1
-                        //     : MediaQuery.of(context).size.width * 0.1,
+                        // size: kIsWeb &&
+                        //         (defaultTargetPlatform ==
+                        //                 TargetPlatform.windows ||
+                        //             defaultTargetPlatform ==
+                        //                 TargetPlatform.macOS ||
+                        //             defaultTargetPlatform ==
+                        //                 TargetPlatform.linux)
+                        //     ? MediaQuery.of(context).size.height * 0.070
+                        //     : MediaQuery.of(context).size.width * 0.070,
                       ),
                       onPressed: () {},
                     );
@@ -202,16 +210,27 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     // bubblesSize: MediaQuery.of(context).size.width * 0.1,
                     // countPostion: CountPostion.bottom,
                     padding: const EdgeInsets.all(0.0),
-                    // size: kIsWeb
-                    //     ? MediaQuery.of(context).size.width * 0.1
-                    //     : MediaQuery.of(context).size.width * 0.1,
+                    size: 40,
+                    // size: kIsWeb &&
+                    //         (defaultTargetPlatform == TargetPlatform.windows ||
+                    //             defaultTargetPlatform == TargetPlatform.macOS ||
+                    //             defaultTargetPlatform == TargetPlatform.linux)
+                    //     ? MediaQuery.of(context).size.height * 0.070
+                    //     : MediaQuery.of(context).size.width * 0.070,
                     likeBuilder: (bool isLiked) {
                       return Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
                         color: isLiked ? Colors.red : Colors.white,
-                        // size: kIsWeb
-                        //     ? MediaQuery.of(context).size.width * 0.1
-                        //     : MediaQuery.of(context).size.width * 0.1,
+                        size: 40,
+                        // size: kIsWeb &&
+                        //         (defaultTargetPlatform ==
+                        //                 TargetPlatform.windows ||
+                        //             defaultTargetPlatform ==
+                        //                 TargetPlatform.macOS ||
+                        //             defaultTargetPlatform ==
+                        //                 TargetPlatform.linux)
+                        //     ? MediaQuery.of(context).size.height * 0.070
+                        //     : MediaQuery.of(context).size.width * 0.070,
                       );
                     },
                     isLiked:
@@ -249,9 +268,13 @@ class _ActionToolBarState extends State<ActionToolBar> {
                 icon: const Icon(
                   Ionicons.chatbubble_outline,
                   color: Colors.white,
-                  // size: kIsWeb
-                  //     ? MediaQuery.of(context).size.width * 0.085
-                  //     : MediaQuery.of(widget.context).size.width * 0.085,
+                  size: 40,
+                  // size: kIsWeb &&
+                  //         (defaultTargetPlatform == TargetPlatform.windows ||
+                  //             defaultTargetPlatform == TargetPlatform.macOS ||
+                  //             defaultTargetPlatform == TargetPlatform.linux)
+                  //     ? MediaQuery.of(context).size.height * 0.065
+                  //     : MediaQuery.of(widget.context).size.width * 0.065,
                 )),
           ),
           if (!kIsWeb)
@@ -287,9 +310,13 @@ class _ActionToolBarState extends State<ActionToolBar> {
                   icon: const Icon(
                     Ionicons.paper_plane_outline,
                     color: Colors.white,
-                    // size: kIsWeb
-                    //     ? MediaQuery.of(context).size.width * 0.085
-                    //     : MediaQuery.of(widget.context).size.width * 0.085,
+                    size: 40,
+                    // size: kIsWeb &&
+                    //         (defaultTargetPlatform == TargetPlatform.windows ||
+                    //             defaultTargetPlatform == TargetPlatform.macOS ||
+                    //             defaultTargetPlatform == TargetPlatform.linux)
+                    //     ? MediaQuery.of(context).size.height * 0.065
+                    //     : MediaQuery.of(widget.context).size.width * 0.065,
                   )),
             ),
           Expanded(
@@ -453,9 +480,13 @@ class _ActionToolBarState extends State<ActionToolBar> {
                       ? Ionicons.checkbox_outline
                       : Ionicons.ellipsis_vertical_outline,
                   color: widget.filterApplied ? Colors.green : Colors.white,
-                  // size: kIsWeb
-                  //     ? MediaQuery.of(context).size.width * 0.1
-                  //     : MediaQuery.of(widget.context).size.width * 0.1,
+                  size: 40,
+                  // size: kIsWeb &&
+                  //         (defaultTargetPlatform == TargetPlatform.windows ||
+                  //             defaultTargetPlatform == TargetPlatform.macOS ||
+                  //             defaultTargetPlatform == TargetPlatform.linux)
+                  //     ? MediaQuery.of(context).size.height * 0.070
+                  //     : MediaQuery.of(widget.context).size.width * 0.070,
                 )),
           )
         ],
