@@ -145,7 +145,6 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     icon: Icon(
                       _status ? Ionicons.pause_outline : Ionicons.play_outline,
                       color: Colors.white,
-                      size: 40,
                       // size: MediaQuery.of(context).size.height * 0.070,
                     ));
               }),
@@ -159,7 +158,6 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     return IconButton(
                       icon: const Icon(
                         Icons.favorite_border,
-                        size: 40,
                         color: Colors.white,
                         // size: kIsWeb &&
                         //         (defaultTargetPlatform ==
@@ -210,7 +208,6 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     // bubblesSize: MediaQuery.of(context).size.width * 0.1,
                     // countPostion: CountPostion.bottom,
                     padding: const EdgeInsets.all(0.0),
-                    size: 40,
                     // size: kIsWeb &&
                     //         (defaultTargetPlatform == TargetPlatform.windows ||
                     //             defaultTargetPlatform == TargetPlatform.macOS ||
@@ -221,7 +218,6 @@ class _ActionToolBarState extends State<ActionToolBar> {
                       return Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
                         color: isLiked ? Colors.red : Colors.white,
-                        size: 40,
                         // size: kIsWeb &&
                         //         (defaultTargetPlatform ==
                         //                 TargetPlatform.windows ||
@@ -268,7 +264,6 @@ class _ActionToolBarState extends State<ActionToolBar> {
                 icon: const Icon(
                   Ionicons.chatbubble_outline,
                   color: Colors.white,
-                  size: 40,
                   // size: kIsWeb &&
                   //         (defaultTargetPlatform == TargetPlatform.windows ||
                   //             defaultTargetPlatform == TargetPlatform.macOS ||
@@ -310,7 +305,6 @@ class _ActionToolBarState extends State<ActionToolBar> {
                   icon: const Icon(
                     Ionicons.paper_plane_outline,
                     color: Colors.white,
-                    size: 40,
                     // size: kIsWeb &&
                     //         (defaultTargetPlatform == TargetPlatform.windows ||
                     //             defaultTargetPlatform == TargetPlatform.macOS ||
@@ -480,7 +474,6 @@ class _ActionToolBarState extends State<ActionToolBar> {
                       ? Ionicons.checkbox_outline
                       : Ionicons.ellipsis_vertical_outline,
                   color: widget.filterApplied ? Colors.green : Colors.white,
-                  size: 40,
                   // size: kIsWeb &&
                   //         (defaultTargetPlatform == TargetPlatform.windows ||
                   //             defaultTargetPlatform == TargetPlatform.macOS ||
