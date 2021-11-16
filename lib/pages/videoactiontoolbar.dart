@@ -112,14 +112,13 @@ class _ActionToolBarState extends State<ActionToolBar> {
   }
 
   Widget sideButtons() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.35,
+      width: MediaQuery.of(context).size.height * 0.12,
+      child: Column(
         children: [
           if (kIsWeb)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+            Expanded(
               child: StatefulBuilder(builder: (context, setState) {
                 return IconButton(
                     onPressed: () {
@@ -146,28 +145,23 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     icon: Icon(
                       _status ? Ionicons.pause_outline : Ionicons.play_outline,
                       color: Colors.white,
-                      size: MediaQuery.of(context).size.width * 0.1,
+                      // size: MediaQuery.of(context).size.width * 0.1,
                     ));
               }),
             ),
-          // if (kIsWeb)
-          //   const SizedBox(
-          //     height: 10,
-          //   ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          Expanded(
             child: FutureBuilder<QuerySnapshot>(
                 future:
                     FirebaseFirestore.instance.collection('VideosData').get(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.favorite_border,
                         color: Colors.white,
-                        size: kIsWeb
-                            ? MediaQuery.of(context).size.width * 0.1
-                            : MediaQuery.of(context).size.width * 0.1,
+                        // size: kIsWeb
+                        //     ? MediaQuery.of(context).size.width * 0.1
+                        //     : MediaQuery.of(context).size.width * 0.1,
                       ),
                       onPressed: () {},
                     );
@@ -202,27 +196,23 @@ class _ActionToolBarState extends State<ActionToolBar> {
                   }
 
                   return LikeButton(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    circleSize: MediaQuery.of(context).size.width * 0.1,
-                    bubblesSize: MediaQuery.of(context).size.width * 0.1,
-                    countPostion: CountPostion.bottom,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    // circleSize: MediaQuery.of(context).size.width * 0.1,
+                    // bubblesSize: MediaQuery.of(context).size.width * 0.1,
+                    // countPostion: CountPostion.bottom,
                     padding: const EdgeInsets.all(0.0),
-                    size: kIsWeb
-                        ? MediaQuery.of(context).size.width * 0.1
-                        : MediaQuery.of(context).size.width * 0.1,
+                    // size: kIsWeb
+                    //     ? MediaQuery.of(context).size.width * 0.1
+                    //     : MediaQuery.of(context).size.width * 0.1,
                     likeBuilder: (bool isLiked) {
-                      return Center(
-                          child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          isLiked ? Icons.favorite : Icons.favorite_border,
-                          color: isLiked ? Colors.red : Colors.white,
-                          size: kIsWeb
-                              ? MediaQuery.of(context).size.width * 0.1
-                              : MediaQuery.of(context).size.width * 0.1,
-                        ),
-                      ));
+                      return Icon(
+                        isLiked ? Icons.favorite : Icons.favorite_border,
+                        color: isLiked ? Colors.red : Colors.white,
+                        // size: kIsWeb
+                        //     ? MediaQuery.of(context).size.width * 0.1
+                        //     : MediaQuery.of(context).size.width * 0.1,
+                      );
                     },
                     isLiked:
                         list.contains(firebaseServices.user) ? true : false,
@@ -230,11 +220,7 @@ class _ActionToolBarState extends State<ActionToolBar> {
                   );
                 }),
           ),
-          // const SizedBox(
-          //   height: 10,
-          // ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          Expanded(
             child: IconButton(
                 onPressed: () {
                   widget.filterScreen
@@ -260,55 +246,53 @@ class _ActionToolBarState extends State<ActionToolBar> {
                     // });
                   });
                 },
-                icon: Icon(
+                icon: const Icon(
                   Ionicons.chatbubble_outline,
                   color: Colors.white,
-                  size: kIsWeb
-                      ? MediaQuery.of(context).size.width * 0.085
-                      : MediaQuery.of(widget.context).size.width * 0.085,
+                  // size: kIsWeb
+                  //     ? MediaQuery.of(context).size.width * 0.085
+                  //     : MediaQuery.of(widget.context).size.width * 0.085,
                 )),
           ),
-          // const SizedBox(
-          //   height: 10,
-          // ),
           if (!kIsWeb)
-            IconButton(
-                onPressed: () async {
-                  if (widget.filterScreen) {
-                    feedViewMode4.pauseDrawer();
-                    feedViewMode4.startCircularProgess();
-                    Uri uri = await dynamicLinkService
-                        .createDynamicLink(feedViewMode4
-                            .videoSource!.listVideos[widget.index].id
-                            .trim())
-                        .whenComplete(() {
-                      feedViewMode4.endCircularProgess();
-                    });
-                    await Share.share('Look at this video!${uri.toString()}',
-                        subject: 'Look at this video!');
-                  } else {
-                    feedViewModel.pauseDrawer();
-                    feedViewModel.startCircularProgess();
-                    Uri uri = await dynamicLinkService
-                        .createDynamicLink(feedViewModel
-                            .videoSource!.listVideos[widget.index].id
-                            .trim())
-                        .whenComplete(() {
-                      feedViewModel.endCircularProgess();
-                    });
-                    await Share.share('Look at this video!${uri.toString()}',
-                        subject: 'Look at this video!');
-                  }
-                },
-                icon: Icon(
-                  Ionicons.paper_plane_outline,
-                  color: Colors.white,
-                  size: kIsWeb
-                      ? MediaQuery.of(context).size.width * 0.085
-                      : MediaQuery.of(widget.context).size.width * 0.085,
-                )),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+            Expanded(
+              child: IconButton(
+                  onPressed: () async {
+                    if (widget.filterScreen) {
+                      feedViewMode4.pauseDrawer();
+                      feedViewMode4.startCircularProgess();
+                      Uri uri = await dynamicLinkService
+                          .createDynamicLink(feedViewMode4
+                              .videoSource!.listVideos[widget.index].id
+                              .trim())
+                          .whenComplete(() {
+                        feedViewMode4.endCircularProgess();
+                      });
+                      await Share.share('Look at this video!${uri.toString()}',
+                          subject: 'Look at this video!');
+                    } else {
+                      feedViewModel.pauseDrawer();
+                      feedViewModel.startCircularProgess();
+                      Uri uri = await dynamicLinkService
+                          .createDynamicLink(feedViewModel
+                              .videoSource!.listVideos[widget.index].id
+                              .trim())
+                          .whenComplete(() {
+                        feedViewModel.endCircularProgess();
+                      });
+                      await Share.share('Look at this video!${uri.toString()}',
+                          subject: 'Look at this video!');
+                    }
+                  },
+                  icon: const Icon(
+                    Ionicons.paper_plane_outline,
+                    color: Colors.white,
+                    // size: kIsWeb
+                    //     ? MediaQuery.of(context).size.width * 0.085
+                    //     : MediaQuery.of(widget.context).size.width * 0.085,
+                  )),
+            ),
+          Expanded(
             child: IconButton(
                 onPressed: () {
                   if (widget.filterScreen) {
@@ -469,11 +453,13 @@ class _ActionToolBarState extends State<ActionToolBar> {
                       ? Ionicons.checkbox_outline
                       : Ionicons.ellipsis_vertical_outline,
                   color: widget.filterApplied ? Colors.green : Colors.white,
-                  size: kIsWeb
-                      ? MediaQuery.of(context).size.width * 0.1
-                      : MediaQuery.of(widget.context).size.width * 0.1,
+                  // size: kIsWeb
+                  //     ? MediaQuery.of(context).size.width * 0.1
+                  //     : MediaQuery.of(widget.context).size.width * 0.1,
                 )),
-          ),
-        ]);
+          )
+        ],
+      ),
+    );
   }
 }

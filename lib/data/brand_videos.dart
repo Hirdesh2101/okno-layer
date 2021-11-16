@@ -19,7 +19,7 @@ class BrandVideosAPI {
           await getBrand().then((listofstring) async {
             listBrand = listofstring;
             await getVideos().then((value) async {
-              listVideos = value;
+              listVideos = List.from(value.reversed);
               listData.addAll(await getData());
             });
           });

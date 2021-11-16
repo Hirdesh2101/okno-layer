@@ -15,7 +15,7 @@ class LikedVideosAPI {
       if (!isRunning) {
         isRunning = true;
         await getLiked().then((listofstring) async {
-          listVideos = listofstring;
+          listVideos = List.from(listofstring.reversed);
           listData.addAll(await getData());
         });
         flag = 1;

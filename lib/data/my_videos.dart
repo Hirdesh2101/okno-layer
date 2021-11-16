@@ -36,7 +36,8 @@ class MyVideosAPI {
         isRunning = true;
         if (listData.isEmpty) {
           await getLiked().then((listofstring) async {
-            listVideos = listofstring;
+            listVideos = List.from(listofstring.reversed);
+            //listVideos = listofstring;
             listData.addAll(await getData());
           });
           flag = 1;
@@ -58,7 +59,7 @@ class MyVideosAPI {
         isRunningapproved = true;
         if (approvedData.isEmpty) {
           await getLiked().then((listofstring) async {
-            listVideos = listofstring;
+            listVideos = List.from(listofstring.reversed);
             approvedData.addAll(await getApprovedData());
           });
           flagapproved = 1;
@@ -80,7 +81,7 @@ class MyVideosAPI {
         isRunningnonapproved = true;
         if (nonapprovedData.isEmpty) {
           await getLiked().then((listofstring) async {
-            listVideos = listofstring;
+            listVideos = List.from(listofstring.reversed);
             nonapprovedData.addAll(await getNonApprovedData());
           });
           flagnonapproved = 1;

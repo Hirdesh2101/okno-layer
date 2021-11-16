@@ -11,6 +11,7 @@ import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
 import 'dart:async';
 import '../services/dynamic_linkstream.dart';
+import 'package:ionicons/ionicons.dart';
 import '../models/video.dart';
 import 'package:stacked/stacked.dart';
 import '../providers/filter_provider.dart';
@@ -416,17 +417,48 @@ class _ScrollFeedState extends State<ScrollFeed> {
                                 child: SizedBox(
                                   height: MediaQuery.of(context).size.height,
                                   child: Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Text('You Are All Caught Up'),
-                                        SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text('Pull To Refresh')
-                                      ],
-                                    ),
+                                    child: kIsWeb &&
+                                            (defaultTargetPlatform ==
+                                                    TargetPlatform.windows ||
+                                                defaultTargetPlatform ==
+                                                    TargetPlatform.macOS ||
+                                                defaultTargetPlatform ==
+                                                    TargetPlatform.linux)
+                                        ? Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              const Text(
+                                                  'You Are All Caught Up'),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              IconButton(
+                                                  onPressed: () {
+                                                    feedViewModel.videoSource!
+                                                        .delete();
+                                                    feedViewModel.videoSource!
+                                                        .load(0)
+                                                        .then((val) {
+                                                      init();
+                                                      setState(() {});
+                                                    });
+                                                  },
+                                                  icon: const Icon(
+                                                      Ionicons.refresh_outline))
+                                            ],
+                                          )
+                                        : Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: const [
+                                              Text('You Are All Caught Up'),
+                                              SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text('Pull To Refresh')
+                                            ],
+                                          ),
                                   ),
                                 ),
                               ),
