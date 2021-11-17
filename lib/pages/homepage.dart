@@ -17,11 +17,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-<<<<<<< HEAD
-=======
-import '../services/dynamic_link.dart';
 import '../providers/filter_provider.dart';
->>>>>>> bc611ab (home button)
 import 'package:ionicons/ionicons.dart';
 
 class HomePage extends StatefulWidget {
@@ -39,12 +35,8 @@ class _HomePageState extends State<HomePage> {
   final feedViewModel4 = GetIt.instance<FilterViewModel>();
   final firebaseAuth = FirebaseAuth.instance;
   var user = FirebaseAuth.instance.currentUser!.uid;
-<<<<<<< HEAD
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-=======
-  final DynamicLinkService _dynamicLinkService = DynamicLinkService();
   bool homepressed = false;
->>>>>>> bc611ab (home button)
   // ignore: prefer_typing_uninitialized_variables
   var future;
   init() async {
