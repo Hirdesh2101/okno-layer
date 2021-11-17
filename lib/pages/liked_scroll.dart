@@ -18,9 +18,11 @@ class LikeScroll extends StatefulWidget {
 class _LikeScrollState extends State<LikeScroll> {
   final feedViewModel = GetIt.instance<LikeProvider>();
   final feedViewModel2 = GetIt.instance<MyVideosProvider>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: SafeArea(
         child: WillPopScope(
           onWillPop: () async {
@@ -35,9 +37,20 @@ class _LikeScrollState extends State<LikeScroll> {
           },
           child: Stack(
             children: [
-              if (widget.isMyVideo) ScrollFeed(widget.indexofgrid, false, true),
+              if (widget.isMyVideo)
+                ScrollFeed(
+                  widget.indexofgrid,
+                  false,
+                  true,
+                  false,
+                ),
               if (!widget.isMyVideo)
-                ScrollFeed(widget.indexofgrid, true, false),
+                ScrollFeed(
+                  widget.indexofgrid,
+                  true,
+                  false,
+                  false,
+                ),
               Positioned(
                 child: Row(
                   children: [

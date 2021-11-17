@@ -23,7 +23,9 @@ class ScrollFeed extends StatefulWidget {
   final int startIndex;
   final bool likedPage;
   final bool myVideopage;
-  const ScrollFeed(this.startIndex, this.likedPage, this.myVideopage,
+  bool homepressed;
+  ScrollFeed(
+      this.startIndex, this.likedPage, this.myVideopage, this.homepressed,
       {Key? key})
       : super(key: key);
 
@@ -58,8 +60,22 @@ class _ScrollFeedState extends State<ScrollFeed> {
     });
   }
 
-  Future<void> _handleBckground(RemoteMessage remoteMessage) async {}
+  Future<void> removeFilter() async {
+    if (filterRunning) {
+      setState(() {
+        filterVideoView = false;
+        filterRunning = false;
+      });
 
+      selectedCountList.clear();
+      await feedViewModel.initial();
+      await feedViewModel4.disposingall();
+      feedViewModel.playDrawer();
+    }
+    widget.homepressed = false;
+  }
+
+  Future<void> _handleBckground(RemoteMessage remoteMessage) async {}
   Future<void> submitFun(list) async {
     setState(() {
       selectedCountList = List.from(list);
@@ -70,8 +86,10 @@ class _ScrollFeedState extends State<ScrollFeed> {
       }
     });
     if (selectedCountList.isNotEmpty) {
+      feedViewModel4.currentscreen = 0;
       await feedViewModel4.initial(list);
     } else {
+      feedViewModel.currentscreen = 0;
       await feedViewModel.initial();
       await feedViewModel4.disposingall();
       feedViewModel4.currentscreen = 0;
@@ -356,6 +374,9 @@ class _ScrollFeedState extends State<ScrollFeed> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.homepressed) {
+      removeFilter();
+    }
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [

@@ -17,6 +17,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+<<<<<<< HEAD
+=======
+import '../services/dynamic_link.dart';
+import '../providers/filter_provider.dart';
+>>>>>>> bc611ab (home button)
 import 'package:ionicons/ionicons.dart';
 
 class HomePage extends StatefulWidget {
@@ -31,9 +36,15 @@ class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final locator = GetIt.instance;
   final feedViewModel = GetIt.instance<FeedViewModel>();
+  final feedViewModel4 = GetIt.instance<FilterViewModel>();
   final firebaseAuth = FirebaseAuth.instance;
   var user = FirebaseAuth.instance.currentUser!.uid;
+<<<<<<< HEAD
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+=======
+  final DynamicLinkService _dynamicLinkService = DynamicLinkService();
+  bool homepressed = false;
+>>>>>>> bc611ab (home button)
   // ignore: prefer_typing_uninitialized_variables
   var future;
   init() async {
@@ -99,6 +110,7 @@ class _HomePageState extends State<HomePage> {
       key: _scaffoldKey,
       drawerEnableOpenDragGesture: false,
       onDrawerChanged: (isOpened) {
+        isOpened ? feedViewModel4.pauseDrawer() : feedViewModel4.playDrawer();
         isOpened ? feedViewModel.pauseDrawer() : feedViewModel.playDrawer();
       },
       drawer: Container(
@@ -183,6 +195,16 @@ class _HomePageState extends State<HomePage> {
                     }),
               ),
               ListTile(
+                leading: const Icon(Icons.home),
+                title: const Text('Home'),
+                onTap: () {
+                  setState(() {
+                    homepressed = true;
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.person),
                 title: const Text('My Profile'),
                 onTap: () {
@@ -262,7 +284,12 @@ class _HomePageState extends State<HomePage> {
                 ? SafeArea(
                     child: Stack(
                       children: [
-                        const ScrollFeed(0, false, false),
+                        ScrollFeed(
+                          0,
+                          false,
+                          false,
+                          homepressed,
+                        ),
                         Positioned(
                           left: 10,
                           top: 20,
