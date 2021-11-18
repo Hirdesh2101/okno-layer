@@ -110,14 +110,14 @@ class _ScrollFeedState extends State<ScrollFeed> {
 
   void init() async {
     if (!widget.likedPage && !widget.myVideopage) {
+      feedViewModel.initial();
+    }
+    if (!widget.likedPage && !widget.myVideopage) {
       stream.listen((event) {
         if (event != '') {
           submitFun(List.filled(1, event));
         }
       });
-    }
-    if (!widget.likedPage && !widget.myVideopage) {
-      feedViewModel.initial();
     }
     if (widget.likedPage) {
       feedViewModel2.initial(widget.startIndex);
@@ -584,6 +584,11 @@ class _ScrollFeedState extends State<ScrollFeed> {
   }
 
   Widget videoCard(Video video, var id) {
+    print('ayaaa');
+    print(id);
+    print(video);
+    print(video.p1name);
+    print(video.controller!.value.isInitialized);
     return video.controller != null && video.controller!.value.isInitialized
         ? VisibilityDetector(
             key: Key(video.id),
