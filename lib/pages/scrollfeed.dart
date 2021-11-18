@@ -19,6 +19,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 import '../services/dynamic_link.dart';
 import '../providers/likedvideoprovider.dart';
 
+// ignore: must_be_immutable
 class ScrollFeed extends StatefulWidget {
   final int startIndex;
   final bool likedPage;
@@ -584,11 +585,6 @@ class _ScrollFeedState extends State<ScrollFeed> {
   }
 
   Widget videoCard(Video video, var id) {
-    print('ayaaa');
-    print(id);
-    print(video);
-    print(video.p1name);
-    print(video.controller!.value.isInitialized);
     return video.controller != null && video.controller!.value.isInitialized
         ? VisibilityDetector(
             key: Key(video.id),
