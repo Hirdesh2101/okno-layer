@@ -141,13 +141,18 @@ class LikeProvider extends BaseViewModel {
   }
 
   Future<void> disposingall() async {
-    await videoSource!.listData[currentscreen].controller?.dispose();
+    if (videoSource!.listData[currentscreen].controller != null) {
+      await videoSource!.listData[currentscreen].controller?.dispose();
+    }
     if (currentscreen + 1 < videoSource!.listData.length) {
-      await videoSource!.listData[currentscreen + 1].controller?.dispose();
+      if (videoSource!.listData[currentscreen + 1].controller != null) {
+        await videoSource!.listData[currentscreen + 1].controller?.dispose();
+      }
     }
     if (currentscreen - 1 >= 0) {
-      await videoSource!.listData[currentscreen - 1].controller?.dispose();
+      if (videoSource!.listData[currentscreen - 1].controller != null) {
+        await videoSource!.listData[currentscreen - 1].controller?.dispose();
+      }
     }
-    notifyListeners();
   }
 }

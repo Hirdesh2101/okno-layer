@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-oknoapp-dev-105338-authRole",
+      "UnauthRoleArn": "arn:aws:iam::898253636909:role/amplify-oknoapp-dev-105338-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::898253636909:role/amplify-oknoapp-dev-105338-authRole",
+      "Region": "ap-south-1",
+      "DeploymentBucketName": "amplify-oknoapp-dev-105338-deployment",
+      "UnauthRoleName": "amplify-oknoapp-dev-105338-unauthRole",
+      "StackName": "amplify-oknoapp-dev-105338",
+      "StackId": "arn:aws:cloudformation:ap-south-1:898253636909:stack/amplify-oknoapp-dev-105338/67711000-38d0-11ee-91e7-06382114c740",
+      "AmplifyAppId": "d2kb8cuga3b8m0"
+    },
+    "categories": {
+      "auth": {
+        "oknoapp32d45908": {}
+      },
+      "storage": {
+        "okno": {}
+      }
+    }
+  }
+}

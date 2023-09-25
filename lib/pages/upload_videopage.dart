@@ -1,6 +1,7 @@
 import 'dart:io';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:async';
@@ -9,6 +10,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:filter_list/filter_list.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:aws_common/vm.dart';
+// import 'package:chewie/chewie.dart';
+// import 'package:cdnbye/cdnbye.dart';
 
 class UploadPage extends StatefulWidget {
   final File file;
@@ -21,13 +26,15 @@ class UploadPage extends StatefulWidget {
 
 class _UploadPageState extends State<UploadPage> {
   bool uploading = false;
-  File? finalFile;
+  late File finalFile;
   //String? finalPath;
   File? thumbnailFile;
   List<String> selectedCountList = [];
   VideoPlayerController? _controller;
   TextEditingController urlController = TextEditingController();
-  void postImage() {
+  final storage = AmplifyStorageS3();
+  void postImage() async {
+
     if (urlController.text.trim() == '' || selectedCountList.isEmpty) {
       if (urlController.text.trim() == '') {
         Fluttertoast.showToast(
@@ -52,9 +59,9 @@ class _UploadPageState extends State<UploadPage> {
       setState(() {
         uploading = true;
       });
-      uploadVideo(finalFile).then((String data) {
-        uploadImage(thumbnailFile).then((String data2) {
-          postToFireStore(
+      await uploadVideo(finalFile).then((String data) async {
+        await uploadImage(thumbnailFile).then((String data2) async {
+          await postToFireStore(
             mediaUrl: data,
             url: urlController.text,
             thumbnail: data2,
@@ -108,6 +115,7 @@ class _UploadPageState extends State<UploadPage> {
   @override
   void dispose() {
     _controller!.dispose();
+    urlController.dispose();
     super.dispose();
   }
 
@@ -139,166 +147,141 @@ class _UploadPageState extends State<UploadPage> {
         ],
       ),
       body: (_controller != null && _controller!.value.isInitialized)
-          ? WillPopScope(
-              onWillPop: () async {
-                if (await finalFile!.exists()) {
-                  await finalFile!.delete();
-                }
-                if (await thumbnailFile!.exists()) {
-                  await thumbnailFile!.delete();
-                }
-                return true;
-              },
-              child: ListView(
-                children: <Widget>[
-                  PostForm(
-                    controller: _controller,
-                    urlController: urlController,
-                    loading: uploading,
-                    tagsList: selectedCountList,
-                    submitTags: _submitTags,
-                  ),
-                  const Divider(),
-                ],
-              ),
+          ? ListView(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    uploading
+                        ? const LinearProgressIndicator()
+                        : const Padding(padding: EdgeInsets.only(top: 0.0)),
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          if (_controller!.value.isInitialized)
+                            GestureDetector(
+                              onTap: () {
+                                if (_controller!.value.isPlaying) {
+                                  _controller?.pause();
+                                } else {
+                                  _controller?.play();
+                                }
+                              },
+                              child: AspectRatio(
+                                aspectRatio: _controller!.value.aspectRatio,
+                                child: VideoPlayer(_controller!),
+                              ),
+                            ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              child: TextField(
+                                enabled: uploading ? false : true,
+                                controller: urlController,
+                                decoration: const InputDecoration(
+                                    hintText: "Enter Product Url",
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)))),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                  onPressed: () {
+                                    showReportDialog1(context);
+                                  },
+                                  child: const Text('Select Tags')),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(),
+              ],
             )
           : const Center(
               child: CircularProgressIndicator(),
             ),
     );
   }
-}
-
-class PostForm extends StatelessWidget {
-  final VideoPlayerController? controller;
-  final TextEditingController urlController;
-  final List<String> tagsList;
-  final bool loading;
-  final Function(List<String>) submitTags;
-  PostForm({
-    Key? key,
-    required this.controller,
-    required this.urlController,
-    required this.loading,
-    required this.tagsList,
-    required this.submitTags,
-  }) : super(key: key);
-
-  _submitFunction(List<String> finalTags) {
-    submitTags(finalTags);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        loading
-            ? const LinearProgressIndicator()
-            : const Padding(padding: EdgeInsets.only(top: 0.0)),
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              if (controller!.value.isInitialized)
-                GestureDetector(
-                  onTap: () {
-                    if (controller!.value.isPlaying) {
-                      controller?.pause();
-                    } else {
-                      controller?.play();
-                    }
-                  },
-                  child: AspectRatio(
-                    aspectRatio: controller!.value.aspectRatio,
-                    child: VideoPlayer(controller!),
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: TextField(
-                    enabled: loading ? false : true,
-                    controller: urlController,
-                    decoration: const InputDecoration(
-                        hintText: "Enter Product Url",
-                        border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10)))),
-                  ),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                      onPressed: () {
-                        showReportDialog1(context);
-                      },
-                      child: const Text('Select Tags')),
-                ],
-              )
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  final List<String> countList = [
-    "Ethenics",
-    "Western",
-    "Festive",
-    "Casuals",
-  ];
 
   void showReportDialog1(BuildContext context) async {
     await FilterListDialog.display<String>(context,
         listData: countList,
-        selectedListData: tagsList,
-        searchFieldTextStyle: const TextStyle(color: Colors.black),
-        controlButtonTextStyle: const TextStyle(color: Colors.blue),
+        selectedListData: selectedCountList,
+        choiceChipLabel: (user) => user,
+        //searchFieldTextStyle: const TextStyle(color: Colors.black),
+        // controlButtonTextStyle: const TextStyle(color: Colors.blue),
         height: MediaQuery.of(context).size.height * 0.6,
-        controlContainerDecoration: const BoxDecoration(color: Colors.white),
+        // controlContainerDecoration: const BoxDecoration(color: Colors.white),
         headlineText: "Select Filters",
-        applyButtonTextStyle: const TextStyle(color: Colors.white),
+        //applyButtonTextStyle: const TextStyle(color: Colors.white),
         selectedItemsText: 'Filters Selected',
-        searchFieldHintText: "Search Here", choiceChipLabel: (item) {
-      return item;
-    }, validateSelectedItem: (list, val) {
-      return list!.contains(val);
-    }, onItemSearch: (list, text) {
-      if (list!.any(
-          (element) => element.toLowerCase().contains(text.toLowerCase()))) {
-        return list
-            .where(
-                (element) => element.toLowerCase().contains(text.toLowerCase()))
-            .toList();
-      } else {
-        return [];
-      }
-    }, onApplyButtonClick: (list) {
-      if (list != null) {
-        _submitFunction(list);
-      }
-      Navigator.pop(context);
-    });
+        //  searchFieldHintText: "Search Here",
+
+        validateSelectedItem: (list, val) {
+          return list!.contains(val);
+        },
+        onItemSearch: (user, query) {
+          return user.toLowerCase().contains(query.toLowerCase());
+        },
+        onApplyButtonClick: (list) {
+          if (list != null) {
+            _submitTags(list);
+          }
+          Navigator.pop(context);
+        });
   }
 }
 
-Future<String> uploadVideo(var imageFile) async {
+final List<String> countList = [
+  "Ethenics",
+  "Western",
+  "Festive",
+  "Casuals",
+];
+
+Future<String> uploadVideo(File imageFile) async {
+  final awsFile = AWSFilePlatform.fromFile(imageFile);
   var uuid = const Uuid().v1();
-  Reference ref = FirebaseStorage.instance.ref().child("Videos/$uuid.mp4");
-  UploadTask uploadTask = ref.putFile(imageFile);
-  String downloadUrl = await (await uploadTask).ref.getDownloadURL();
-  return downloadUrl;
+  const url = "https://d140p29c73x6ns.cloudfront.net/";
+  late String uploadUrl;
+  try {
+    final uploadResult = await Amplify.Storage.uploadFile(
+      localFile: awsFile,
+      key: 'Videos/$uuid.mp4',
+    ).result;
+    uploadUrl = "$url$uuid/master.m3u8";
+    safePrint('Uploaded file: ${uploadResult.uploadedItem.key}');
+  } on StorageException catch (e) {
+    safePrint('Error uploading file: ${e.message}');
+    rethrow;
+  }
+  return uploadUrl;
 }
 
 Future<String> uploadImage(var thumnailfile) async {
+  final awsFile = AWSFilePlatform.fromFile(thumnailfile);
   var uuid = const Uuid().v1();
-  Reference ref2 = FirebaseStorage.instance.ref().child("Images/$uuid.jpeg");
-  UploadTask uploadTask2 = ref2.putFile(thumnailfile);
-  String downloadUrl = await (await uploadTask2).ref.getDownloadURL();
-  return downloadUrl;
+  const url = "https://d36sxz5nwbaxr3.cloudfront.net/public/";
+  final uploadUrl;
+  try {
+    final uploadResult = await Amplify.Storage.uploadFile(
+      localFile: awsFile,
+      key: 'Images/$uuid.jpeg',
+    ).result;
+    uploadUrl = "${url}Images/$uuid.jpeg";
+    safePrint('Uploaded file: ${uploadResult.uploadedItem.key}');
+  } on StorageException catch (e) {
+    safePrint('Error uploading file: ${e.message}');
+    rethrow;
+  }
+  return uploadUrl;
 }
 
 Future<void> postToFireStore(

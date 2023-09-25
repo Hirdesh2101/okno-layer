@@ -104,7 +104,7 @@ class _MyLikedVideosState extends State<MyLikedVideos> {
                                         ? FadeInImage.memoryNetwork(
                                             placeholder: kTransparentImage,
                                             image: feedViewModel.videoSource!
-                                                .listData[index].product1,
+                                                .listData[index].thumbnail,
                                             fit: BoxFit.fitHeight,
                                           )
                                         : CachedNetworkImage(

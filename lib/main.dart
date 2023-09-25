@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_core/amplify_core.dart';
+import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/Auth/login.dart';
@@ -17,17 +20,30 @@ import 'services/service_locator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:provider/provider.dart';
 import './providers/theme_provider.dart';
 import './constants/themes.dart';
+import 'amplifyconfiguration.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
+  await configureAmplify();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const MyApp());
+}
+
+Future<void> configureAmplify() async {
+  final storage = AmplifyStorageS3();
+  final auth = AmplifyAuthCognito();
+
+  try {
+    await Amplify.addPlugins([auth, storage]);
+    await Amplify.configure(amplifyconfig);
+    print('Successfully configured Amplify');
+  } on Exception catch (error) {
+    print('Something went wrong configuring Amplify: $error');
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -52,7 +68,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseAnalytics analytics = FirebaseAnalytics();
+    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
     return ChangeNotifierProvider(create: (_) {
       return themeModel;
     }, child: Consumer<ThemeModel>(

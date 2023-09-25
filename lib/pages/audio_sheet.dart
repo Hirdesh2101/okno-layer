@@ -56,7 +56,6 @@ class MyItem extends StatefulWidget {
 }
 
 class _MyItemState extends State<MyItem> {
-  late int result;
   List<AudioDetails> audiolist = feedViewModel.videoSource!.audioData;
   int status = 0;
   _trySubmit(int index) {
@@ -81,10 +80,9 @@ class _MyItemState extends State<MyItem> {
         return GestureDetector(
           onTap: () async {
             if (audiolist[index].playingstatus == 0) {
-              result = await widget.audioPlayer.stop();
+              await widget.audioPlayer.stop();
               //await widget.audioPlayer.dispose();
-              result = await widget.audioPlayer
-                  .play(audiolist[index].url, isLocal: true);
+              await widget.audioPlayer.play(UrlSource(audiolist[index].url));
               setState(() {
                 for (int i = 0; i < audiolist.length; i++) {
                   audiolist[i].playingstatus = 0;
@@ -92,7 +90,7 @@ class _MyItemState extends State<MyItem> {
                 audiolist[index].playingstatus = 1;
               });
             } else if (audiolist[index].playingstatus == 1) {
-              result = await widget.audioPlayer.stop();
+              await widget.audioPlayer.stop();
               //await widget.audioPlayer.dispose();
               setState(() {
                 for (int i = 0; i < audiolist.length; i++) {

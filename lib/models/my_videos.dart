@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:pedantic/pedantic.dart';
 import '../services/cache_service.dart';
 
 class MyVideos {

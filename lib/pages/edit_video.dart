@@ -1,11 +1,13 @@
-import 'package:flutter/cupertino.dart';
+import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:oknoapp/pages/crop_page.dart';
+import 'package:oknoapp/pages/export_service.dart';
 import 'dart:io';
 import 'package:video_editor/video_editor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:helpers/helpers.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import './upload_videopage.dart';
 import 'package:dio/dio.dart';
 //import 'package:permission_handler/permission_handler.dart';
@@ -61,15 +63,16 @@ class _VideoEditorState extends State<VideoEditor> {
   int flag = 0;
   var coloring = false;
   var addingAudio = false;
-  final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
+  var angle = 0;
   String _exportText = "";
-  late VideoEditorController _controller;
+  late VideoEditorController _controller = VideoEditorController.file(
+    widget.file,
+    minDuration: const Duration(seconds: 1),
+    maxDuration: const Duration(seconds: 100),
+  );
 
   @override
   void initState() {
-    _controller = VideoEditorController.file(
-      widget.file,
-    );
     _controller.initialize().then((_) {
       setState(() {});
     });
@@ -77,17 +80,22 @@ class _VideoEditorState extends State<VideoEditor> {
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     _exportingProgress.dispose();
     _isExporting.dispose();
     _isExporting2.dispose();
     _exportingProgress2.dispose();
     _controller.dispose();
+    final executions = await FFmpegKit.listSessions();
+    if (executions.isNotEmpty) await FFmpegKit.cancel();
     super.dispose();
   }
 
-  void _openCropScreen() => context.navigator.push(
-      MaterialPageRoute(builder: (ctx) => CropScreen(controller: _controller)));
+  void _openCropScreen() => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (ctx) => CropPage(controller: _controller)))
+      .then((value) => angle = value);
 
   String _getColorBackground(int index) {
     String newBackground = "";
@@ -250,8 +258,7 @@ class _VideoEditorState extends State<VideoEditor> {
     if (await File(filePath).exists()) {
       await File(filePath).delete();
     }
-    await _flutterFFmpeg
-        .execute(
+    await FFmpegKit.execute(
             '-i ${widget.file.path} -i $audio -c:v copy -map 0:v:0 -map 1:a:0 -shortest $filePath')
         .whenComplete(() async {
       _controller.dispose();
@@ -277,58 +284,106 @@ class _VideoEditorState extends State<VideoEditor> {
     });
   }
 
-  Future<File> _exportVideo() async {
-    Misc.delayed(1000, () => _isExporting.value = true);
-    final File? file = await _controller.exportVideo(
-      preset: VideoExportPreset.ultrafast,
-      customInstruction: "-crf 17",
-      onProgress: (statics) {
-        _exportingProgress.value =
-            statics.time / _controller.video.value.duration.inMilliseconds;
-      },
-    );
-    final Directory? appDirectory = await getExternalStorageDirectory();
-    final String videoDirectory = '${appDirectory!.path}/Videos';
-    await Directory(videoDirectory).create(recursive: true);
-    final String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
-    final String filePath = '$videoDirectory/$currentTime.mp4';
-    var info = await videoInfo.getVideoInfo(file!.path.toString());
-    final String size1 = "${info!.width!.toInt()}x${info.height!.toInt()}";
-    setState(() {
-      coloring = true;
-    });
-    if (_page != 0) {
-      await _flutterFFmpeg.execute(
-          '-i ${file.path} -f lavfi -i "color=${_getColorBackground(_page)}:s=$size1" -filter_complex "blend=shortest=1:all_mode=overlay:all_opacity=0.2" -preset ultrafast -y $filePath');
-      if (await file.exists()) {
-        await file.delete();
+  int findIndexOfStringStartingWith(List<String> array, String prefix) {
+    for (int i = 0; i < array.length; i++) {
+      if (array[i].startsWith(prefix)) {
+        return i;
       }
     }
-    _isExporting.value = false;
+    return -1; // Return -1 if the prefix is not found in the array
+  }
 
-    // ignore: unnecessary_null_comparison
-    if (file != null) {
-      _exportText = "Video success export!";
-    } else {
-      _exportText = "Error on export video :(";
+  Future<File> _exportVideo() async {
+    Misc.delayed(1000, () => _isExporting.value = true);
+    late File file;
+    final config = VideoFFmpegVideoEditorConfig(
+      _controller,
+      commandBuilder: (config, videoPath, outputPath) {
+        final List<String> filters = config.getExportFilters();
+        int index = findIndexOfStringStartingWith(filters, 'crop');
+        List<String> crops = ["0", "0", "0", "0"];
+        if (index != -1) {
+          crops = filters[index].split(':');
+        }
+        return _page != 0
+            ? '-ss ${config.controller.startTrim} -i $videoPath -t ${config.controller.endTrim} -f lavfi -i color=${_getColorBackground(_page)}:s=${config.controller.croppedArea.width.toInt()}*${config.controller.croppedArea.height.toInt()} -filter_complex [0]crop=${config.controller.croppedArea.width.toInt()}:${config.controller.croppedArea.height.toInt()}:${crops[2]}:${crops[3]},rotate=angle=${config.controller.cacheRotation}*PI/180[a];[a][1]blend=shortest=1:all_mode=overlay:all_opacity=0.2 -preset ultrafast -y $outputPath'
+            : '-ss ${config.controller.startTrim} -i $videoPath -t ${config.controller.endTrim} -filter_complex [0]crop=${config.controller.croppedArea.width.toInt()}:${config.controller.croppedArea.height.toInt()}:${crops[2]}:${crops[3]},rotate=angle=${config.controller.cacheRotation}*PI/180 -preset ultrafast -y $outputPath';
+      },
+    );
+    // Returns the generated command and the output path
+    final executeConfig = await config.getExecuteConfig();
+    try {
+      await FFmpegKit.execute(executeConfig.command)
+          .then((value) => {file = File(executeConfig.outputPath)});
+      // await ExportService.runFFmpegCommand(
+      //   executeConfig,
+      //   onProgress: (stats) {
+      //     _exportingProgress.value =
+      //         stats.getTime() / _controller.video.value.duration.inMilliseconds;
+      //   },
+      //   onError: (e, s) =>
+      //       Fluttertoast.showToast(msg: '"Error on export video :("'),
+      //   onCompleted: (fileout) {
+      //     _isExporting.value = false;
+      //     if (!mounted) return;
+      //     file = fileout;
+      //   },
+      // );
+    } catch (error, stackTrace) {
+      // Handle error if needed
+      print("Error exporting video: $error");
+      print(stackTrace);
     }
-    File? finalFile;
-    if (_page != 0) {
-      finalFile = File(filePath);
-    } else {
-      finalFile = file;
-    }
+
+    // final Directory? appDirectory = await getExternalStorageDirectory();
+    // final String videoDirectory = '${appDirectory!.path}/Videos';
+    // await Directory(videoDirectory).create(recursive: true);
+    // final String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
+    // final String filePath = '$videoDirectory/$currentTime.mp4';
+
+    // setState(() {
+    //   coloring = true;
+    // });
+    // final arguments = '-i ${file!.path} ' +
+    //     '-preset ultrafast -g 48 -sc_threshold 0 ' +
+    //     '-map 0:0 -map 0:1 -map 0:0 -map 0:1 ' +
+    //     '-c:v:0 libx264 -b:v:0 1000k ' +
+    //     '-c:v:1 libx264 -b:v:1 600k ' +
+    //     '-c:a copy ' +
+    //     '-var_stream_map "v:0,a:0 v:1,a:1" ' +
+    //     '-master_pl_name master.m3u8 ' +
+    //     '-f hls -hls_time 6 -hls_list_size 0 ' +
+    //     '-hls_segment_filename "$videoDirectory/%v_fileSequence_%d.ts" ' +
+    //     '$videoDirectory/%v_playlistVariant.m3u8';
+
+    // await FFmpegKit.execute(arguments);
+    // if (_page != 0) {
+    //   await FFmpegKit.execute(
+    //       '-i ${file!.path} -f lavfi -i "color=${_getColorBackground(_page)}:s=$size1" -filter_complex "blend=shortest=1:all_mode=overlay:all_opacity=0.2" -preset ultrafast -y $filePath');
+    //   if (await file!.exists()) {
+    //     await file!.delete();
+    //   }
+    // }
+    _isExporting.value = false;
     setState(() => _exported = true);
     Misc.delayed(18000, () => setState(() => _exported = false));
-    return finalFile;
+    return file;
   }
 
   void _exportCover() async {
     setState(() => _exported = false);
-    final File? cover = await _controller.extractCover();
+    File? cover;
+
+    final config = CoverFFmpegVideoEditorConfig(_controller);
+    await config
+        .getExecuteConfig()
+        .then((value) => cover = File(value!.outputPath));
+    // await _controller.extractCover(onCompleted: ((file) {
+    //   cover = file;
+    // }));
 
     if (cover != null) {
-      _exportText = "Cover exported! ${cover.path}";
+      _exportText = "Cover exported! ${cover!.path}";
     } else {
       _exportText = "Error on cover exportation :(";
     }
@@ -598,12 +653,14 @@ class _VideoEditorState extends State<VideoEditor> {
             child: IconButton(
               onPressed: () async {
                 File file = await _exportVideo();
-                Navigator.of(context)
-                    .push(MaterialPageRoute(
-                        builder: (context) => UploadPage(file, file.path)))
-                    .then((value) {
-                  Navigator.of(context).pop();
-                });
+                if (file != null) {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(
+                          builder: (context) => UploadPage(file, file.path)))
+                      .then((value) {
+                    Navigator.of(context).pop();
+                  });
+                }
               },
               icon: const Icon(Icons.done, color: Colors.white),
             ),
@@ -621,40 +678,44 @@ class _VideoEditorState extends State<VideoEditor> {
   List<Widget> _trimSlider() {
     return [
       AnimatedBuilder(
-        animation: _controller.video,
+        animation: Listenable.merge([
+          _controller,
+          _controller.video,
+        ]),
         builder: (_, __) {
-          final duration = _controller.video.value.duration.inSeconds;
-          final pos = _controller.trimPosition * duration;
-          final start = _controller.minTrim * duration;
-          final end = _controller.maxTrim * duration;
+          final int duration = _controller.videoDuration.inSeconds;
+          final double pos = _controller.trimPosition * duration;
 
           return Padding(
-            padding: Margin.horizontal(height / 4),
+            padding: EdgeInsets.symmetric(horizontal: height / 4),
             child: Row(children: [
               Text(formatter(Duration(seconds: pos.toInt()))),
               const Expanded(child: SizedBox()),
-              OpacityTransition(
-                visible: _controller.isTrimming,
+              AnimatedOpacity(
+                opacity: _controller.isTrimming ? 1 : 0,
+                duration: kThemeAnimationDuration,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(formatter(Duration(seconds: start.toInt()))),
+                  Text(formatter(_controller.startTrim)),
                   const SizedBox(width: 10),
-                  Text(formatter(Duration(seconds: end.toInt()))),
+                  Text(formatter(_controller.endTrim)),
                 ]),
-              )
+              ),
             ]),
           );
         },
       ),
       Container(
         width: MediaQuery.of(context).size.width,
-        margin: Margin.vertical(height / 4),
+        margin: EdgeInsets.symmetric(vertical: height / 4),
         child: TrimSlider(
-            child: TrimTimeline(
-                controller: _controller,
-                margin: const EdgeInsets.only(top: 10)),
+          controller: _controller,
+          height: height,
+          horizontalMargin: height / 4,
+          child: TrimTimeline(
             controller: _controller,
-            height: height,
-            horizontalMargin: height / 4),
+            padding: const EdgeInsets.only(top: 10),
+          ),
+        ),
       )
     ];
   }
@@ -664,8 +725,8 @@ class _VideoEditorState extends State<VideoEditor> {
         margin: Margin.horizontal(height / 4),
         child: CoverSelection(
           controller: _controller,
-          height: height,
-          nbSelection: 8,
+          // size: height + 10,
+          // quantity: 8,
         ));
   }
 
@@ -685,98 +746,6 @@ class _VideoEditorState extends State<VideoEditor> {
               // bold: true,
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class CropScreen extends StatelessWidget {
-  const CropScreen({Key? key, required this.controller}) : super(key: key);
-
-  final VideoEditorController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Padding(
-          padding: const Margin.all(30),
-          child: Column(children: [
-            Expanded(
-              child: AnimatedInteractiveViewer(
-                maxScale: 2.4,
-                child: CropGridViewer(controller: controller),
-              ),
-            ),
-            const SizedBox(height: 15),
-            Row(children: [
-              Expanded(
-                child: SplashTap(
-                  onTap: () => context.navigator.pop(),
-                  child: const Center(
-                    child: Text(
-                      "CANCEL",
-                      // bold: true,
-                    ),
-                  ),
-                ),
-              ),
-              buildSplashTap("16:9", 16 / 9,
-                  padding: const Margin.horizontal(10)),
-              buildSplashTap("1:1", 1 / 1),
-              buildSplashTap("4:5", 4 / 5,
-                  padding: const Margin.horizontal(10)),
-              buildSplashTap("NO", null, padding: const Margin.right(10)),
-              Expanded(
-                child: SplashTap(
-                  onTap: () {
-                    //2 WAYS TO UPDATE CROP
-                    //WAY 1:
-                    controller.updateCrop();
-                    /*WAY 2:
-                    controller.minCrop = controller.cacheMinCrop;
-                    controller.maxCrop = controller.cacheMaxCrop;
-                    */
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Crop will be visible after export!!!')));
-                    context.navigator.pop();
-                  },
-                  child: const Center(
-                    child: Text(
-                      "OK",
-                    ),
-                  ),
-                ),
-              ),
-            ]),
-          ]),
-        ),
-      ),
-    );
-  }
-
-  Widget buildSplashTap(
-    String title,
-    double? aspectRatio, {
-    EdgeInsetsGeometry? padding,
-  }) {
-    return SplashTap(
-      onTap: () => controller.preferredCropAspectRatio = aspectRatio,
-      child: Padding(
-        padding: padding ?? Margin.zero,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.aspect_ratio,
-              //color: Colors.white
-            ),
-            Text(
-              title,
-            ),
-          ],
         ),
       ),
     );

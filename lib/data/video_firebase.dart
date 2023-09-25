@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'demodata.dart';
 import '../models/video.dart';
@@ -18,16 +17,7 @@ class VideosAPI {
     load(0);
   }
   List<Video> shuffle1(List<Video> items) {
-    var random = Random();
-
-    for (var i = items.length - 1; i > 0; i--) {
-      var n = random.nextInt(i + 1);
-
-      var temp = items[i];
-      items[i] = items[n];
-      items[n] = temp;
-    }
-
+    items.shuffle();
     return items;
   }
 
@@ -43,6 +33,7 @@ class VideosAPI {
         userlist = await _viewedProduct();
         _sorting.mergeSort(userlist!, 0, userlist!.length - 1);
         listVideos = await _getVideoList();
+        bool initialSize = listVideos.length == 1;
 
         for (int i = 0; i < listVideos.length; i++) {
           int temp =
@@ -52,7 +43,7 @@ class VideosAPI {
             i--;
           }
         }
-        if (listVideos.length <= 1) {
+        if (!initialSize && listVideos.length <= 1) {
           addVideos();
         }
         listVideos = shuffle1(listVideos);
@@ -79,15 +70,18 @@ class VideosAPI {
 
   void addVideos() async {
     var list = await getMoreVideos();
-    for (int i = 0; i < list.length; i++) {
-      int temp = _search.count2(userlist!, userlist!.length, list[i].id);
-      if (temp != -1) {
-        list.remove(list[i]);
-        i--;
+    if (list.isNotEmpty) {
+      for (int i = 0; i < list.length; i++) {
+        int temp = _search.count2(userlist!, userlist!.length, list[i].id);
+        if (temp != -1) {
+          list.remove(list[i]);
+          i--;
+        }
       }
+
+      list = shuffle1(list);
+      listVideos.addAll(list);
     }
-    list = shuffle1(list);
-    listVideos.addAll(list);
   }
 
   Future<List> _viewedProduct() async {
@@ -114,13 +108,11 @@ class VideosAPI {
         .get();
     var videoList = <Video>[];
     QuerySnapshot<Map<String, dynamic>> videos;
-
+    videos = data;
     if (data.docs.isEmpty) {
-      await addDemoData();
-      videos =
-          (await _firebase.where('Approved', isEqualTo: true).limit(10).get());
-    } else {
-      videos = data;
+      //await addDemoData();
+      // videos =
+      //     (await _firebase.where('Approved', isEqualTo: true).limit(10).get());
     }
     lastData = data.docs.last;
     for (var element in videos.docs) {
@@ -132,10 +124,8 @@ class VideosAPI {
 
   Future<void> addDemoData() async {
     for (var video in data) {
-      await _firebase.add(video).then((DocumentReference doc) {
-        String docId = doc.id;
-        _firebase.doc(docId).update({"id": docId});
-      });
+      var timestamp = DateTime.now().toString();
+      await _firebase.doc(timestamp).set(video);
     }
   }
 
@@ -149,12 +139,15 @@ class VideosAPI {
         .get();
     var videoList = <Video>[];
     QuerySnapshot<Map<String, dynamic>> videos;
-    videos = data;
-    lastData = data.docs.last;
-    for (var element in videos.docs) {
-      Video video = Video.fromJson(element.data());
-      videoList.add(video);
+    if (data.docs.isNotEmpty) {
+      videos = data;
+      lastData = data.docs.last;
+      for (var element in videos.docs) {
+        Video video = Video.fromJson(element.data());
+        videoList.add(video);
+      }
     }
+
     return videoList;
   }
 }

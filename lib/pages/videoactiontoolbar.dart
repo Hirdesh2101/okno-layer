@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:oknoapp/pages/comments.dart';
 import 'package:oknoapp/services/dynamic_link.dart';
@@ -183,7 +182,8 @@ class _ActionToolBarState extends State<ActionToolBar> {
                                 .videoSource!.listVideos[widget.index].id
                                 .trim();
                   });
-                  List<dynamic> list = documents.first['Likes'] ?? [];
+                  List<dynamic> list =
+                      documents.isEmpty ? [] : documents.first['Likes'] ?? [];
 
                   Future<bool> likeFunc(bool init) async {
                     firebaseServices.add(
@@ -368,46 +368,32 @@ class _ActionToolBarState extends State<ActionToolBar> {
                                         listData: widget.countList,
                                         selectedListData:
                                             widget.selectedCountList,
-                                        searchFieldTextStyle: const TextStyle(
-                                            color: Colors.black),
-                                        controlButtonTextStyle:
-                                            const TextStyle(color: Colors.blue),
+                                        choiceChipLabel: (user) => user,
+                                        //searchFieldTextStyle: const TextStyle(color: Colors.black),
+                                        // controlButtonTextStyle: const TextStyle(color: Colors.blue),
                                         height:
                                             MediaQuery.of(context).size.height *
                                                 0.6,
-                                        controlContainerDecoration:
-                                            const BoxDecoration(
-                                                color: Colors.white),
+                                        // controlContainerDecoration: const BoxDecoration(color: Colors.white),
                                         headlineText: "Select Filters",
-                                        searchFieldHintText: "Search Here",
-                                        applyButtonTextStyle: const TextStyle(
-                                            color: Colors.white),
+                                        //applyButtonTextStyle: const TextStyle(color: Colors.white),
                                         selectedItemsText: 'Filters Selected',
-                                        choiceChipLabel: (item) {
-                                      return item;
-                                    }, validateSelectedItem: (list, val) {
-                                      return list!.contains(val);
-                                    }, onItemSearch: (list, text) {
-                                      if (list!.any((element) => element
-                                          .toLowerCase()
-                                          .contains(text.toLowerCase()))) {
-                                        return list
-                                            .where((element) => element
-                                                .toLowerCase()
-                                                .contains(text.toLowerCase()))
-                                            .toList();
-                                      } else {
-                                        return [];
-                                      }
-                                    }, onApplyButtonClick: (list) async {
-                                      if (list != null) {
-                                        await submitFunct(list);
-                                      }
-                                      Navigator.pop(context);
-                                    }).whenComplete(() {
-                                      statusCheck(false);
-                                      Navigator.pop(context);
-                                    });
+                                        //  searchFieldHintText: "Search Here",
+
+                                        validateSelectedItem: (list, val) {
+                                          return list!.contains(val);
+                                        },
+                                        onItemSearch: (user, query) {
+                                          return user
+                                              .toLowerCase()
+                                              .contains(query.toLowerCase());
+                                        },
+                                        onApplyButtonClick: (list) {
+                                          if (list != null) {
+                                            submitFunct(list);
+                                          }
+                                          Navigator.pop(context);
+                                        });
                                   },
                                 ),
                                 ListTile(

@@ -13,8 +13,7 @@ class BrandDeatilsAPI {
   }
 
   Future<void> applyFilter() async {
-    var now = DateTime.now();
-    var previous = Jiffy(now).subtract(months: 1);
+    var previous = Jiffy.now().subtract(months: 1);
     for (int i = listData.length - 1; i >= 0; i--) {
       for (int j = listData[i].viewedproduct.length - 1; j >= 0; j--) {
         if (listData[i]

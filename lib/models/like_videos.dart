@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:pedantic/pedantic.dart';
 import '../services/cache_service.dart';
 
 class LikeVideo {
@@ -13,6 +14,7 @@ class LikeVideo {
   String price;
   String p1name;
   String store;
+  String thumbnail;
 
   VideoPlayerController? controller;
   BaseCacheManager? _cacheManager;
@@ -25,7 +27,8 @@ class LikeVideo {
       required this.seller,
       required this.p1name,
       required this.store,
-      required this.price});
+      required this.price,
+      required this.thumbnail});
 
   LikeVideo.fromJson(Map<dynamic, dynamic> json)
       : id = json['id'],
@@ -35,6 +38,7 @@ class LikeVideo {
         product2 = json['product2'],
         seller = json['seller'],
         store = json['store'],
+        thumbnail = json['Thumbnail'],
         price = json['price'];
 
   Map<String, dynamic> toJson() {
@@ -47,6 +51,7 @@ class LikeVideo {
     data['selller'] = seller;
     data['store'] = store;
     data['price'] = price;
+    data['Thumbnail'] = thumbnail;
     return data;
   }
 

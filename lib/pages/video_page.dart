@@ -49,14 +49,14 @@ class _VideoRecorderState extends State<VideoRecorder>
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     initialize();
     super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     controller!.stopImageStream();
     controller!.dispose();
     super.dispose();

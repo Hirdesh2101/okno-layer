@@ -162,12 +162,18 @@ class FilterViewModel extends BaseViewModel {
   }
 
   Future<void> disposingall() async {
-    await videoSource!.listVideos[currentscreen].controller?.dispose();
+    if (videoSource!.listVideos[currentscreen].controller != null) {
+      await videoSource!.listVideos[currentscreen].controller?.dispose();
+    }
     if (currentscreen + 1 < videoSource!.listVideos.length) {
-      await videoSource!.listVideos[currentscreen + 1].controller?.dispose();
+      if (videoSource!.listVideos[currentscreen + 1].controller != null) {
+        await videoSource!.listVideos[currentscreen + 1].controller?.dispose();
+      }
     }
     if (currentscreen - 1 >= 0) {
-      await videoSource!.listVideos[currentscreen - 1].controller?.dispose();
+      if (videoSource!.listVideos[currentscreen - 1].controller != null) {
+        await videoSource!.listVideos[currentscreen - 1].controller?.dispose();
+      }
     }
     //notifyListeners();
   }

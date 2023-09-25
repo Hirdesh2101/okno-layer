@@ -41,14 +41,14 @@ class _HomePageState extends State<HomePage> {
   var future;
   init() async {
     //subscribe to topic on each app start-up
-    FirebaseAnalytics().logEvent(name: 'login', parameters: null);
-    FirebaseAnalytics().logEvent(name: 'main_feed', parameters: null);
+    // FirebaseAnalytics.instance.logEvent(name: 'login', parameters: null);
+    // FirebaseAnalytics.instance.logEvent(name: 'main_feed', parameters: null);
     await FirebaseFirestore.instance
         .collection('UsersData')
         .doc(user)
         .get()
         .then((value) async {
-      await FirebaseAnalytics().setUserProperty(
+      await FirebaseAnalytics.instance.setUserProperty(
           name: 'category', value: '${value.data()!['topic']}');
       await _firebaseMessaging.subscribeToTopic('${value.data()!['topic']}');
     });
