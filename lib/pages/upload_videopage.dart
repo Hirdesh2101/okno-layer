@@ -292,7 +292,7 @@ Future<void> postToFireStore(
       FirebaseFirestore.instance.collection('VideosData').doc(timestamp);
   var reference2 = FirebaseFirestore.instance.collection('UsersData').doc(user);
   await reference.set({
-    "Approved": false,
+    "Approved": true,
     "Likes": [],
     "Thumbnail": thumbnail,
     "id": timestamp,
