@@ -61,22 +61,28 @@ class BrandVideos {
 
   Future<void> loadController() async {
     if (kIsWeb) {
-      controller = VideoPlayerController.network(url);
+      controller = VideoPlayerController.networkUrl(
+        Uri.parse(url),
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      );
       await controller?.initialize();
       controller?.setLooping(true);
     } else {
-      _cacheManager ??= CustomCacheManager.instance;
-      final fileInfo = await _cacheManager?.getFileFromCache(url);
-      if (fileInfo == null) {
-        unawaited(_cacheManager!.downloadFile(url));
-        controller = VideoPlayerController.network(url);
+      // _cacheManager ??= CustomCacheManager.instance;
+      // final fileInfo = await _cacheManager?.getFileFromCache(url);
+      // if (fileInfo == null) {
+      //unawaited(_cacheManager!.downloadFile(url));
+      controller = VideoPlayerController.networkUrl(
+        Uri.parse(url),
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      );
         await controller?.initialize();
         controller?.setLooping(true);
-      } else {
-        controller = VideoPlayerController.file(fileInfo.file);
-        await controller?.initialize();
-        controller?.setLooping(true);
-      }
+      // } else {
+      //   controller = VideoPlayerController.file(fileInfo.file);
+      //   await controller?.initialize();
+      //   controller?.setLooping(true);
+      // }
     }
   }
 

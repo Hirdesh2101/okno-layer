@@ -11,6 +11,7 @@ import './videoactiontoolbar.dart';
 import 'package:get_it/get_it.dart';
 import 'dart:async';
 import '../services/dynamic_linkstream.dart';
+import 'package:flutter_hls_parser/flutter_hls_parser.dart';
 import 'package:ionicons/ionicons.dart';
 import '../models/video.dart';
 import 'package:stacked/stacked.dart';

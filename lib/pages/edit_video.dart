@@ -306,33 +306,40 @@ class _VideoEditorState extends State<VideoEditor> {
           crops = filters[index].split(':');
         }
         return _page != 0
-            ? '-ss ${config.controller.startTrim} -i $videoPath -t ${config.controller.endTrim} -f lavfi -i color=${_getColorBackground(_page)}:s=${config.controller.croppedArea.width.toInt()}*${config.controller.croppedArea.height.toInt()} -filter_complex [0]crop=${config.controller.croppedArea.width.toInt()}:${config.controller.croppedArea.height.toInt()}:${crops[2]}:${crops[3]},rotate=angle=${config.controller.cacheRotation}*PI/180[a];[a][1]blend=shortest=1:all_mode=overlay:all_opacity=0.2 -preset ultrafast -y $outputPath'
-            : '-ss ${config.controller.startTrim} -i $videoPath -t ${config.controller.endTrim} -filter_complex [0]crop=${config.controller.croppedArea.width.toInt()}:${config.controller.croppedArea.height.toInt()}:${crops[2]}:${crops[3]},rotate=angle=${config.controller.cacheRotation}*PI/180 -preset ultrafast -y $outputPath';
+            ? '-ss ${config.controller.startTrim} -i $videoPath -t ${config.controller.endTrim} -f lavfi -i color=${_getColorBackground(_page)}:s=${config.controller.croppedArea.width.toInt()}*${config.controller.croppedArea.height.toInt()} -filter_complex [0]crop=${config.controller.croppedArea.width.toInt()}:${config.controller.croppedArea.height.toInt()}:${crops[2]}:${crops[3]},rotate=angle=${config.controller.cacheRotation}*PI/180[a];[a][1]blend=shortest=1:all_mode=overlay:all_opacity=0.2 -preset faster -y $outputPath'
+            : '-ss ${config.controller.startTrim} -i $videoPath -t ${config.controller.endTrim} -filter_complex [0]crop=${config.controller.croppedArea.width.toInt()}:${config.controller.croppedArea.height.toInt()}:${crops[2]}:${crops[3]},rotate=angle=${config.controller.cacheRotation}*PI/180 -preset faster -y $outputPath';
       },
     );
     // Returns the generated command and the output path
-    final executeConfig = await config.getExecuteConfig();
-    try {
-      await FFmpegKit.execute(executeConfig.command)
-          .then((value) => {file = File(executeConfig.outputPath)});
-      // await ExportService.runFFmpegCommand(
-      //   executeConfig,
-      //   onProgress: (stats) {
-      //     _exportingProgress.value =
-      //         stats.getTime() / _controller.video.value.duration.inMilliseconds;
-      //   },
-      //   onError: (e, s) =>
-      //       Fluttertoast.showToast(msg: '"Error on export video :("'),
-      //   onCompleted: (fileout) {
-      //     _isExporting.value = false;
-      //     if (!mounted) return;
-      //     file = fileout;
-      //   },
-      // );
-    } catch (error, stackTrace) {
-      // Handle error if needed
-      print("Error exporting video: $error");
-      print(stackTrace);
+    final filtersApplied = config.getExportFilters().isNotEmpty;
+    if (filtersApplied || _page != 0) {
+      final executeConfig = await config.getExecuteConfig();
+      try {
+        await FFmpegKit.execute(executeConfig.command)
+            .then((value) => {file = File(executeConfig.outputPath)});
+        _isExporting.value = false;
+        setState(() => _exported = true);
+        Misc.delayed(18000, () => setState(() => _exported = false));
+        return file;
+        // await ExportService.runFFmpegCommand(
+        //   executeConfig,
+        //   onProgress: (stats) {
+        //     _exportingProgress.value =
+        //         stats.getTime() / _controller.video.value.duration.inMilliseconds;
+        //   },
+        //   onError: (e, s) =>
+        //       Fluttertoast.showToast(msg: '"Error on export video :("'),
+        //   onCompleted: (fileout) {
+        //     _isExporting.value = false;
+        //     if (!mounted) return;
+        //     file = fileout;
+        //   },
+        // );
+      } catch (error, stackTrace) {
+        // Handle error if needed
+        print("Error exporting video: $error");
+        print(stackTrace);
+      }
     }
 
     // final Directory? appDirectory = await getExternalStorageDirectory();
@@ -364,10 +371,8 @@ class _VideoEditorState extends State<VideoEditor> {
     //     await file!.delete();
     //   }
     // }
-    _isExporting.value = false;
-    setState(() => _exported = true);
-    Misc.delayed(18000, () => setState(() => _exported = false));
-    return file;
+
+    return widget.file;
   }
 
   void _exportCover() async {
