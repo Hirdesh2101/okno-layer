@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,7 +18,6 @@ class SharedVideo extends StatefulWidget {
 class _SharedVideoState extends State<SharedVideo> {
   Video? finalVideo;
   bool isLoading = true;
-  final feedViewModel = GetIt.instance<FeedViewModel>();
   final _firebase = FirebaseFirestore.instance.collection("VideosData");
   Future<Video> addtoTop(dynamic doc) async {
     Video? sharedVideo;
@@ -30,6 +29,7 @@ class _SharedVideoState extends State<SharedVideo> {
   }
 
   void init() async {
+    final feedViewModel = Provider.of<FeedViewModel>(context,listen: false);
     feedViewModel.pauseDrawer();
     finalVideo = await addtoTop(widget.id);
     await finalVideo!.loadController().whenComplete(() {
@@ -54,6 +54,7 @@ class _SharedVideoState extends State<SharedVideo> {
 
   @override
   Widget build(BuildContext context) {
+    final feedViewModel = Provider.of<FeedViewModel>(context,listen: false);
     return Scaffold(
       body: Container(
         padding: MediaQuery.of(context).padding,

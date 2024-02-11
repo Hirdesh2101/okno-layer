@@ -1,23 +1,14 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cache_service.dart';
-import '../providers/likedvideoprovider.dart';
-import '../providers/myvideosprovider.dart';
-import '../services/web_placeholder.dart';
-import '../providers/filter_provider.dart';
 import '../services/launch_url.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../firebase functions/sidebar_fun.dart';
 
 class ProductDetails {
-  final feedViewModel = GetIt.instance<FeedViewModel>();
-  final feedViewModel2 = GetIt.instance<LikeProvider>();
-  final feedViewModel3 = GetIt.instance<MyVideosProvider>();
-  final feedViewModel4 = GetIt.instance<FilterViewModel>();
   SideBarFirebase firebasefun = SideBarFirebase();
 
   Future<String> getname(String id) async {
@@ -30,8 +21,8 @@ class ProductDetails {
     });
   }
 
-  void sheet(context, int index, bool likedVideo, bool myVideo,
-      bool filterVideo) async {
+  void sheet(context, int index) async {
+    final feedViewModel = Provider.of<FeedViewModel>(context, listen: false);
     showModalBottomSheet(
         context: context,
         //barrierColor: Colors.black.withOpacity(0.3),
@@ -84,56 +75,15 @@ class ProductDetails {
                                 Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(9, 18, 9, 18),
-                                  child: kIsWeb
-                                      ? FadeInImage.memoryNetwork(
-                                          placeholder: kTransparentImage,
-                                          image: likedVideo || myVideo
-                                              ? likedVideo
-                                                  ? feedViewModel2.videoSource!
-                                                      .listData[index].product1
-                                                  : feedViewModel3.videoSource!
-                                                      .listData[index].product1
-                                              : filterVideo
-                                                  ? feedViewModel4
-                                                      .videoSource!
-                                                      .listVideos[index]
-                                                      .product1
-                                                  : feedViewModel
-                                                      .videoSource!
-                                                      .listVideos[index]
-                                                      .product1,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.2,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.2,
-                                          fit: BoxFit.contain,
-                                        )
-                                      : CachedNetworkImage(
+                                  child: CachedNetworkImage(
                                           placeholder: (context, url) =>
                                               Container(
                                                   //color: Colors.grey,
                                                   ),
                                           cacheManager:
                                               CustomCacheManager.instance2,
-                                          imageUrl: likedVideo || myVideo
-                                              ? likedVideo
-                                                  ? feedViewModel2.videoSource!
-                                                      .listData[index].product1
-                                                  : feedViewModel3.videoSource!
-                                                      .listData[index].product1
-                                              : filterVideo
-                                                  ? feedViewModel4
-                                                      .videoSource!
-                                                      .listVideos[index]
-                                                      .product1
-                                                  : feedViewModel
-                                                      .videoSource!
-                                                      .listVideos[index]
-                                                      .product1,
+                                          imageUrl: feedViewModel
+                                              .listVideos[index].product1,
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
@@ -145,22 +95,12 @@ class ProductDetails {
                                           fit: BoxFit.contain,
                                         ),
                                 ),
-                                Text(likedVideo || myVideo
-                                    ? likedVideo
-                                        ? feedViewModel2
-                                            .videoSource!.listData[index].p1name
-                                        : feedViewModel3
-                                            .videoSource!.listData[index].p1name
-                                    : filterVideo
-                                        ? feedViewModel4.videoSource!
-                                            .listVideos[index].p1name
-                                        : feedViewModel.videoSource!
-                                            .listVideos[index].p1name),
+                                Text(feedViewModel.listVideos[index].p1name),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Text(
-                                    'Price - ₹${likedVideo || myVideo ? likedVideo ? feedViewModel2.videoSource!.listData[index].price : feedViewModel3.videoSource!.listData[index].price : filterVideo ? feedViewModel4.videoSource!.listVideos[index].price : feedViewModel.videoSource!.listVideos[index].price}'),
+                                    'Price - ₹${feedViewModel.listVideos[index].price}'),
                               ],
                             ),
                           ),
@@ -177,42 +117,17 @@ class ProductDetails {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                         onPressed: () async {
-                          final url = likedVideo || myVideo
-                              ? likedVideo
-                                  ? feedViewModel2
-                                      .videoSource!.listData[index].store
-                                  : feedViewModel3
-                                      .videoSource!.listData[index].store
-                              : filterVideo
-                                  ? feedViewModel4
-                                      .videoSource!.listVideos[index].store
-                                  : feedViewModel
-                                      .videoSource!.listVideos[index].store;
+                          final url = feedViewModel.listVideos[index].store;
                           launchURL(context, url);
-                          await firebasefun.viewedUrl(likedVideo
-                              ? feedViewModel2.videoSource!.listData[index].id
-                              : filterVideo
-                                  ? feedViewModel4
-                                      .videoSource!.listVideos[index].id
-                                      .trim()
-                                  : feedViewModel
-                                      .videoSource!.listVideos[index].id
-                                      .trim());
+                          await firebasefun.viewedUrl(
+                              feedViewModel.listVideos[index].id.trim());
                         },
                         child: const Text('Visit Store')),
                   )),
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                 child: FutureBuilder(
-                    future: getname(likedVideo || myVideo
-                        ? likedVideo
-                            ? feedViewModel2.videoSource!.listData[index].seller
-                            : feedViewModel3.videoSource!.listData[index].seller
-                        : filterVideo
-                            ? feedViewModel4
-                                .videoSource!.listVideos[index].seller
-                            : feedViewModel
-                                .videoSource!.listVideos[index].seller),
+                    future: getname(feedViewModel.listVideos[index].seller),
                     builder: (context, snapsot) {
                       if (snapsot.connectionState == ConnectionState.waiting) {
                         return const Text('Loading');
@@ -222,12 +137,6 @@ class ProductDetails {
               ),
             ],
           );
-        }).whenComplete(() => likedVideo || myVideo
-        ? likedVideo
-            ? feedViewModel2.playVideo(index)
-            : feedViewModel3.playDrawer(false, false)
-        : filterVideo
-            ? feedViewModel4.playVideo(index)
-            : feedViewModel.playVideo(index));
+        }).whenComplete(() => feedViewModel.playVideo(index));
   }
 }

@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:get_it/get_it.dart';
 import 'package:oknoapp/pages/shared_video.dart';
-import '../providers/feedviewprovider.dart';
-import './dynamic_linkstream.dart';
 
 class DynamicLinkService {
-  final feedViewModel = GetIt.instance<FeedViewModel>();
   Future<void> retrieveDynamicLink(BuildContext context) async {
     final PendingDynamicLinkData? data =
         await FirebaseDynamicLinks.instance.getInitialLink();

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 final darkTheme = ThemeData(
   primaryColor: Colors.black,
-  //brightness: Brightness.dark,
-  backgroundColor: Colors.black,
   appBarTheme: const AppBarTheme(
       titleTextStyle: TextStyle(color: Colors.white),
       actionsIconTheme: IconThemeData(color: Colors.white),
@@ -28,16 +26,13 @@ final darkTheme = ThemeData(
     ),
   ),
   cardColor: Colors.grey[800],
-  colorScheme: ColorScheme.fromSwatch()
-      .copyWith(secondary: Colors.white, brightness: Brightness.dark),
   textSelectionTheme:
-      const TextSelectionThemeData(selectionColor: Colors.white54),
+      const TextSelectionThemeData(selectionColor: Colors.white54), colorScheme: ColorScheme.fromSwatch()
+      .copyWith(secondary: Colors.white, brightness: Brightness.dark).copyWith(background: Colors.black),
 );
 
 final lightTheme = ThemeData(
   primaryColor: Colors.white,
-  //brightness: Brightness.light,
-  backgroundColor: Colors.white,
   appBarTheme: const AppBarTheme(
       titleTextStyle: TextStyle(color: Colors.black),
       actionsIconTheme: IconThemeData(color: Colors.black),
@@ -62,10 +57,9 @@ final lightTheme = ThemeData(
     ),
   ),
   cardColor: Colors.grey[500],
-  colorScheme: ColorScheme.fromSwatch()
-      .copyWith(secondary: Colors.black, brightness: Brightness.light),
   textSelectionTheme:
-      const TextSelectionThemeData(selectionColor: Colors.black38),
+      const TextSelectionThemeData(selectionColor: Colors.black38), colorScheme: ColorScheme.fromSwatch()
+      .copyWith(secondary: Colors.black, brightness: Brightness.light).copyWith(background: Colors.white),
 );
 
 const kFontWeightBoldTextStyle = TextStyle(fontWeight: FontWeight.bold);

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:oknoapp/pages/userimage_set.dart';
+import 'package:oknoapp/pages/homepage.dart';
 import './auth_form_register.dart';
 
 class Register extends StatefulWidget {
@@ -54,7 +54,7 @@ class _RegisterState extends State<Register> {
         'BrandEnabled': false,
         'BrandAssociated': [],
       });
-      Navigator.of(context).pushReplacementNamed(SetProfileImage.routeName);
+      Navigator.of(context).pushReplacementNamed(HomePage.routeName);
     } on FirebaseAuthException catch (err) {
       var message = '${err.message}';
       ScaffoldMessenger.of(ctx).showSnackBar(
@@ -63,7 +63,7 @@ class _RegisterState extends State<Register> {
             message,
             style: const TextStyle(color: Colors.white),
           ),
-          backgroundColor: Theme.of(ctx).errorColor,
+          backgroundColor: Theme.of(ctx).colorScheme.error,
         ),
       );
       setState(() {
