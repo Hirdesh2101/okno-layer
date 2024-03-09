@@ -14,6 +14,7 @@ class Video {
   String price;
   String p1name;
   String store;
+  bool showProduct;
 
   VideoPlayerController? controller;
   BaseCacheManager? _cacheManager;
@@ -26,7 +27,9 @@ class Video {
       required this.seller,
       required this.p1name,
       required this.store,
-      required this.price});
+      required this.price,
+      required this.showProduct,
+      });
 
   Video.fromJson(Map<dynamic, dynamic> json)
       : id = json['id'],
@@ -36,6 +39,7 @@ class Video {
         product2 = json['product2'],
         seller = json['seller'],
         store = json['store'],
+        showProduct = json['showProduct']?? false,
         price = json['price'];
 
   Map<String, dynamic> toJson() {
@@ -48,6 +52,7 @@ class Video {
     data['seller'] = seller;
     data['store'] = store;
     data['price'] = price;
+    data['showProduct'] = showProduct;
     return data;
   }
 

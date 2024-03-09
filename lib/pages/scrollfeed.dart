@@ -1,20 +1,13 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:oknoapp/firebase%20functions/sidebar_fun.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:video_player/video_player.dart';
 import './videoactiontoolbar.dart';
-import 'dart:async';
 import '../models/video.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import '../services/dynamic_link.dart';
+// import '../services/dynamic_link.dart';
 
 // ignore: must_be_immutable
 class ScrollFeed extends StatefulWidget {
@@ -26,7 +19,7 @@ class ScrollFeed extends StatefulWidget {
 
 class _ScrollFeedState extends State<ScrollFeed> {
   final SideBarFirebase firebaseServices = SideBarFirebase();
-  final DynamicLinkService _dynamicLinkService = DynamicLinkService();
+  // final DynamicLinkService _dynamicLinkService = DynamicLinkService();
   bool loadingNotification = false;
   String? dynamicId = '';
   //Stream stream = controller.stream;
@@ -368,6 +361,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
                             context,
                             countList,
                             selectedCountList,
+                            feedViewModel.listVideos[index].showProduct,
                           ),
                           feedViewModel.creatingLink!
                               ? const Center(child: CircularProgressIndicator())

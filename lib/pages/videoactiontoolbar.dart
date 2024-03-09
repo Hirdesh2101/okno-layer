@@ -18,8 +18,9 @@ class ActionToolBar extends StatefulWidget {
   final List<String> countList;
   final List<String> selectedCountList;
   final BuildContext context;
+  final bool showProduct;
   const ActionToolBar(
-      this.index, this.context, this.countList, this.selectedCountList,
+      this.index, this.context, this.countList, this.selectedCountList,this.showProduct,
       {Key? key})
       : super(key: key);
 
@@ -40,6 +41,7 @@ class _ActionToolBarState extends State<ActionToolBar> {
   Widget build(BuildContext context) {
     final feedViewModel = Provider.of<FeedViewModel>(context,listen: false);
     return Stack(children: [
+      if(widget.showProduct)
       Align(
         alignment: Alignment.bottomCenter,
         child: OutlinedButton(
