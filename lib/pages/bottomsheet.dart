@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +13,8 @@ class ProductDetails {
   SideBarFirebase firebasefun = SideBarFirebase();
 
   Future<String> getname(String id) async {
-    return await FirebaseFirestore.instance
+  FirebaseApp otherFirebase = Firebase.app('okno');
+    return await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('BrandData')
         .doc(id.trim())
         .get()

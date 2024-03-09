@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:oknoapp/data/demodata.dart';
 import 'package:oknoapp/models/video.dart';
@@ -18,7 +19,8 @@ class FeedViewModel extends ChangeNotifier {
   List? userlist;
   final _sorting = MergeSort();
   final _search = BinarySearch();
-  final _firebase = FirebaseFirestore.instance.collection("VideosData");
+  FirebaseApp otherFirebase = Firebase.app('okno');
+  final _firebase = FirebaseFirestore.instanceFor(app: Firebase.app('okno')).collection("VideosData");
 
   List<Video> shuffle1(List<Video> items) {
     items.shuffle();
@@ -58,11 +60,11 @@ class FeedViewModel extends ChangeNotifier {
 
   Future<void> delete() async {
     var obj2 = [];
-    await FirebaseFirestore.instance
+    await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('UsersData')
         .doc(user)
         .update({'WatchedVideo': FieldValue.delete()});
-    await FirebaseFirestore.instance
+    await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('UsersData')
         .doc(user)
         .update({'WatchedVideo': FieldValue.arrayUnion(obj2)});
@@ -87,7 +89,7 @@ class FeedViewModel extends ChangeNotifier {
 
   Future<List> _viewedProduct() async {
     List? userlist2 = [];
-    await FirebaseFirestore.instance
+    await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('UsersData')
         .doc(user)
         .get()
@@ -162,6 +164,7 @@ class FeedViewModel extends ChangeNotifier {
 
   initial() async {
     await _initializeControllerAtIndex(0);
+    notifyListeners();
 
     /// Play 1st video
     _playControllerAtIndex(0);
@@ -299,16 +302,16 @@ class FeedViewModel extends ChangeNotifier {
 
   Future<void> disposingall() async {
     if (listVideos[currentscreen].controller != null) {
-      await listVideos[currentscreen].controller?.dispose();
+      listVideos[currentscreen].dispose();
     }
     if (currentscreen + 1 < listVideos.length) {
       if (listVideos[currentscreen + 1].controller != null) {
-        await listVideos[currentscreen + 1].controller?.dispose();
+        listVideos[currentscreen + 1].dispose();
       }
     }
     if (currentscreen - 1 >= 0) {
       if (listVideos[currentscreen - 1].controller != null) {
-        await listVideos[currentscreen - 1].controller?.dispose();
+        listVideos[currentscreen - 1].dispose();
       }
     }
     //notifyListeners();

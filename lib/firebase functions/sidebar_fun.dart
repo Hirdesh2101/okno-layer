@@ -1,69 +1,53 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class SideBarFirebase {
   final user = FirebaseAuth.instance.currentUser!.uid;
+  FirebaseApp otherFirebase = Firebase.app('okno');
 
   Future<void> add(dynamic docu, bool contains) async {
     var obj = [user];
     var obj2 = [docu];
     if (contains) {
-      await FirebaseFirestore.instance
+      await FirebaseFirestore.instanceFor(app: otherFirebase)
           .collection('VideosData')
           .doc(docu)
           .update({'Likes': FieldValue.arrayRemove(obj)});
-      await FirebaseFirestore.instance
+      await FirebaseFirestore.instanceFor(app: otherFirebase)
           .collection('UsersData')
           .doc(user)
           .update({'Likes': FieldValue.arrayRemove(obj2)});
     } else {
-      await FirebaseFirestore.instance
+      await FirebaseFirestore.instanceFor(app: otherFirebase)
           .collection('VideosData')
           .doc(docu.toString().trim())
           .update({'Likes': FieldValue.arrayUnion(obj)});
 
-      await FirebaseFirestore.instance
+      await FirebaseFirestore.instanceFor(app: otherFirebase)
           .collection('UsersData')
           .doc(user)
           .update({'Likes': FieldValue.arrayUnion(obj2)});
     }
   }
 
-  Future<void> removeSaved(dynamic docu) async {
-    var obj2 = [docu];
-
-    await FirebaseFirestore.instance
-        .collection('UsersData')
-        .doc(user)
-        .update({'Saved': FieldValue.arrayRemove(obj2)});
-  }
-
-  Future<void> removeMyVideo(dynamic docu) async {
-    //var obj2 = [docu];
-
-    await FirebaseFirestore.instance
-        .collection('VideosData')
-        .doc(docu.trim())
-        .update({'deleted': true});
-  }
-
   Future<void> watchedVideo(dynamic docu) async {
     var obj = [docu];
     var obj2 = [user];
-    await FirebaseFirestore.instance.collection('UsersData').doc(user).update(
+    await FirebaseFirestore.instanceFor(app: otherFirebase).collection('UsersData').doc(user).update(
         {'WatchedVideo': FieldValue.arrayUnion(obj)}).whenComplete(() {});
-    FirebaseFirestore.instance
+    FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('VideosDataAdmin')
         .doc(docu)
         .get()
         .then((snapshot) {
       if (snapshot.exists) {
-        FirebaseFirestore.instance
+        FirebaseFirestore.instanceFor(app: otherFirebase)
             .collection('VideosDataAdmin')
             .doc(docu)
             .update({'WatchedVideo': FieldValue.arrayUnion(obj2)});
       } else {
-        FirebaseFirestore.instance
+        FirebaseFirestore.instanceFor(app: otherFirebase)
             .collection('VideosDataAdmin')
             .doc(docu)
             .set({'WatchedVideo': FieldValue.arrayUnion(obj2)});
@@ -73,18 +57,18 @@ class SideBarFirebase {
 
   Future<void> reportVideo(dynamic docu) async {
     var obj2 = [user];
-    FirebaseFirestore.instance
+    FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('VideosDataAdmin')
         .doc(docu)
         .get()
         .then((snapshot) {
       if (snapshot.exists) {
-        FirebaseFirestore.instance
+        FirebaseFirestore.instanceFor(app: otherFirebase)
             .collection('VideosDataAdmin')
             .doc(docu)
             .update({'ReportedBy': FieldValue.arrayUnion(obj2)});
       } else {
-        FirebaseFirestore.instance
+        FirebaseFirestore.instanceFor(app: otherFirebase)
             .collection('VideosDataAdmin')
             .doc(docu)
             .set({'ReportedBy': FieldValue.arrayUnion(obj2)});
@@ -92,24 +76,15 @@ class SideBarFirebase {
     });
   }
 
-  Future<void> brandreportVideo(dynamic docu) async {
-    await FirebaseFirestore.instance.collection('Requests').doc(docu).set({
-      'video': docu,
-      'timestamp': DateTime.now(),
-      'user': user,
-      'report': true,
-    });
-  }
-
   Future<void> saveVideo(dynamic docu) async {
     var obj2 = [docu];
-    FirebaseFirestore.instance
+    FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('UsersData')
         .doc(user)
         .get()
         .then((snapshot) {
       if (snapshot.exists) {
-        FirebaseFirestore.instance
+        FirebaseFirestore.instanceFor(app: otherFirebase)
             .collection('UsersData')
             .doc(user)
             .update({'Saved': FieldValue.arrayUnion(obj2)});
@@ -125,38 +100,38 @@ class SideBarFirebase {
       }
     ];
     var storeid = '';
-    await FirebaseFirestore.instance
+    await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('VideosData')
         .doc(docu)
         .get()
         .then((value) {
       storeid = value.data()!['seller'];
     });
-    await FirebaseFirestore.instance
+    await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('VideosData')
         .doc(docu)
         .get()
         .then((value) async {
       if (value.data()!['userupload'] && value.data()!['uploadedby'] != user ||
           !value.data()!['userupload']) {
-        await FirebaseFirestore.instance
+        await FirebaseFirestore.instanceFor(app: otherFirebase)
             .collection('UsersData')
             .doc(user)
             .get()
             .then((value2) async {
           if (!value2.data()!['BrandAssociated'].contains(storeid)) {
-            await FirebaseFirestore.instance
+            await FirebaseFirestore.instanceFor(app: otherFirebase)
                 .collection('VideosDataAdmin')
                 .doc(docu)
                 .get()
                 .then((snapshot) async {
               if (snapshot.exists) {
-                await FirebaseFirestore.instance
+                await FirebaseFirestore.instanceFor(app: otherFirebase)
                     .collection('VideosDataAdmin')
                     .doc(docu)
                     .update({'ViewedProduct': FieldValue.arrayUnion(obj)});
               } else {
-                await FirebaseFirestore.instance
+                await FirebaseFirestore.instanceFor(app: otherFirebase)
                     .collection('VideosDataAdmin')
                     .doc(docu)
                     .set({'ViewedProduct': FieldValue.arrayUnion(obj)});
@@ -177,7 +152,7 @@ class SideBarFirebase {
     ];
     var storeid = '';
     double? finalprice;
-    await FirebaseFirestore.instance
+    await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('VideosData')
         .doc(docu)
         .get()
@@ -186,26 +161,26 @@ class SideBarFirebase {
       var price = value.data()!['value'];
       finalprice = double.parse('$price');
     });
-    await FirebaseFirestore.instance
+    await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('VideosData')
         .doc(docu)
         .get()
         .then((value) async {
       if (value.data()!['userupload'] && value.data()!['uploadedby'] != user ||
           !value.data()!['userupload']) {
-        await FirebaseFirestore.instance
+        await FirebaseFirestore.instanceFor(app: otherFirebase)
             .collection('UsersData')
             .doc(user)
             .get()
             .then((value2) async {
           if (!value2.data()!['BrandAssociated'].contains(storeid)) {
-            await FirebaseFirestore.instance
+            await FirebaseFirestore.instanceFor(app: otherFirebase)
                 .collection('VideosDataAdmin')
                 .doc(docu)
                 .get()
                 .then((snapshot) async {
               if (snapshot.exists) {
-                await FirebaseFirestore.instance
+                await FirebaseFirestore.instanceFor(app: otherFirebase)
                     .collection('VideosDataAdmin')
                     .doc(docu)
                     .update({'ViewedUrl': FieldValue.arrayUnion(obj)});
@@ -215,7 +190,7 @@ class SideBarFirebase {
         });
       }
     });
-    await FirebaseFirestore.instance
+    await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('VideosData')
         .doc(docu)
         .get()
@@ -224,7 +199,7 @@ class SideBarFirebase {
         if (value.data()!['uploadedby'] != user) {
           var user = value.data()!['uploadedby'];
           var price = value.data()!['value'];
-          await FirebaseFirestore.instance
+          await FirebaseFirestore.instanceFor(app: otherFirebase)
               .collection('UsersData')
               .doc(user)
               .get()
@@ -232,7 +207,7 @@ class SideBarFirebase {
             if (!value2.data()!['BrandAssociated'].contains(storeid)) {
               double finalprice = double.parse('$price');
               double balance = 0;
-              await FirebaseFirestore.instance
+              await FirebaseFirestore.instanceFor(app: otherFirebase)
                   .collection('UsersData')
                   .doc(user)
                   .get()
@@ -240,7 +215,7 @@ class SideBarFirebase {
                 balance = (value.data()!['Balance']);
                 balance += finalprice;
               });
-              await FirebaseFirestore.instance
+              await FirebaseFirestore.instanceFor(app: otherFirebase)
                   .collection('UsersData')
                   .doc(user)
                   .update({'Balance': balance});
@@ -250,13 +225,13 @@ class SideBarFirebase {
       }
     });
 
-    await FirebaseFirestore.instance
+    await FirebaseFirestore.instanceFor(app: otherFirebase)
         .collection('UsersData')
         .doc(user)
         .get()
         .then((value) async {
       if (!value.data()!['BrandAssociated'].contains(storeid)) {
-        await FirebaseFirestore.instance
+        await FirebaseFirestore.instanceFor(app: otherFirebase)
             .collection('VideosData')
             .doc(docu)
             .get()
@@ -265,7 +240,7 @@ class SideBarFirebase {
                   value.data()!['uploadedby'] != user ||
               !value.data()!['userupload']) {
             double balance = 0;
-            await FirebaseFirestore.instance
+            await FirebaseFirestore.instanceFor(app: otherFirebase)
                 .collection('BrandData')
                 .doc(storeid)
                 .get()
@@ -274,50 +249,13 @@ class SideBarFirebase {
               balance = value1;
               balance -= finalprice!;
             });
-            await FirebaseFirestore.instance
+            await FirebaseFirestore.instanceFor(app: otherFirebase)
                 .collection('BrandData')
                 .doc(storeid)
                 .update({'balance': balance});
           }
         });
       }
-    });
-  }
-
-  Future<void> encashedSub(var phoneNumber) async {
-    double balance = 0.0;
-    double enchashed = 0.0;
-    await FirebaseFirestore.instance
-        .collection('UsersData')
-        .doc(user)
-        .get()
-        .then((value) {
-      balance = (value.data()!['Balance']).toDouble();
-      enchashed = (value.data()!['Encashed']).toDouble();
-    });
-    await FirebaseFirestore.instance.collection('Requests').doc().set({
-      'Amount': balance,
-      'timestamp': DateTime.now(),
-      'paytmNo': phoneNumber,
-      'id': user,
-    });
-    await FirebaseFirestore.instance
-        .collection('UsersData')
-        .doc(user)
-        .update({'Encashed': balance + enchashed});
-    await FirebaseFirestore.instance
-        .collection('UsersData')
-        .doc(user)
-        .update({'Balance': 0.0});
-  }
-
-  Future<void> contactInfo(var email, var phoneNumber, var company) async {
-    await FirebaseFirestore.instance.collection('Requests').doc().set({
-      'email': email,
-      'timestamp': DateTime.now(),
-      'phoneno': phoneNumber,
-      'company': company,
-      'id': user,
     });
   }
 }

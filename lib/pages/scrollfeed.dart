@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:oknoapp/firebase%20functions/sidebar_fun.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
 import '../providers/feedviewprovider.dart';
 import 'package:video_player/video_player.dart';
@@ -24,7 +30,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
   bool loadingNotification = false;
   String? dynamicId = '';
   //Stream stream = controller.stream;
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  // final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   List<String> countList = [
     "Ethenics",
     "Western",
@@ -33,7 +39,7 @@ class _ScrollFeedState extends State<ScrollFeed> {
   ];
   List<String> selectedCountList = [];
 
-  Future<void> _handleBckground(RemoteMessage remoteMessage) async {}
+  // Future<void> _handleBckground(RemoteMessage remoteMessage) async {}
 
   final PageController pageController = PageController(
     keepPage: true,
@@ -329,15 +335,15 @@ class _ScrollFeedState extends State<ScrollFeed> {
                           height: MediaQuery.of(context).size.height,
                           child: const Center(
                             child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text('You Are All Caught Up'),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text('Pull To Refresh')
-                                    ],
-                                  ),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('You Are All Caught Up'),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text('Pull To Refresh')
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -352,8 +358,11 @@ class _ScrollFeedState extends State<ScrollFeed> {
                       scrollDirection: Axis.vertical,
                       itemBuilder: (context, index) {
                         return Stack(children: [
-                          videoCard(feedViewModel.listVideos[index],
-                              feedViewModel.listVideos[index].id),
+                          Align(
+                            alignment: AlignmentDirectional.bottomCenter,
+                            child: videoCard(feedViewModel.listVideos[index],
+                                feedViewModel.listVideos[index].id),
+                          ),
                           ActionToolBar(
                             index,
                             context,

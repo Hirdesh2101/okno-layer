@@ -1,39 +1,82 @@
 {
-	"project_info": {
-	  "project_number": "242796974269",
-	  "project_id": "okno-970d4",
-	  "storage_bucket": "okno-970d4.appspot.com"
-	},
-	"client": [
-	  {
-		"client_info": {
-		  "mobilesdk_app_id": "1:242796974269:android:a9b05a7fb362da6591a7d4",
-		  "android_client_info": {
-			"package_name": "com.example.oknoapp"
-		  }
-		},
-		"oauth_client": [
-		  {
-			"client_id": "242796974269-s6niu8k8slgfg17vm2rb677vm0djbgrq.apps.googleusercontent.com",
-			"client_type": 3
-		  }
-		],
-		"api_key": [
-		  {
-			"current_key": "AIzaSyAL10cBvs1bWWv3sQHHfsHCTxD-WvQZgMM"
-		  }
-		],
-		"services": {
-		  "appinvite_service": {
-			"other_platform_oauth_client": [
-			  {
-				"client_id": "242796974269-ona9nmcren8btbd1a095j06guaj1o58a.apps.googleusercontent.com",
-				"client_type": 3
-			  }
-			]
-		  }
-		}
-	  }
-	],
-	"configuration_version": "1"
-  }
+  "project_info": {
+    "project_number": "242796974269",
+    "project_id": "okno-970d4",
+    "storage_bucket": "okno-970d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:242796974269:android:c9af86d06cc0e80891a7d4",
+        "android_client_info": {
+          "package_name": "com.example.okno"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "242796974269-s6niu8k8slgfg17vm2rb677vm0djbgrq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAL10cBvs1bWWv3sQHHfsHCTxD-WvQZgMM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "242796974269-ona9nmcren8btbd1a095j06guaj1o58a.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "242796974269-gis5cce9qgaehb5ku7c80t8gaesp1a40.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.okno"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:242796974269:android:a9b05a7fb362da6591a7d4",
+        "android_client_info": {
+          "package_name": "com.example.oknoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "242796974269-s6niu8k8slgfg17vm2rb677vm0djbgrq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAL10cBvs1bWWv3sQHHfsHCTxD-WvQZgMM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "242796974269-ona9nmcren8btbd1a095j06guaj1o58a.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "242796974269-gis5cce9qgaehb5ku7c80t8gaesp1a40.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.okno"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

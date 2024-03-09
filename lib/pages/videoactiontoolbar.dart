@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oknoapp/pages/comments.dart';
@@ -31,6 +32,7 @@ class _ActionToolBarState extends State<ActionToolBar> {
   final SideBarFirebase firebaseServices = SideBarFirebase();
 
   final DynamicLinkService dynamicLinkService = DynamicLinkService();
+  FirebaseApp otherFirebase = Firebase.app('okno');
 
   bool _status = true;
 
@@ -100,7 +102,7 @@ class _ActionToolBarState extends State<ActionToolBar> {
           Expanded(
             child: FutureBuilder<QuerySnapshot>(
                 future:
-                    FirebaseFirestore.instance.collection('VideosData').get(),
+                    FirebaseFirestore.instanceFor(app: otherFirebase).collection('VideosData').get(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return IconButton(

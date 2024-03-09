@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,6 +17,7 @@ class _CommentsState extends State<Comments> {
   final TextEditingController _textEditingController = TextEditingController();
   //bool _isUploading = false;
   final user = FirebaseAuth.instance.currentUser;
+  FirebaseApp otherFirebase = Firebase.app('okno');
 
   @override
   void dispose() {
@@ -31,7 +33,7 @@ class _CommentsState extends State<Comments> {
       var obj = [
         {'Comment': _textEditingController.text.trim(), 'uid': user!.uid}
       ];
-      await FirebaseFirestore.instance
+      await FirebaseFirestore.instanceFor(app: otherFirebase)
           .collection('VideosData')
           .doc(widget.id.trim())
           .update({'Comments': FieldValue.arrayUnion(obj)});
@@ -65,7 +67,7 @@ class _CommentsState extends State<Comments> {
         children: [
           Expanded(
             child: StreamBuilder(
-                stream: FirebaseFirestore.instance
+                stream: FirebaseFirestore.instanceFor(app: otherFirebase)
                     .collection('VideosData')
                     .where('id', isEqualTo: widget.id.trim())
                     .snapshots(),
@@ -91,7 +93,7 @@ class _CommentsState extends State<Comments> {
                       return Column(
                         children: [
                           FutureBuilder(
-                              future: FirebaseFirestore.instance
+                              future: FirebaseFirestore.instanceFor(app: otherFirebase)
                                   .collection('UsersData')
                                   .doc(list[index]['uid'])
                                   .get(),

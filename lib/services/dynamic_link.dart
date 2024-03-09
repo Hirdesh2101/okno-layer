@@ -12,8 +12,8 @@ class DynamicLinkService {
       String? id;
       if (deepLink!.queryParameters.containsKey('id')) {
         id = deepLink.queryParameters['id']!;
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SharedVideo(id!)));
+        // Navigator.push(
+        //     context, MaterialPageRoute(builder: (context) => SharedVideo(id!)));
       } else {
         String? id;
         if (deepLink.queryParameters.containsKey('filter')) {
@@ -30,8 +30,8 @@ class DynamicLinkService {
       String? id;
       if (deepLink.queryParameters.containsKey('id')) {
         id = deepLink.queryParameters['id']!;
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SharedVideo(id!)));
+        // Navigator.push(
+        //     context, MaterialPageRoute(builder: (context) => SharedVideo(id!)));
       } else {
         if (deepLink.queryParameters.containsKey('filter')) {
           String? id;
